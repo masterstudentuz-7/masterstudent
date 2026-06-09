@@ -4,7 +4,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 
 import database as db
-from config import BANK_CARD, ADMIN_IDS
+from config import BANK_CARD, ADMIN_IDS, PAYME_TOKEN, CLICK_TOKEN
 from locales import get_text
 from keyboards.inline_kb import get_payment_amounts_kb, get_payment_method_kb, get_admin_payment_kb
 from keyboards.main_kb import get_main_menu_kb
@@ -56,20 +56,30 @@ async def payment_method_selected(callback: CallbackQuery, state: FSMContext):
     data = await state.get_data()
     amount = data["amount"]
     
-    if method in ["payme", "click"]:
-        # Automated payment (simplified - in production would redirect to payment gateway)
-        payment_id = await db.create_payment(user_id, amount, method)
-        # Auto-confirm for demo (in production, webhook would confirm)
-        result = await db.confirm_payment(payment_id)
+    if method == "payme":
+        # Payme — chek yuborilishi kerak, admin tasdiqlaydi
+        payment_id = await db.create_payment(user_id, amount, "payme")
+        await state.update_data(payment_id=payment_id)
+        await state.set_state(PaymentStates.waiting_receipt)
         
         await callback.message.edit_text(
-            get_text("payment_confirmed", lang, amount=amount),
+            get_text("payment_payme_info", lang, amount=amount),
             parse_mode="HTML"
         )
-        await state.clear()
+    
+    elif method == "click":
+        # Click — chek yuborilishi kerak, admin tasdiqlaydi
+        payment_id = await db.create_payment(user_id, amount, "click")
+        await state.update_data(payment_id=payment_id)
+        await state.set_state(PaymentStates.waiting_receipt)
+        
+        await callback.message.edit_text(
+            get_text("payment_click_info", lang, amount=amount),
+            parse_mode="HTML"
+        )
     
     elif method == "card":
-        # Bank card - manual confirmation
+        # Bank karta — chek yuborilishi kerak, admin tasdiqlaydi
         payment_id = await db.create_payment(user_id, amount, "card")
         await state.update_data(payment_id=payment_id)
         await state.set_state(PaymentStates.waiting_receipt)
@@ -84,7 +94,43 @@ async def payment_method_selected(callback: CallbackQuery, state: FSMContext):
 
 @router.message(PaymentStates.waiting_receipt, F.photo)
 async def payment_receipt_received(message: Message, state: FSMContext):
-    """Handle receipt photo."""
+    """Handle receipt photo — admin tasdiqlamaguncha balans to'ldirilMAYDI."""
+    user_id = message.from_user.id
+    lang = await db.get_user_language(user_id)
+    data = await state.get_data()
+    
+    # Mijozga xabar
+    await message.answer(
+        get_text("payment_pending", lang),
+        reply_markup=get_main_menu_kb(lang),
+        parse_mode="HTML"
+    )
+    
+    # Admin'larga chek yuborish — ular tasdiqlagunicha balans TO'LDIRILMAYDI
+    for admin_id in ADMIN_IDS:
+        try:
+            await message.bot.send_photo(
+                admin_id,
+                message.photo[-1].file_id,
+                caption=f"💳 <b>Yangi to'lov kutilmoqda!</b>\n\n"
+                        f"👤 @{message.from_user.username or user_id}\n"
+                        f"🆔 User ID: {user_id}\n"
+                        f"💰 Summa: <b>{data['amount']} so'm</b>\n"
+                        f"📋 Usul: {data.get('method', 'unknown')}\n"
+                        f"🆔 Payment ID: #{data['payment_id']}\n\n"
+                        f"⚠️ <b>Tasdiqlash uchun tugmani bosing!</b>",
+                reply_markup=get_admin_payment_kb(data["payment_id"]),
+                parse_mode="HTML"
+            )
+        except Exception:
+            pass
+    
+    await state.clear()
+
+
+@router.message(PaymentStates.waiting_receipt, F.document)
+async def payment_receipt_document(message: Message, state: FSMContext):
+    """Handle receipt as document."""
     user_id = message.from_user.id
     lang = await db.get_user_language(user_id)
     data = await state.get_data()
@@ -95,16 +141,17 @@ async def payment_receipt_received(message: Message, state: FSMContext):
         parse_mode="HTML"
     )
     
-    # Notify admins
     for admin_id in ADMIN_IDS:
         try:
-            await message.bot.send_photo(
+            await message.bot.send_document(
                 admin_id,
-                message.photo[-1].file_id,
-                caption=f"💳 <b>Yangi to'lov!</b>\n\n"
+                message.document.file_id,
+                caption=f"💳 <b>Yangi to'lov kutilmoqda!</b>\n\n"
                         f"👤 @{message.from_user.username or user_id}\n"
-                        f"💰 Summa: {data['amount']} so'm\n"
-                        f"🆔 Payment ID: #{data['payment_id']}",
+                        f"🆔 User ID: {user_id}\n"
+                        f"💰 Summa: <b>{data['amount']} so'm</b>\n"
+                        f"🆔 Payment ID: #{data['payment_id']}\n\n"
+                        f"⚠️ <b>Tasdiqlash uchun tugmani bosing!</b>",
                 reply_markup=get_admin_payment_kb(data["payment_id"]),
                 parse_mode="HTML"
             )
@@ -118,7 +165,10 @@ async def payment_receipt_received(message: Message, state: FSMContext):
 async def payment_receipt_text(message: Message, state: FSMContext):
     """Handle non-photo message while waiting for receipt."""
     lang = await db.get_user_language(message.from_user.id)
-    await message.answer("📷 Iltimos, chek rasmini yuboring!", parse_mode="HTML")
+    await message.answer(
+        "📷 Iltimos, to'lov chekining rasmini yoki screenshotini yuboring!",
+        parse_mode="HTML"
+    )
 
 
 @router.callback_query(F.data == "cancel_payment")

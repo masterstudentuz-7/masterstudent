@@ -341,25 +341,95 @@ Confirm?""",
     "btn_payme": {"uz": "💙 Payme", "ru": "💙 Payme", "en": "💙 Payme"},
     "btn_click": {"uz": "🟢 Click", "ru": "🟢 Click", "en": "🟢 Click"},
     "btn_bank_card": {"uz": "💳 Bank karta", "ru": "💳 Банк. карта", "en": "💳 Bank Card"},
+    "payment_payme_info": {
+        "uz": """💙 <b>Payme orqali to'lov</b>
+
+💰 Summa: <b>{amount} so'm</b>
+
+📋 <b>Qadamlar:</b>
+1. Payme ilovasini oching
+2. To'lovni amalga oshiring
+3. Chek/screenshot rasmini shu yerga yuboring
+
+⚠️ Admin tasdiqlagandan keyin balansingiz to'ldiriladi.""",
+        "ru": """💙 <b>Оплата через Payme</b>
+
+💰 Сумма: <b>{amount} сум</b>
+
+📋 <b>Шаги:</b>
+1. Откройте приложение Payme
+2. Произведите оплату
+3. Отправьте фото чека/скриншот сюда
+
+⚠️ Баланс пополнится после подтверждения админом.""",
+        "en": """💙 <b>Payme Payment</b>
+
+💰 Amount: <b>{amount} so'm</b>
+
+📋 <b>Steps:</b>
+1. Open Payme app
+2. Make the payment
+3. Send receipt/screenshot photo here
+
+⚠️ Balance will be topped up after admin confirmation.""",
+    },
+    "payment_click_info": {
+        "uz": """🟢 <b>Click orqali to'lov</b>
+
+💰 Summa: <b>{amount} so'm</b>
+
+📋 <b>Qadamlar:</b>
+1. Click ilovasini oching
+2. To'lovni amalga oshiring
+3. Chek/screenshot rasmini shu yerga yuboring
+
+⚠️ Admin tasdiqlagandan keyin balansingiz to'ldiriladi.""",
+        "ru": """🟢 <b>Оплата через Click</b>
+
+💰 Сумма: <b>{amount} сум</b>
+
+📋 <b>Шаги:</b>
+1. Откройте приложение Click
+2. Произведите оплату
+3. Отправьте фото чека/скриншот сюда
+
+⚠️ Баланс пополнится после подтверждения админом.""",
+        "en": """🟢 <b>Click Payment</b>
+
+💰 Amount: <b>{amount} so'm</b>
+
+📋 <b>Steps:</b>
+1. Open Click app
+2. Make the payment
+3. Send receipt/screenshot photo here
+
+⚠️ Balance will be topped up after admin confirmation.""",
+    },
     "payment_card_info": {
         "uz": """💳 <b>Bank karta orqali to'lov</b>
 
 Karta raqami: <code>{card}</code>
 Summa: <b>{amount} so'm</b>
 
-To'lovni amalga oshirgach, chek rasmini yuboring.""",
+To'lovni amalga oshirgach, chek rasmini yuboring.
+
+⚠️ Admin tasdiqlagandan keyin balansingiz to'ldiriladi.""",
         "ru": """💳 <b>Оплата банковской картой</b>
 
 Номер карты: <code>{card}</code>
 Сумма: <b>{amount} сум</b>
 
-После оплаты отправьте фото чека.""",
+После оплаты отправьте фото чека.
+
+⚠️ Баланс пополнится после подтверждения админом.""",
         "en": """💳 <b>Bank card payment</b>
 
 Card number: <code>{card}</code>
 Amount: <b>{amount} so'm</b>
 
-After payment, send a photo of the receipt.""",
+After payment, send a photo of the receipt.
+
+⚠️ Balance will be topped up after admin confirmation.""",
     },
     "payment_pending": {
         "uz": "⏳ To'lovingiz admin tomonidan tekshirilmoqda...",
@@ -517,6 +587,26 @@ Your link:
         "uz": "📞 <b>Bog'lanish</b>\n\nQuyidagilardan birini tanlang:",
         "ru": "📞 <b>Связаться</b>\n\nВыберите один из вариантов:",
         "en": "📞 <b>Contact</b>\n\nChoose one of the options:",
+    },
+    "contact_admin_text": {
+        "uz": "📞 <b>Admin bilan bog'lanish</b>\n\n👤 Admin: {support}\n\nShu yerga yozing yoki admin'ga to'g'ridan-to'g'ri murojaat qiling.",
+        "ru": "📞 <b>Связаться с админом</b>\n\n👤 Админ: {support}\n\nНапишите здесь или свяжитесь с админом напрямую.",
+        "en": "📞 <b>Contact Admin</b>\n\n👤 Admin: {support}\n\nWrite here or contact admin directly.",
+    },
+    "suggestion_prompt": {
+        "uz": "💬 <b>Taklif yuborish</b>\n\nTaklifingizni yozing, biz albatta ko'rib chiqamiz!\n\n(Ortga qaytish uchun ⬅️ tugmasini bosing)",
+        "ru": "💬 <b>Отправить предложение</b>\n\nНапишите ваше предложение, мы обязательно рассмотрим!\n\n(Для возврата нажмите ⬅️)",
+        "en": "💬 <b>Send Suggestion</b>\n\nWrite your suggestion, we'll review it!\n\n(Press ⬅️ to go back)",
+    },
+    "report_prompt": {
+        "uz": "⚠️ <b>Muammo haqida xabar</b>\n\nMuammoni yozing, biz tez orada hal qilamiz!\n\n(Ortga qaytish uchun ⬅️ tugmasini bosing)",
+        "ru": "⚠️ <b>Сообщить о проблеме</b>\n\nОпишите проблему, мы решим её в ближайшее время!\n\n(Для возврата нажмите ⬅️)",
+        "en": "⚠️ <b>Report Issue</b>\n\nDescribe the issue, we'll fix it soon!\n\n(Press ⬅️ to go back)",
+    },
+    "channel_link": {
+        "uz": "📢 <b>Bizning kanal:</b>\n\n👉 {channel}\n\nObuna bo'ling va yangiliklar, aksiyalardan xabardor bo'ling!",
+        "ru": "📢 <b>Наш канал:</b>\n\n👉 {channel}\n\nПодпишитесь и будьте в курсе новостей и акций!",
+        "en": "📢 <b>Our channel:</b>\n\n👉 {channel}\n\nSubscribe and stay updated on news and promotions!",
     },
     "btn_admin_contact": {"uz": "📞 Admin", "ru": "📞 Админ", "en": "📞 Admin"},
     "btn_suggestion": {"uz": "💬 Taklif yuborish", "ru": "💬 Предложение", "en": "💬 Suggestion"},

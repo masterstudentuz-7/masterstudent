@@ -156,6 +156,49 @@ async def menu_contact(message: Message):
     )
 
 
+@router.message(F.text.in_(["📞 Admin", "📞 Админ", "📞 Admin"]))
+async def contact_admin(message: Message):
+    """Contact admin."""
+    lang = await db.get_user_language(message.from_user.id)
+    await message.answer(
+        get_text("contact_admin_text", lang, support=SUPPORT_USERNAME),
+        parse_mode="HTML"
+    )
+
+
+@router.message(F.text.in_(["💬 Taklif yuborish", "💬 Предложение", "💬 Suggestion"]))
+async def contact_suggestion(message: Message, state):
+    """Send suggestion."""
+    from aiogram.fsm.context import FSMContext
+    lang = await db.get_user_language(message.from_user.id)
+    await message.answer(
+        get_text("suggestion_prompt", lang),
+        reply_markup=get_back_kb(lang),
+        parse_mode="HTML"
+    )
+
+
+@router.message(F.text.in_(["⚠️ Muammo xabari", "⚠️ Сообщить о проблеме", "⚠️ Report Issue"]))
+async def contact_report(message: Message):
+    """Report issue."""
+    lang = await db.get_user_language(message.from_user.id)
+    await message.answer(
+        get_text("report_prompt", lang),
+        reply_markup=get_back_kb(lang),
+        parse_mode="HTML"
+    )
+
+
+@router.message(F.text.in_(["📢 Kanal", "📢 Канал", "📢 Channel"]))
+async def contact_channel(message: Message):
+    """Show channel link."""
+    lang = await db.get_user_language(message.from_user.id)
+    await message.answer(
+        get_text("channel_link", lang, channel=CHANNEL_ID),
+        parse_mode="HTML"
+    )
+
+
 @router.message(F.text.in_(["👤 Profil", "👤 Профиль", "👤 Profile"]))
 async def menu_profile(message: Message):
     """Show user profile."""
