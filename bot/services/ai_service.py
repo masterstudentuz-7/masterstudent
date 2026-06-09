@@ -344,7 +344,11 @@ Return ONLY valid JSON array, no other text, no markdown."""
             content = content[:-3]
     content = content.strip()
     
-    return json.loads(content)
+    try:
+        return json.loads(content)
+    except json.JSONDecodeError as e:
+        logger.error(f"PPT JSON parse error: {e}\nContent preview: {content[:200]}")
+        raise Exception(f"AI noto'g'ri format qaytardi (JSONDecodeError)")
 
 
 async def create_ppt_file(topic: str, slides_count: int, design: str, purpose: str, lang: str, extra: str = "") -> io.BytesIO:
@@ -479,7 +483,11 @@ Return ONLY valid JSON, no markdown formatting."""
             content = content[:-3]
     content = content.strip()
     
-    return json.loads(content)
+    try:
+        return json.loads(content)
+    except json.JSONDecodeError as e:
+        logger.error(f"Document JSON parse error: {e}\nContent preview: {content[:200]}")
+        raise Exception(f"AI noto'g'ri format qaytardi (JSONDecodeError)")
 
 
 async def create_document_file(topic: str, doc_type: str, pages: int, lang: str, references: bool = True) -> io.BytesIO:

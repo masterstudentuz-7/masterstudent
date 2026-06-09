@@ -234,7 +234,13 @@ async def doc_confirmed(callback: CallbackQuery, state: FSMContext):
         await callback.message.answer(get_text("rate_order", lang), reply_markup=get_rating_kb())
         
     except Exception as e:
-        await callback.message.answer(get_text("error_generic", lang), reply_markup=get_main_menu_kb(lang))
+        import logging
+        logging.getLogger(__name__).error(f"Document creation error: {type(e).__name__}: {e}")
+        await callback.message.answer(
+            f"❌ Xatolik: {type(e).__name__}\n\n💬 Iltimos qayta urinib ko'ring.",
+            reply_markup=get_main_menu_kb(lang),
+            parse_mode="HTML"
+        )
         await db.update_order_status(order_id, "cancelled")
         await db.add_balance(user_id, price)
     

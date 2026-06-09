@@ -253,8 +253,10 @@ async def ppt_confirmed(callback: CallbackQuery, state: FSMContext):
         await state.update_data(rate_order_id=order_id)
         
     except Exception as e:
+        import logging
+        logging.getLogger(__name__).error(f"PPT creation error: {type(e).__name__}: {e}")
         await callback.message.answer(
-            get_text("error_generic", lang),
+            f"❌ Xatolik: {type(e).__name__}\n\n💬 Iltimos qayta urinib ko'ring.",
             reply_markup=get_main_menu_kb(lang),
             parse_mode="HTML"
         )
