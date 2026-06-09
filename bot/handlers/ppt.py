@@ -184,6 +184,9 @@ async def ppt_confirmed(callback: CallbackQuery, state: FSMContext):
     data = await state.get_data()
     price = data["price"]
     
+    # DARHOL callback.answer() — Telegram 30s timeout bo'lmasligi uchun
+    await callback.answer("⏳ PPT yaratilmoqda...")
+    
     # Check and deduct balance
     success = await db.deduct_balance(user_id, price)
     if not success:
@@ -194,7 +197,6 @@ async def ppt_confirmed(callback: CallbackQuery, state: FSMContext):
             parse_mode="HTML"
         )
         await state.clear()
-        await callback.answer()
         return
     
     # Create order
@@ -261,7 +263,6 @@ async def ppt_confirmed(callback: CallbackQuery, state: FSMContext):
         await db.add_balance(user_id, price)
     
     await state.clear()
-    await callback.answer()
 
 
 @router.callback_query(F.data == "cancel_order")

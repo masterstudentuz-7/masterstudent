@@ -182,6 +182,9 @@ async def doc_confirmed(callback: CallbackQuery, state: FSMContext):
     data = await state.get_data()
     price = data["price"]
     
+    # DARHOL callback.answer() chaqiramiz — timeout bo'lmasligi uchun
+    await callback.answer("⏳ Yaratilmoqda...")
+    
     success = await db.deduct_balance(user_id, price)
     if not success:
         user = await db.get_user(user_id)
@@ -191,7 +194,6 @@ async def doc_confirmed(callback: CallbackQuery, state: FSMContext):
             parse_mode="HTML"
         )
         await state.clear()
-        await callback.answer()
         return
     
     doc_type_name = "Referat" if data["doc_type"] == "referat" else "Mustaqil ish"
@@ -233,7 +235,6 @@ async def doc_confirmed(callback: CallbackQuery, state: FSMContext):
         await db.add_balance(user_id, price)
     
     await state.clear()
-    await callback.answer()
 
 
 # ===== ESSAY =====
@@ -285,6 +286,9 @@ async def esse_type_selected(callback: CallbackQuery, state: FSMContext):
     user_id = callback.from_user.id
     lang = await db.get_user_language(user_id)
     
+    # DARHOL callback.answer() — timeout bo'lmasligi uchun
+    await callback.answer("⏳ Yaratilmoqda...")
+    
     await state.update_data(essay_type=essay_type)
     data = await state.get_data()
     price = PRICES["esse"]
@@ -298,13 +302,11 @@ async def esse_type_selected(callback: CallbackQuery, state: FSMContext):
             parse_mode="HTML"
         )
         await state.clear()
-        await callback.answer()
         return
     
     success = await db.deduct_balance(user_id, price)
     if not success:
         await state.clear()
-        await callback.answer()
         return
     
     order_id = await db.create_order(user_id, "esse", "Esse", 
@@ -330,7 +332,6 @@ async def esse_type_selected(callback: CallbackQuery, state: FSMContext):
         await db.add_balance(user_id, price)
     
     await state.clear()
-    await callback.answer()
 
 
 # ===== TRANSLATION =====
@@ -361,6 +362,9 @@ async def tarjima_lang_selected(callback: CallbackQuery, state: FSMContext):
     lang = await db.get_user_language(user_id)
     data = await state.get_data()
     
+    # DARHOL callback.answer() — timeout bo'lmasligi uchun
+    await callback.answer("⏳ Tarjima qilinmoqda...")
+    
     price = PRICES["tarjima_page"]
     user = await db.get_user(user_id)
     balance = user["balance"] + user["bonus"]
@@ -369,7 +373,6 @@ async def tarjima_lang_selected(callback: CallbackQuery, state: FSMContext):
         await callback.message.edit_text(
             get_text("insufficient_balance", lang, price=price, balance=balance), parse_mode="HTML")
         await state.clear()
-        await callback.answer()
         return
     
     await db.deduct_balance(user_id, price)
@@ -388,7 +391,6 @@ async def tarjima_lang_selected(callback: CallbackQuery, state: FSMContext):
         await db.add_balance(user_id, price)
     
     await state.clear()
-    await callback.answer()
 
 
 # ===== QR CODE =====
@@ -419,6 +421,9 @@ async def qr_design_selected(callback: CallbackQuery, state: FSMContext):
     lang = await db.get_user_language(user_id)
     data = await state.get_data()
     
+    # DARHOL callback.answer()
+    await callback.answer()
+    
     price = PRICES["qr_code"]
     user = await db.get_user(user_id)
     balance = user["balance"] + user["bonus"]
@@ -427,7 +432,6 @@ async def qr_design_selected(callback: CallbackQuery, state: FSMContext):
         await callback.message.edit_text(
             get_text("insufficient_balance", lang, price=price, balance=balance), parse_mode="HTML")
         await state.clear()
-        await callback.answer()
         return
     
     await db.deduct_balance(user_id, price)
@@ -450,7 +454,6 @@ async def qr_design_selected(callback: CallbackQuery, state: FSMContext):
         await db.add_balance(user_id, price)
     
     await state.clear()
-    await callback.answer()
 
 
 # ===== AI TEXT / CONTENT / SPEECH / BANNER =====
@@ -582,14 +585,13 @@ async def admin_order_details(message: Message, state: FSMContext):
 @router.callback_query(F.data.startswith("rate_"))
 async def handle_rating(callback: CallbackQuery, state: FSMContext):
     """Handle order rating."""
-    if callback.data.startswith("rate_"):
-        rating = int(callback.data.split("_")[1])
-        lang = await db.get_user_language(callback.from_user.id)
-        
-        # Get latest order
-        orders = await db.get_user_orders(callback.from_user.id, limit=1)
-        if orders:
-            await db.add_review(callback.from_user.id, orders[0]["order_id"], rating)
-        
-        await callback.message.edit_text(get_text("rate_thanks", lang), parse_mode="HTML")
-        await callback.answer()
+    rating = int(callback.data.split("_")[1])
+    lang = await db.get_user_language(callback.from_user.id)
+    
+    # Get latest order
+    orders = await db.get_user_orders(callback.from_user.id, limit=1)
+    if orders:
+        await db.add_review(callback.from_user.id, orders[0]["order_id"], rating)
+    
+    await callback.message.edit_text(get_text("rate_thanks", lang), parse_mode="HTML")
+    await callback.answer()
