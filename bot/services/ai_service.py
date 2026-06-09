@@ -333,22 +333,28 @@ Return a JSON array with exactly {slides} objects. Each object must have:
 - "content": array of 3-5 bullet points (academic style)
 - "notes": speaker notes (1-2 sentences)
 
-Return ONLY valid JSON array, no other text, no markdown."""
+Return ONLY valid JSON array, no other text, no markdown. ENSURE the JSON is COMPLETE."""
 
-    content = await ai_generate(prompt, max_tokens=6000, temperature=0.7)
-    
-    content = content.strip()
-    if content.startswith("```"):
-        content = content.split("\n", 1)[1]
-        if content.endswith("```"):
-            content = content[:-3]
-    content = content.strip()
-    
-    try:
-        return json.loads(content)
-    except json.JSONDecodeError as e:
-        logger.error(f"PPT JSON parse error: {e}\nContent preview: {content[:200]}")
-        raise Exception(f"AI noto'g'ri format qaytardi (JSONDecodeError)")
+    for attempt in range(2):
+        try:
+            content = await ai_generate(prompt, max_tokens=8000, temperature=0.7)
+            
+            content = content.strip()
+            if content.startswith("```"):
+                content = content.split("\n", 1)[1]
+                if content.endswith("```"):
+                    content = content[:-3]
+            content = content.strip()
+            
+            return json.loads(content)
+        except json.JSONDecodeError as e:
+            logger.warning(f"PPT JSON parse attempt {attempt + 1} failed: {e}")
+            if attempt == 0:
+                prompt += "\n\nIMPORTANT: Previous attempt produced invalid JSON. Keep bullet points SHORT (max 15 words each). Ensure complete valid JSON array."
+                continue
+            else:
+                logger.error(f"PPT JSON parse error (final): {e}\nContent preview: {content[:300]}")
+                raise Exception(f"AI noto'g'ri format qaytardi (JSONDecodeError)")
 
 
 async def create_ppt_file(topic: str, slides_count: int, design: str, purpose: str, lang: str, extra: str = "") -> io.BytesIO:
@@ -443,51 +449,60 @@ async def generate_document_content(topic: str, doc_type: str, pages: int, lang:
         "en": "Introduction, Main body (multiple sections), Conclusion, References",
     }
     
+    # Sahifalar ko'p bo'lsa, kontentni qisqartirish
+    # AI max_tokens limiti tufayli 
+    effective_pages = min(pages, 15)  # 15 sahifadan ko'p bo'lsa ham, kontentni siqamiz
+    effective_words = effective_pages * 200  # Kamroq so'z so'rab, JSON tugallanishini ta'minlaymiz
+    
     prompt = f"""Write a GOST-standard academic {doc_type} in {lang_name} language.
 Topic: {topic}
-Approximate length: {total_words} words (about {pages} pages)
+Length: approximately {effective_words} words
 
-GOST STRUCTURE (strictly follow this order):
+GOST STRUCTURE:
 1. Title
-2. Introduction (Kirish/Введение) — relevance, goal, tasks, methods
-3. Main body — 3-5 sections with subheadings, detailed academic analysis
-4. Conclusion (Xulosa/Заключение) — summary of findings, recommendations
-5. References — 5-10 real academic sources (books, articles, laws)
+2. Introduction — relevance, goal, tasks (1 paragraph)
+3. Main body — 3-4 sections (each section 2-3 paragraphs)
+4. Conclusion — summary (1 paragraph)
+5. References — 5-7 academic sources
 
-REQUIREMENTS:
-- Academic writing style
-- Each section should be substantial (multiple paragraphs)
-- Introduction must state the relevance, goal, and tasks
-- Conclusion must summarize key findings
+IMPORTANT: Keep response SHORT enough to fit in valid JSON. Do NOT write very long paragraphs.
 
-Return as JSON:
+Return as JSON (make sure JSON is COMPLETE and VALID):
 {{
-    "title": "full title",
-    "introduction": "detailed introduction text (relevance, goal, tasks)",
+    "title": "title text",
+    "introduction": "introduction text",
     "sections": [
-        {{"heading": "section title", "content": "detailed section content (multiple paragraphs)"}},
-        {{"heading": "section title", "content": "detailed section content"}}
+        {{"heading": "heading", "content": "content"}},
+        {{"heading": "heading", "content": "content"}}
     ],
-    "conclusion": "detailed conclusion text",
-    "references": ["Author. Title. Publisher, Year.", "..."]
+    "conclusion": "conclusion text",
+    "references": ["source 1", "source 2"]
 }}
 
-Return ONLY valid JSON, no markdown formatting."""
+Return ONLY valid JSON. No markdown. Make sure all strings are properly closed."""
 
-    content = await ai_generate(prompt, max_tokens=8000, temperature=0.7)
-    
-    content = content.strip()
-    if content.startswith("```"):
-        content = content.split("\n", 1)[1]
-        if content.endswith("```"):
-            content = content[:-3]
-    content = content.strip()
-    
-    try:
-        return json.loads(content)
-    except json.JSONDecodeError as e:
-        logger.error(f"Document JSON parse error: {e}\nContent preview: {content[:200]}")
-        raise Exception(f"AI noto'g'ri format qaytardi (JSONDecodeError)")
+    # 2 marta sinash — birinchi marta JSON xato bo'lsa, qayta so'rash
+    for attempt in range(2):
+        try:
+            content = await ai_generate(prompt, max_tokens=16000, temperature=0.7)
+            
+            content = content.strip()
+            if content.startswith("```"):
+                content = content.split("\n", 1)[1]
+                if content.endswith("```"):
+                    content = content[:-3]
+            content = content.strip()
+            
+            return json.loads(content)
+        except json.JSONDecodeError as e:
+            logger.warning(f"Document JSON parse attempt {attempt + 1} failed: {e}")
+            if attempt == 0:
+                # Qayta urinish — yanada qisqaroq so'rash
+                prompt += "\n\nPREVIOUS ATTEMPT FAILED. Make JSON SHORTER. Use shorter paragraphs. ENSURE valid complete JSON."
+                continue
+            else:
+                logger.error(f"Document JSON parse error (final): {e}\nContent preview: {content[:300]}")
+                raise Exception(f"AI noto'g'ri format qaytardi (JSONDecodeError)")
 
 
 async def create_document_file(topic: str, doc_type: str, pages: int, lang: str, references: bool = True) -> io.BytesIO:
