@@ -16,7 +16,11 @@ SUPPORT_USERNAME = os.getenv("SUPPORT_USERNAME", "@admin")
 AI_PROVIDER = os.getenv("AI_PROVIDER", "gemini")
 
 # Gemini (Google) - ASOSIY (hozir ishlamoqda)
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
+# Bir nechta API key qo'yish mumkin — vergul bilan ajratiladi
+# Masalan: GEMINI_API_KEY=key1,key2,key3
+# Bitta key limiti tugasa keyingisiga o'tadi
+GEMINI_API_KEYS = [k.strip() for k in os.getenv("GEMINI_API_KEY", "").split(",") if k.strip()]
+GEMINI_API_KEY = GEMINI_API_KEYS[0] if GEMINI_API_KEYS else ""
 GEMINI_MODELS = [
     "gemini-2.5-flash",
     "gemini-2.5-pro",

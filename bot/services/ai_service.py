@@ -14,7 +14,7 @@ from docx.enum.section import WD_ORIENT
 import qrcode
 
 from config import (
-    AI_PROVIDER, GEMINI_API_KEY, GEMINI_MODELS,
+    AI_PROVIDER, GEMINI_API_KEY, GEMINI_API_KEYS, GEMINI_MODELS,
     OPENAI_API_KEY, OPENAI_MODEL
 )
 
@@ -36,44 +36,52 @@ async def ai_generate(prompt: str, max_tokens: int = 4000, temperature: float = 
 
 
 async def _gemini_generate(prompt: str, max_tokens: int = 4000, temperature: float = 0.7) -> str:
-    """Gemini modellarini ketma-ket sinab ko'radi. Quota xatosida kutib qayta sinaydi."""
+    """
+    Gemini — barcha API keylarni va modellarni ketma-ket sinaydi.
+    Key1 + barcha modellar → Key2 + barcha modellar → ... → Kutish → Qayta sinash
+    """
     last_error = None
-    max_retries = 2
-
+    max_retries = 3
+    
     for attempt in range(max_retries):
-        for model_name in GEMINI_MODELS:
-            try:
-                logger.info(f"Trying Gemini model: {model_name} (attempt {attempt + 1})")
-                model = genai.GenerativeModel(model_name)
-                generation_config = genai.types.GenerationConfig(
-                    max_output_tokens=max_tokens,
-                    temperature=temperature,
-                )
-                response = await model.generate_content_async(
-                    prompt, generation_config=generation_config,
-                )
-                if response and response.text:
-                    logger.info(f"Success with model: {model_name}")
-                    return response.text.strip()
-                else:
-                    logger.warning(f"Empty response from model: {model_name}")
+        # Har bir API key bilan sinash
+        for key_idx, api_key in enumerate(GEMINI_API_KEYS):
+            genai.configure(api_key=api_key)
+            
+            for model_name in GEMINI_MODELS:
+                try:
+                    logger.info(f"Trying model: {model_name}, key #{key_idx + 1} (attempt {attempt + 1})")
+                    model = genai.GenerativeModel(model_name)
+                    generation_config = genai.types.GenerationConfig(
+                        max_output_tokens=max_tokens,
+                        temperature=temperature,
+                    )
+                    response = await model.generate_content_async(
+                        prompt, generation_config=generation_config,
+                    )
+                    if response and response.text:
+                        logger.info(f"✅ Success: {model_name}, key #{key_idx + 1}")
+                        return response.text.strip()
+                    else:
+                        continue
+                except Exception as e:
+                    last_error = e
+                    error_msg = str(e)
+                    if "429" in error_msg or "ResourceExhausted" in error_msg or "quota" in error_msg.lower():
+                        logger.warning(f"⚠️ Quota: {model_name}, key #{key_idx + 1}")
+                    elif "404" in error_msg or "NotFound" in error_msg:
+                        logger.warning(f"❌ Not found: {model_name}")
+                    else:
+                        logger.warning(f"❌ Error: {model_name}: {e}")
                     continue
-            except Exception as e:
-                last_error = e
-                error_msg = str(e)
-                if "429" in error_msg or "ResourceExhausted" in error_msg or "quota" in error_msg.lower():
-                    logger.warning(f"Model {model_name} quota exceeded, trying next...")
-                elif "404" in error_msg or "NotFound" in error_msg:
-                    logger.warning(f"Model {model_name} not found, skipping...")
-                else:
-                    logger.warning(f"Model {model_name} failed: {type(e).__name__}: {e}")
-                continue
-
+        
+        # Barcha keylar va modellar ishlamadi — kutish
         if attempt < max_retries - 1:
-            logger.info("All models failed. Waiting 15s before retry...")
-            await asyncio.sleep(15)
-
-    raise Exception(f"Barcha Gemini modellari ishlamadi. Oxirgi xato: {last_error}")
+            wait_time = 20 * (attempt + 1)  # 20s, 40s, 60s
+            logger.info(f"⏳ All keys/models failed. Waiting {wait_time}s...")
+            await asyncio.sleep(wait_time)
+    
+    raise Exception(f"❌ Barcha API keylar va modellar ishlamadi. Oxirgi xato: {last_error}")
 
 
 async def _openai_generate(prompt: str, max_tokens: int = 4000, temperature: float = 0.7) -> str:
