@@ -199,7 +199,7 @@ Choose the section you need from the menu below 👇""",
 
 🎨 Dizayn: {design}
 🎯 Maqsad: {purpose}
-🌐 Til: {lang}
+🌐 Til: {ppt_lang}
 📝 Mavzu: {topic}
 📑 Slaydlar: {slides}
 📋 Qo'shimcha: {extra}
@@ -212,7 +212,7 @@ Tasdiqlaysizmi?""",
 
 🎨 Дизайн: {design}
 🎯 Назначение: {purpose}
-🌐 Язык: {lang}
+🌐 Язык: {ppt_lang}
 📝 Тема: {topic}
 📑 Слайдов: {slides}
 📋 Дополнительно: {extra}
@@ -225,7 +225,7 @@ Tasdiqlaysizmi?""",
 
 🎨 Design: {design}
 🎯 Purpose: {purpose}
-🌐 Language: {lang}
+🌐 Language: {ppt_lang}
 📝 Topic: {topic}
 📑 Slides: {slides}
 📋 Extra: {extra}

@@ -165,7 +165,7 @@ async def ppt_extra_entered(message: Message, state: FSMContext):
         get_text("ppt_confirm", lang,
                  design=data["design"].title(),
                  purpose=purpose_names.get(data["purpose"], data["purpose"]),
-                 lang=lang_names.get(data["ppt_lang"], data["ppt_lang"]),
+                 ppt_lang=lang_names.get(data["ppt_lang"], data["ppt_lang"]),
                  topic=data["topic"],
                  slides=slides,
                  extra=extra or "-",
