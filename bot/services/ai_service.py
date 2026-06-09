@@ -1,22 +1,112 @@
-import openai
-import os
 import io
 import json
+import logging
+import google.generativeai as genai
 from pptx import Presentation
-from pptx.util import Inches, Pt, Emu
+from pptx.util import Inches, Pt
 from pptx.dml.color import RGBColor
 from pptx.enum.text import PP_ALIGN
 from docx import Document
-from docx.shared import Pt as DocxPt, Inches as DocxInches
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 import qrcode
-from PIL import Image
-from config import OPENAI_API_KEY
 
-client = openai.AsyncOpenAI(api_key=OPENAI_API_KEY)
+from config import (
+    AI_PROVIDER, GEMINI_API_KEY, GEMINI_MODELS,
+    OPENAI_API_KEY, OPENAI_MODEL
+)
+
+logger = logging.getLogger(__name__)
+
+# ===== GEMINI SETUP (ASOSIY - HOZIR ISHLAYDI) =====
+genai.configure(api_key=GEMINI_API_KEY)
+
+# ===== OPENAI SETUP (O'CHIRILGAN - KELAJAKDA ISHLATILADI) =====
+# import openai
+# openai_client = openai.AsyncOpenAI(api_key=OPENAI_API_KEY)
 
 
-# ===== PPT GENERATION =====
+# ============================================================
+# UNIVERSAL AI CALL - Gemini modellarini ketma-ket sinab ko'radi
+# Biri ishlamasa keyingisiga o'tadi
+# ============================================================
+
+async def ai_generate(prompt: str, max_tokens: int = 4000, temperature: float = 0.7) -> str:
+    """
+    AI orqali matn generatsiya qilish.
+    Gemini modellarini ketma-ket sinab ko'radi - biri ishlamasa keyingisiga o'tadi.
+    
+    Agar AI_PROVIDER = "openai" bo'lsa, OpenAI ishlatiladi (hozir o'chirilgan).
+    """
+    
+    # ===== OPENAI (O'CHIRILGAN) =====
+    if AI_PROVIDER == "openai":
+        return await _openai_generate(prompt, max_tokens, temperature)
+    
+    # ===== GEMINI (ASOSIY) =====
+    return await _gemini_generate(prompt, max_tokens, temperature)
+
+
+async def _gemini_generate(prompt: str, max_tokens: int = 4000, temperature: float = 0.7) -> str:
+    """
+    Gemini modellarini ketma-ket sinab ko'radi.
+    Birinchi ishlagan model natijasini qaytaradi.
+    """
+    last_error = None
+    
+    for model_name in GEMINI_MODELS:
+        try:
+            logger.info(f"Trying Gemini model: {model_name}")
+            model = genai.GenerativeModel(model_name)
+            
+            generation_config = genai.types.GenerationConfig(
+                max_output_tokens=max_tokens,
+                temperature=temperature,
+            )
+            
+            response = await model.generate_content_async(
+                prompt,
+                generation_config=generation_config,
+            )
+            
+            if response and response.text:
+                logger.info(f"Success with model: {model_name}")
+                return response.text.strip()
+            else:
+                logger.warning(f"Empty response from model: {model_name}")
+                continue
+                
+        except Exception as e:
+            last_error = e
+            logger.warning(f"Model {model_name} failed: {type(e).__name__}: {e}")
+            continue
+    
+    # Hech qaysi model ishlamadi
+    raise Exception(f"Barcha Gemini modellari ishlamadi. Oxirgi xato: {last_error}")
+
+
+async def _openai_generate(prompt: str, max_tokens: int = 4000, temperature: float = 0.7) -> str:
+    """
+    OpenAI orqali generatsiya (HOZIR O'CHIRILGAN).
+    AI_PROVIDER = "openai" qilganda ishlay boshlaydi.
+    """
+    try:
+        import openai
+        client = openai.AsyncOpenAI(api_key=OPENAI_API_KEY)
+        
+        response = await client.chat.completions.create(
+            model=OPENAI_MODEL,
+            messages=[{"role": "user", "content": prompt}],
+            temperature=temperature,
+            max_tokens=max_tokens,
+        )
+        return response.choices[0].message.content.strip()
+    except Exception as e:
+        raise Exception(f"OpenAI xatosi: {e}")
+
+
+# ============================================================
+# PPT GENERATION
+# ============================================================
 
 PPT_COLOR_SCHEMES = {
     "business": {"bg": "1F3864", "title": "FFFFFF", "text": "D9E2F3"},
@@ -33,7 +123,7 @@ PPT_COLOR_SCHEMES = {
 
 
 async def generate_ppt_content(topic: str, slides: int, purpose: str, lang: str, extra: str = "") -> list:
-    """Generate PPT content using OpenAI."""
+    """Generate PPT content using AI."""
     lang_name = {"uz": "O'zbek", "ru": "Русский", "en": "English"}.get(lang, "O'zbek")
     
     prompt = f"""Create a professional presentation content in {lang_name} language.
@@ -47,31 +137,25 @@ Return a JSON array with exactly {slides} objects. Each object must have:
 - "content": array of 3-5 bullet points
 - "notes": speaker notes (1-2 sentences)
 
-Return ONLY valid JSON array, no other text."""
+Return ONLY valid JSON array, no other text. No markdown formatting, no ```json blocks."""
 
-    response = await client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0.7,
-        max_tokens=4000,
-    )
+    content = await ai_generate(prompt, max_tokens=4000, temperature=0.7)
     
-    content = response.choices[0].message.content.strip()
     # Clean up potential markdown formatting
+    content = content.strip()
     if content.startswith("```"):
         content = content.split("\n", 1)[1]
         if content.endswith("```"):
             content = content[:-3]
+    content = content.strip()
     
     return json.loads(content)
 
 
 async def create_ppt_file(topic: str, slides_count: int, design: str, purpose: str, lang: str, extra: str = "") -> io.BytesIO:
     """Create a PPTX file with AI-generated content."""
-    # Generate content
     slides_data = await generate_ppt_content(topic, slides_count, purpose, lang, extra)
     
-    # Create presentation
     prs = Presentation()
     prs.slide_width = Inches(13.333)
     prs.slide_height = Inches(7.5)
@@ -82,13 +166,11 @@ async def create_ppt_file(topic: str, slides_count: int, design: str, purpose: s
     slide_layout = prs.slide_layouts[5]  # Blank
     slide = prs.slides.add_slide(slide_layout)
     
-    # Set background
     background = slide.background
     fill = background.fill
     fill.solid()
     fill.fore_color.rgb = RGBColor.from_string(colors["bg"])
     
-    # Add title
     left = Inches(1)
     top = Inches(2.5)
     width = Inches(11)
@@ -107,7 +189,6 @@ async def create_ppt_file(topic: str, slides_count: int, design: str, purpose: s
     for slide_data in slides_data:
         slide = prs.slides.add_slide(slide_layout)
         
-        # Background
         background = slide.background
         fill = background.fill
         fill.solid()
@@ -173,17 +254,18 @@ async def create_ppt_file(topic: str, slides_count: int, design: str, purpose: s
     p.font.color.rgb = RGBColor.from_string(colors["title"])
     p.alignment = PP_ALIGN.CENTER
     
-    # Save to bytes
     output = io.BytesIO()
     prs.save(output)
     output.seek(0)
     return output
 
 
-# ===== DOCUMENT GENERATION =====
+# ============================================================
+# DOCUMENT GENERATION (Referat, Mustaqil ish)
+# ============================================================
 
 async def generate_document_content(topic: str, doc_type: str, pages: int, lang: str, references: bool = True) -> dict:
-    """Generate document content using OpenAI."""
+    """Generate document content using AI."""
     lang_name = {"uz": "O'zbek", "ru": "Русский", "en": "English"}.get(lang, "O'zbek")
     words_per_page = 250
     total_words = pages * words_per_page
@@ -210,20 +292,17 @@ Return as JSON:
     "references": ["..."] 
 }}
 
-Write substantial academic content. Return ONLY valid JSON."""
+Write substantial academic content. Return ONLY valid JSON, no markdown formatting."""
 
-    response = await client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0.7,
-        max_tokens=8000,
-    )
+    content = await ai_generate(prompt, max_tokens=8000, temperature=0.7)
     
-    content = response.choices[0].message.content.strip()
+    # Clean up
+    content = content.strip()
     if content.startswith("```"):
         content = content.split("\n", 1)[1]
         if content.endswith("```"):
             content = content[:-3]
+    content = content.strip()
     
     return json.loads(content)
 
@@ -234,7 +313,6 @@ async def create_document_file(topic: str, doc_type: str, pages: int, lang: str,
     
     doc = Document()
     
-    # Title
     title = doc.add_heading(data.get("title", topic), level=0)
     title.alignment = WD_ALIGN_PARAGRAPH.CENTER
     
@@ -247,7 +325,7 @@ async def create_document_file(topic: str, doc_type: str, pages: int, lang: str,
     # Table of contents placeholder
     toc_title = {"uz": "Mundarija", "ru": "Содержание", "en": "Table of Contents"}
     doc.add_heading(toc_title.get(lang, toc_title["uz"]), level=1)
-    doc.add_paragraph("") 
+    doc.add_paragraph("")
     doc.add_page_break()
     
     # Introduction
@@ -278,7 +356,9 @@ async def create_document_file(topic: str, doc_type: str, pages: int, lang: str,
     return output
 
 
-# ===== ESSAY GENERATION =====
+# ============================================================
+# ESSAY GENERATION
+# ============================================================
 
 async def create_essay_file(topic: str, lang: str, word_count: int, essay_type: str) -> io.BytesIO:
     """Create an essay DOCX file."""
@@ -289,27 +369,18 @@ Topic: {topic}
 Word count: approximately {word_count} words
 
 Write a well-structured essay with introduction, body, and conclusion.
-Return the full essay text only, no JSON."""
+Return the full essay text only, no JSON, no markdown formatting."""
 
-    response = await client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0.7,
-        max_tokens=4000,
-    )
-    
-    essay_text = response.choices[0].message.content.strip()
+    essay_text = await ai_generate(prompt, max_tokens=4000, temperature=0.7)
     
     doc = Document()
     title = doc.add_heading(topic, level=0)
     title.alignment = WD_ALIGN_PARAGRAPH.CENTER
     
-    # Split by paragraphs and add
     paragraphs = essay_text.split("\n\n")
     for para in paragraphs:
         if para.strip():
             if para.strip().startswith("#"):
-                # It's a heading
                 heading_text = para.strip().lstrip("#").strip()
                 doc.add_heading(heading_text, level=2)
             else:
@@ -321,25 +392,22 @@ Return the full essay text only, no JSON."""
     return output
 
 
-# ===== TRANSLATION =====
+# ============================================================
+# TRANSLATION
+# ============================================================
 
 async def translate_text(text: str, target_lang: str) -> str:
-    """Translate text using OpenAI."""
+    """Translate text using AI."""
     lang_name = {"uz": "O'zbek (Uzbek)", "ru": "Русский (Russian)", "en": "English"}.get(target_lang, "English")
     
-    prompt = f"Translate the following text to {lang_name}. Return only the translation:\n\n{text}"
+    prompt = f"Translate the following text to {lang_name}. Return only the translation, nothing else:\n\n{text}"
     
-    response = await client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0.3,
-        max_tokens=4000,
-    )
-    
-    return response.choices[0].message.content.strip()
+    return await ai_generate(prompt, max_tokens=4000, temperature=0.3)
 
 
-# ===== QR CODE =====
+# ============================================================
+# QR CODE
+# ============================================================
 
 def create_qr_code(data: str, design: str = "simple") -> io.BytesIO:
     """Create a QR code image."""
@@ -352,7 +420,6 @@ def create_qr_code(data: str, design: str = "simple") -> io.BytesIO:
     qr.add_data(data)
     qr.make(fit=True)
     
-    # Design colors
     colors = {
         "simple": {"fill": "black", "back": "white"},
         "minimal": {"fill": "#333333", "back": "#f5f5f5"},
@@ -369,45 +436,34 @@ def create_qr_code(data: str, design: str = "simple") -> io.BytesIO:
     return output
 
 
-# ===== AI HELPER =====
+# ============================================================
+# AI HELPER (Chat)
+# ============================================================
 
 async def ai_chat(question: str, lang: str = "uz") -> str:
     """AI helper chat."""
     lang_name = {"uz": "O'zbek", "ru": "Русский", "en": "English"}.get(lang, "O'zbek")
     
-    system_prompt = f"""You are a helpful AI assistant for an online computer services bot. 
+    prompt = f"""You are a helpful AI assistant for an online computer services bot. 
 Answer in {lang_name} language. Be concise and helpful.
-You help users with questions about services, computer-related topics, and general assistance."""
+You help users with questions about services, computer-related topics, and general assistance.
+
+User question: {question}"""
     
-    response = await client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": question},
-        ],
-        temperature=0.7,
-        max_tokens=1000,
-    )
-    
-    return response.choices[0].message.content.strip()
+    return await ai_generate(prompt, max_tokens=1000, temperature=0.7)
 
 
-# ===== AI TEXT/CONTENT =====
+# ============================================================
+# AI TEXT / CONTENT
+# ============================================================
 
 async def generate_ai_text(topic: str, lang: str = "uz") -> str:
     """Generate AI text content."""
     lang_name = {"uz": "O'zbek", "ru": "Русский", "en": "English"}.get(lang, "O'zbek")
     
-    prompt = f"Write a professional text about: {topic}\nLanguage: {lang_name}\nLength: 300-500 words"
+    prompt = f"Write a professional text about: {topic}\nLanguage: {lang_name}\nLength: 300-500 words\n\nReturn only the text, no extra formatting."
     
-    response = await client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0.7,
-        max_tokens=2000,
-    )
-    
-    return response.choices[0].message.content.strip()
+    return await ai_generate(prompt, max_tokens=2000, temperature=0.7)
 
 
 async def generate_speech(topic: str, lang: str = "uz", slides: int = 10) -> io.BytesIO:
@@ -418,16 +474,9 @@ async def generate_speech(topic: str, lang: str = "uz", slides: int = 10) -> io.
 Topic: {topic}
 For {slides} slides presentation.
 Include transitions between slides and engaging language.
-Return the full speech text."""
+Return the full speech text only."""
 
-    response = await client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0.7,
-        max_tokens=4000,
-    )
-    
-    speech_text = response.choices[0].message.content.strip()
+    speech_text = await ai_generate(prompt, max_tokens=4000, temperature=0.7)
     
     doc = Document()
     doc.add_heading(f"Nutq: {topic}", level=0)

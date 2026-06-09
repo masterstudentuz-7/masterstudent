@@ -4,13 +4,32 @@ from dotenv import load_dotenv
 load_dotenv()
 
 BOT_TOKEN = os.getenv("BOT_TOKEN", "")
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 ADMIN_IDS = [int(x) for x in os.getenv("ADMIN_IDS", "").split(",") if x.strip()]
 PAYME_TOKEN = os.getenv("PAYME_TOKEN", "")
 CLICK_TOKEN = os.getenv("CLICK_TOKEN", "")
 BANK_CARD = os.getenv("BANK_CARD", "8600000000000000")
 CHANNEL_ID = os.getenv("CHANNEL_ID", "")
 SUPPORT_USERNAME = os.getenv("SUPPORT_USERNAME", "@admin")
+
+# ===== AI PROVIDER SETTINGS =====
+# Active provider: "gemini" or "openai"
+AI_PROVIDER = os.getenv("AI_PROVIDER", "gemini")
+
+# Gemini (Google) - ASOSIY (hozir ishlamoqda)
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
+GEMINI_MODELS = [
+    "gemini-2.5-flash",
+    "gemini-2.5-pro",
+    "gemini-2.0-flash",
+    "gemini-2.0-flash-lite",
+    "gemini-1.5-flash",
+    "gemini-1.5-pro",
+    "gemini-1.5-flash-8b",
+]
+
+# OpenAI - O'CHIRILGAN (kelajakda ishlatiladi)
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
+OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 
 # Database
 DB_PATH = "database.db"
