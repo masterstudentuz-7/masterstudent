@@ -148,6 +148,10 @@ async def doc_references_selected(callback: CallbackQuery, state: FSMContext):
     await state.update_data(price=price)
     
     user = await db.get_user(callback.from_user.id)
+    if not user:
+        await callback.answer("❌ Xatolik")
+        await state.clear()
+        return
     balance = user["balance"] + user["bonus"]
     
     if balance < price:

@@ -134,7 +134,19 @@ async def get_user(user_id: int):
     async with aiosqlite.connect(DB_PATH) as db:
         db.row_factory = aiosqlite.Row
         cursor = await db.execute("SELECT * FROM users WHERE user_id = ?", (user_id,))
-        return await cursor.fetchone()
+        user = await cursor.fetchone()
+        if not user:
+            # Foydalanuvchi bazada yo'q — avtomatik yaratish
+            await db.execute(
+                """INSERT OR IGNORE INTO users 
+                (user_id, username, full_name, created_at, last_active) 
+                VALUES (?, ?, ?, ?, ?)""",
+                (user_id, "", "", time.time(), time.time())
+            )
+            await db.commit()
+            cursor = await db.execute("SELECT * FROM users WHERE user_id = ?", (user_id,))
+            user = await cursor.fetchone()
+        return user
 
 
 async def create_user(user_id: int, username: str, full_name: str, referred_by: int = None):
