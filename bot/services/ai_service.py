@@ -50,35 +50,56 @@ async def _gemini_generate(prompt: str, max_tokens: int = 4000, temperature: flo
     """
     Gemini modellarini ketma-ket sinab ko'radi.
     Birinchi ishlagan model natijasini qaytaradi.
+    Quota xatosida 15 soniya kutib qayta sinaydi.
     """
+    import asyncio
     last_error = None
+    max_retries = 2  # Har bir model uchun max qayta urinish
     
-    for model_name in GEMINI_MODELS:
-        try:
-            logger.info(f"Trying Gemini model: {model_name}")
-            model = genai.GenerativeModel(model_name)
-            
-            generation_config = genai.types.GenerationConfig(
-                max_output_tokens=max_tokens,
-                temperature=temperature,
-            )
-            
-            response = await model.generate_content_async(
-                prompt,
-                generation_config=generation_config,
-            )
-            
-            if response and response.text:
-                logger.info(f"Success with model: {model_name}")
-                return response.text.strip()
-            else:
-                logger.warning(f"Empty response from model: {model_name}")
-                continue
+    for attempt in range(max_retries):
+        for model_name in GEMINI_MODELS:
+            try:
+                logger.info(f"Trying Gemini model: {model_name} (attempt {attempt + 1})")
+                model = genai.GenerativeModel(model_name)
                 
-        except Exception as e:
-            last_error = e
-            logger.warning(f"Model {model_name} failed: {type(e).__name__}: {e}")
-            continue
+                generation_config = genai.types.GenerationConfig(
+                    max_output_tokens=max_tokens,
+                    temperature=temperature,
+                )
+                
+                response = await model.generate_content_async(
+                    prompt,
+                    generation_config=generation_config,
+                )
+                
+                if response and response.text:
+                    logger.info(f"Success with model: {model_name}")
+                    return response.text.strip()
+                else:
+                    logger.warning(f"Empty response from model: {model_name}")
+                    continue
+                    
+            except Exception as e:
+                last_error = e
+                error_msg = str(e)
+                
+                # Quota xatosi — kutish kerak
+                if "429" in error_msg or "ResourceExhausted" in error_msg or "quota" in error_msg.lower():
+                    logger.warning(f"Model {model_name} quota exceeded, trying next...")
+                    continue
+                # Model topilmadi — keyingisiga o'tish
+                elif "404" in error_msg or "NotFound" in error_msg:
+                    logger.warning(f"Model {model_name} not found, skipping...")
+                    continue
+                else:
+                    logger.warning(f"Model {model_name} failed: {type(e).__name__}: {e}")
+                    continue
+        
+        # Barcha modellar ishlamadi, kutib qayta sinash
+        if attempt < max_retries - 1:
+            wait_time = 15
+            logger.info(f"All models failed. Waiting {wait_time}s before retry...")
+            await asyncio.sleep(wait_time)
     
     # Hech qaysi model ishlamadi
     raise Exception(f"Barcha Gemini modellari ishlamadi. Oxirgi xato: {last_error}")
