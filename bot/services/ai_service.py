@@ -2,11 +2,14 @@ import io
 import json
 import logging
 import asyncio
+import urllib.request
+import urllib.parse
 import google.generativeai as genai
 from pptx import Presentation
 from pptx.util import Inches, Pt, Cm, Emu
 from pptx.dml.color import RGBColor
-from pptx.enum.text import PP_ALIGN
+from pptx.enum.text import PP_ALIGN, MSO_ANCHOR
+from pptx.enum.shapes import MSO_SHAPE
 from docx import Document
 from docx.shared import Pt as DocxPt, Cm as DocxCm, Inches as DocxInches
 from docx.enum.text import WD_ALIGN_PARAGRAPH
@@ -15,7 +18,7 @@ import qrcode
 
 from config import (
     AI_PROVIDER, GEMINI_API_KEY, GEMINI_API_KEYS, GEMINI_MODELS,
-    OPENAI_API_KEY, OPENAI_MODEL
+    OPENAI_API_KEY, OPENAI_MODEL, PEXELS_API_KEY
 )
 
 logger = logging.getLogger(__name__)
@@ -361,8 +364,81 @@ Return ONLY valid JSON array, no other text, no markdown. ENSURE the JSON is COM
                 raise Exception(f"AI noto'g'ri format qaytardi (JSONDecodeError)")
 
 
+def _fetch_image(query: str) -> io.BytesIO:
+    """
+    Pexels'dan mavzuga oid rasm yuklab oladi.
+    PEXELS_API_KEY bo'lmasa yoki xato bo'lsa None qaytaradi.
+    """
+    if not PEXELS_API_KEY:
+        return None
+    try:
+        url = f"https://api.pexels.com/v1/search?query={urllib.parse.quote(query)}&per_page=5&orientation=landscape"
+        req = urllib.request.Request(url, headers={"Authorization": PEXELS_API_KEY})
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            data = json.loads(resp.read().decode())
+        photos = data.get("photos", [])
+        if not photos:
+            return None
+        import random as _r
+        photo = _r.choice(photos)
+        img_url = photo["src"]["large"]
+        with urllib.request.urlopen(img_url, timeout=10) as img_resp:
+            img_data = img_resp.read()
+        return io.BytesIO(img_data)
+    except Exception as e:
+        logger.warning(f"Rasm yuklab olinmadi: {e}")
+        return None
+
+
+async def _get_image_keyword(topic: str, slide_title: str) -> str:
+    """AI yordamida slayd uchun mos rasm kalit so'zini (inglizcha) oladi."""
+    try:
+        prompt = f"""Presentation topic: {topic}
+Slide title: {slide_title}
+Give ONE simple English keyword (1-2 words) for searching a relevant background photo.
+Return ONLY the keyword, nothing else. Example: "business meeting" or "technology"."""
+        kw = await ai_generate(prompt, max_tokens=20, temperature=0.5)
+        return kw.strip().strip('"').strip()[:40] or topic
+    except Exception:
+        return topic
+
+
+def _add_decorative_elements(slide, colors, idx, total_slides):
+    """Slaydga dizayn elementlari qo'shadi: accent chiziq, raqam, bezak shakllar."""
+    try:
+        # Yuqori accent chiziq (title ostida)
+        bar = slide.shapes.add_shape(
+            MSO_SHAPE.RECTANGLE, Inches(0.8), Inches(1.7), Inches(3.5), Inches(0.08)
+        )
+        bar.fill.solid()
+        bar.fill.fore_color.rgb = RGBColor.from_string(colors["title"])
+        bar.line.fill.background()
+        bar.shadow.inherit = False
+
+        # Pastki o'ng burchakda bezak doira
+        circle = slide.shapes.add_shape(
+            MSO_SHAPE.OVAL, Inches(12.3), Inches(6.7), Inches(0.6), Inches(0.6)
+        )
+        circle.fill.solid()
+        circle.fill.fore_color.rgb = RGBColor.from_string(colors["title"])
+        circle.line.fill.background()
+        circle.shadow.inherit = False
+
+        # Slayd raqami badge (pastki o'ng)
+        num_box = slide.shapes.add_textbox(Inches(12.1), Inches(6.75), Inches(1.0), Inches(0.5))
+        ntf = num_box.text_frame
+        np = ntf.paragraphs[0]
+        np.text = f"{idx + 1}"
+        np.font.size = Pt(16)
+        np.font.bold = True
+        np.font.color.rgb = RGBColor.from_string(colors["bg"])
+        np.alignment = PP_ALIGN.CENTER
+    except Exception as e:
+        logger.warning(f"Dekorativ element qo'shilmadi: {e}")
+
+
 async def create_ppt_file(topic: str, slides_count: int, design: str, purpose: str, lang: str, extra: str = "") -> io.BytesIO:
-    """Create GOST-standard PPTX file."""
+    """Create GOST-standard PPTX file with images and decorative design."""
     slides_data = await generate_ppt_content(topic, slides_count, purpose, lang, extra)
     
     prs = Presentation()
@@ -370,7 +446,8 @@ async def create_ppt_file(topic: str, slides_count: int, design: str, purpose: s
     prs.slide_height = Inches(7.5)
     
     colors = PPT_COLOR_SCHEMES.get(design, PPT_COLOR_SCHEMES["business"])
-    slide_layout = prs.slide_layouts[5]  # Blank
+    slide_layout = prs.slide_layouts[6]  # Blank (eng toza)
+    total = len(slides_data)
     
     for idx, slide_data in enumerate(slides_data):
         slide = prs.slides.add_slide(slide_layout)
@@ -381,49 +458,99 @@ async def create_ppt_file(topic: str, slides_count: int, design: str, purpose: s
         fill.solid()
         fill.fore_color.rgb = RGBColor.from_string(colors["bg"])
         
-        # === GOST: Title — Times New Roman / Arial, 28-36pt, Bold ===
-        left = Inches(0.8)
-        top = Inches(0.4)
-        width = Inches(11.5)
-        height = Inches(1.4)
-        txBox = slide.shapes.add_textbox(left, top, width, height)
+        is_title_slide = (idx == 0)
+        is_image_slide = False
+        img_stream = None
+        
+        # Rasm — faqat ba'zi slaydlarga (titul va asosiy qism)
+        # Adabiyotlar va xulosa slaydlariga rasm qo'ymaymiz
+        if PEXELS_API_KEY and idx < total - 1:
+            try:
+                keyword = await _get_image_keyword(topic, slide_data.get("title", topic))
+                img_stream = _fetch_image(keyword)
+            except Exception:
+                img_stream = None
+        
+        # === TITUL SLAYDI ===
+        if is_title_slide:
+            # Agar rasm bo'lsa — fon sifatida
+            if img_stream:
+                try:
+                    slide.shapes.add_picture(img_stream, 0, 0, width=prs.slide_width, height=prs.slide_height)
+                    # Qoramtir overlay (matn o'qilishi uchun)
+                    overlay = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, 0, 0, prs.slide_width, prs.slide_height)
+                    overlay.fill.solid()
+                    overlay.fill.fore_color.rgb = RGBColor.from_string(colors["bg"])
+                    overlay.line.fill.background()
+                    overlay.shadow.inherit = False
+                    # transparency yo'q, lekin yarim — element orqasiga qo'yamiz
+                except Exception:
+                    pass
+            
+            txBox = slide.shapes.add_textbox(Inches(1), Inches(2.8), Inches(11.3), Inches(2))
+            tf = txBox.text_frame
+            tf.word_wrap = True
+            p = tf.paragraphs[0]
+            p.text = topic
+            p.font.size = Pt(40)
+            p.font.name = "Times New Roman"
+            p.font.bold = True
+            p.font.color.rgb = RGBColor.from_string(colors["title"])
+            p.alignment = PP_ALIGN.CENTER
+            # Pastki yozuv
+            sub = slide.shapes.add_textbox(Inches(1), Inches(5.0), Inches(11.3), Inches(0.8))
+            stf = sub.text_frame
+            sp = stf.paragraphs[0]
+            sp.text = "MasterStudent — EVA AI tomonidan tayyorlandi"
+            sp.font.size = Pt(16)
+            sp.font.name = "Times New Roman"
+            sp.font.italic = True
+            sp.font.color.rgb = RGBColor.from_string(colors["text"])
+            sp.alignment = PP_ALIGN.CENTER
+            continue
+        
+        # === KONTENT SLAYDLARI ===
+        # Title
+        txBox = slide.shapes.add_textbox(Inches(0.8), Inches(0.5), Inches(11.5), Inches(1.1))
         tf = txBox.text_frame
         tf.word_wrap = True
         p = tf.paragraphs[0]
-        
-        if idx == 0:
-            # Titul slaydi — kattaroq shrift
-            p.text = topic
-            p.font.size = Pt(36)  # GOST: 28-36pt
-        else:
-            p.text = slide_data["title"]
-            p.font.size = Pt(30)  # GOST: 28-36pt
-        
-        p.font.name = "Times New Roman"  # GOST
+        p.text = slide_data["title"]
+        p.font.size = Pt(30)
+        p.font.name = "Times New Roman"
         p.font.bold = True
         p.font.color.rgb = RGBColor.from_string(colors["title"])
-        p.alignment = PP_ALIGN.CENTER
         
-        # === GOST: Content — Times New Roman, 18-24pt ===
-        if idx > 0:  # Titul slaydida content yo'q
-            left = Inches(1)
-            top = Inches(2.0)
-            width = Inches(11)
-            height = Inches(4.8)
-            txBox = slide.shapes.add_textbox(left, top, width, height)
-            tf = txBox.text_frame
-            tf.word_wrap = True
-            
-            for i, bullet in enumerate(slide_data.get("content", [])):
-                if i == 0:
-                    p = tf.paragraphs[0]
-                else:
-                    p = tf.add_paragraph()
-                p.text = f"• {bullet}"
-                p.font.name = "Times New Roman"  # GOST
-                p.font.size = Pt(18)             # GOST: 18-24pt (18 = ko'proq matn sig'adi)
-                p.font.color.rgb = RGBColor.from_string(colors["text"])
-                p.space_after = Pt(10)
+        # Dekorativ elementlar
+        _add_decorative_elements(slide, colors, idx, total)
+        
+        # Agar rasm bo'lsa — o'ng tomonga, matn chap tomonga
+        if img_stream:
+            try:
+                # Rasm o'ng tomonda
+                slide.shapes.add_picture(img_stream, Inches(8.3), Inches(2.0), width=Inches(4.5), height=Inches(4.3))
+                content_width = Inches(7.0)
+                is_image_slide = True
+            except Exception:
+                content_width = Inches(11)
+        else:
+            content_width = Inches(11)
+        
+        # Content matn
+        txBox = slide.shapes.add_textbox(Inches(0.9), Inches(2.0), content_width, Inches(4.8))
+        tf = txBox.text_frame
+        tf.word_wrap = True
+        
+        for i, bullet in enumerate(slide_data.get("content", [])):
+            if i == 0:
+                p = tf.paragraphs[0]
+            else:
+                p = tf.add_paragraph()
+            p.text = f"•  {bullet}"
+            p.font.name = "Times New Roman"
+            p.font.size = Pt(16 if is_image_slide else 18)
+            p.font.color.rgb = RGBColor.from_string(colors["text"])
+            p.space_after = Pt(10)
         
         # Notes
         if slide_data.get("notes"):
@@ -743,14 +870,37 @@ def create_qr_code(data: str, design: str = "simple") -> io.BytesIO:
 # ============================================================
 
 async def ai_chat(question: str, lang: str = "uz") -> str:
-    """AI helper chat."""
+    """EVA — aqlli, hushmuomala AI yordamchi (o'zbek stilda)."""
     lang_name = {"uz": "O'zbek", "ru": "Русский", "en": "English"}.get(lang, "O'zbek")
-    prompt = f"""You are a helpful AI assistant for an online computer services bot. 
-Answer in {lang_name} language. Be concise and helpful.
-You help users with questions about services, computer-related topics, and general assistance.
+    
+    persona = {
+        "uz": """Sening isming EVA — sen O'zbekistondagi "MasterStudent" platformasining shaxsiy AI yordamchisisan. 
 
-User question: {question}"""
-    return await ai_generate(prompt, max_tokens=1000, temperature=0.7)
+SENING SHAXSIYATING:
+- Sen mehribon, samimiy va g'amxo'r qizsan
+- Har doim hurmat bilan, o'zbekona iliqlik bilan gaplashasan
+- Mijozni "siz" deb, hurmat bilan murojaat qilasan
+- Kerak bo'lganda "azizim", "hurmatli mijoz", "do'stim" kabi iliq so'zlar ishlatasan
+- Sen juda aqlli, bilimdon va foydalisan
+- Javoblaring qisqa, aniq va tushunarli bo'ladi
+- Kerak joyda emoji ishlatasan (lekin haddan ortiq emas)
+
+SENING VAZIFANG:
+- Mijozlarga xizmat tanlashda yordam berish
+- Savollariga aqlli javob berish
+- Taqdimot, referat, mustaqil ish mavzularida maslahat berish
+- Texnik va o'quv savollariga yordam berish
+
+PLATFORMA XIZMATLARI: Professional PPT, Referat, Mustaqil ish, Esse, Tarjima, QR Code, AI matn, Nutq tayyorlash, va dizayn xizmatlari (CV, Logo, Vizitka).
+
+Har doim {lang_name} tilida javob ber. Iliq, do'stona va foydali bo'l!""",
+        "ru": "Тебя зовут EVA — персональный AI-помощник платформы MasterStudent. Ты добрая, вежливая и умная. Помогай клиентам тепло и профессионально. Отвечай на русском языке.",
+        "en": "Your name is EVA — personal AI assistant of MasterStudent platform. You are kind, polite and smart. Help customers warmly and professionally. Answer in English.",
+    }
+    
+    system = persona.get(lang, persona["uz"]).replace("{lang_name}", lang_name)
+    prompt = f"{system}\n\nMijoz savoli: {question}\n\nEVA javobi:"
+    return await ai_generate(prompt, max_tokens=1200, temperature=0.8)
 
 
 # ============================================================

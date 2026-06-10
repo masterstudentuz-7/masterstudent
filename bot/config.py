@@ -32,6 +32,11 @@ GEMINI_MODELS = [
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 
+# Pexels API — slaydlarga real rasmlar qo'shish uchun (IXTIYORIY)
+# Bepul kalit: https://www.pexels.com/api/
+# Agar bo'sh bo'lsa, slaydlar chiroyli dizayn elementlari bilan yaratiladi
+PEXELS_API_KEY = os.getenv("PEXELS_API_KEY", "")
+
 # Database
 DB_PATH = "database.db"
 
