@@ -307,61 +307,105 @@ GOST_SLIDE_STRUCTURE = {
 
 
 async def generate_ppt_content(topic: str, slides: int, purpose: str, lang: str, extra: str = "") -> list:
-    """Generate GOST-compliant PPT content using AI."""
+    """
+    GOST standartidagi taqdimot — avval REJA tuziladi, keyin har slayd real sarlavha bilan.
+    Reja nomlari mazmunli bo'ladi, "1-bo'lim" emas.
+    """
     lang_name = {"uz": "O'zbek", "ru": "Русский", "en": "English"}.get(lang, "O'zbek")
-    
-    # GOST tuzilishini hisobga olamiz
-    structure = GOST_SLIDE_STRUCTURE.get(lang, GOST_SLIDE_STRUCTURE["uz"])
-    # Asosiy qism slaydalari = jami - (titul + dolzarblik + maqsad + natijalar + xulosa + adabiyotlar)
-    main_slides = slides - 6  # 6 ta majburiy slayd
-    if main_slides < 1:
-        main_slides = 1
-    
-    prompt = f"""Create a professional GOST-standard academic presentation in {lang_name} language.
-Topic: {topic}
-Purpose: {purpose}
-{f'Additional requirements: {extra}' if extra else ''}
 
-STRICT STRUCTURE (GOST standard):
-1. First slide: "{structure[0]}" - title of presentation
-2. Second slide: "{structure[1]}" - why this topic is relevant/important
-3. Third slide: "{structure[2]}" - main goal and 3-5 specific tasks
-4. Slides 4 to {3 + main_slides}: Main content ({main_slides} slides with detailed information)
-5. Slide {4 + main_slides}: "{structure[3]}" - key findings/results
-6. Slide {5 + main_slides}: "{structure[4]}" - conclusion and recommendations
-7. Last slide: "{structure[5]}" - list of 5-8 academic sources
+    # Asosiy qism slaydlari soni = jami - (titul + reja + kirish + xulosa + adabiyotlar)
+    main_count = max(1, slides - 5)
 
-Return a JSON array with exactly {slides} objects. Each object must have:
-- "title": slide title (clear, specific)
-- "content": array of 5-7 detailed bullet points (each bullet should be a FULL sentence, 15-25 words, with facts/data)
-- "notes": speaker notes (2-3 detailed sentences for presenting)
+    # 1-QADAM: REJA tuzish — mazmunli sarlavhalar
+    plan_prompt = f"""Sen "{lang_name}" tilida GOST standartidagi akademik taqdimot (PPT) tayyorlayotgan mutaxassissan.
+Mavzu: "{topic}"
+Maqsad: {purpose}
 
-IMPORTANT: Each bullet point must be INFORMATIVE and DETAILED. Not short phrases — full academic sentences with facts.
-Example good bullet: "O'zbekiston YaIMi 2023-yilda 80 mlrd dollarni tashkil etib, oldingi yilga nisbatan 5.5% o'sdi"
-Example bad bullet: "Iqtisodiyot o'sdi" (TOO SHORT!)
+VAZIFA: Asosiy qism uchun aniq {main_count} ta MAZMUNLI slayd sarlavhasini yoz.
 
-Return ONLY valid JSON array, no other text, no markdown. ENSURE the JSON is COMPLETE."""
+QOIDALAR:
+- Har bir sarlavha mavzuning aniq jihatini ifodalasin
+- "1-bo'lim", "2-slayd", "Asosiy qism" kabi UMUMIY nomlar TAQIQLANADI
+- Sarlavhalar qisqa, aniq va mavzuga oid bo'lsin (3-7 so'z)
+
+Faqat JSON massiv qaytar:
+["birinchi mazmunli sarlavha", "ikkinchi mazmunli sarlavha", ...]
+Faqat to'g'ri JSON. Markdown yo'q."""
+
+    main_titles = []
+    try:
+        pt = await ai_generate(plan_prompt, max_tokens=800, temperature=0.7)
+        pt = pt.strip()
+        if pt.startswith("```"):
+            pt = pt.split("\n", 1)[1]
+            if pt.endswith("```"):
+                pt = pt[:-3]
+        main_titles = json.loads(pt.strip())
+    except Exception:
+        main_titles = []
+
+    # Validatsiya
+    def _bad(t):
+        tl = (t or "").lower().strip()
+        return (not tl) or len(tl) < 6 or tl.startswith(("1-", "2-", "3-", "slayd", "bob", "bo'lim"))
+
+    if not main_titles or any(_bad(t) for t in main_titles):
+        main_titles = [f"{topic}: {asp}" for asp in
+                       ["mohiyati", "ahamiyati", "tahlili", "muammolari", "istiqbollari"]][:main_count]
+    main_titles = main_titles[:main_count]
+
+    # GOST slayd tuzilishi: titul + reja + kirish + [asosiy] + xulosa + adabiyotlar
+    intro_t = {"uz": "Kirish", "ru": "Введение", "en": "Introduction"}.get(lang, "Kirish")
+    plan_t = {"uz": "Reja", "ru": "План", "en": "Plan"}.get(lang, "Reja")
+    concl_t = {"uz": "Xulosa", "ru": "Заключение", "en": "Conclusion"}.get(lang, "Xulosa")
+    refs_t = {"uz": "Foydalanilgan adabiyotlar", "ru": "Использованная литература", "en": "References"}.get(lang, "Foydalanilgan adabiyotlar")
+
+    # To'liq slayd sarlavhalari ro'yxati
+    full_titles = [topic, plan_t, intro_t] + main_titles + [concl_t, refs_t]
+
+    # 2-QADAM: Har slayd uchun kontent generatsiya (bitta so'rovda)
+    titles_for_prompt = "\n".join([f"{i+1}. {t}" for i, t in enumerate(full_titles)])
+    content_prompt = f"""Sen "{lang_name}" tilida GOST standartidagi akademik taqdimot kontentini yozayotgan mutaxassissan.
+Mavzu: "{topic}"
+{f'Qo`shimcha talab: {extra}' if extra else ''}
+
+Quyidagi slaydlar uchun kontent yoz (sarlavhalar ALREADY berilgan, ularni O'ZGARTIRMA):
+{titles_for_prompt}
+
+QOIDALAR:
+- 2-slayd "Reja" — unda barcha bo'limlar ro'yxati bullet sifatida
+- Har slaydda 4-6 ta to'liq, ma'lumotli bullet (har biri 12-20 so'z, faktlar bilan)
+- "Foydalanilgan adabiyotlar" slaydida 5-6 ta manba
+- Akademik, aniq, mazmunli yoz
+
+Aniq {len(full_titles)} ta obyektli JSON massiv qaytar. Har obyekt:
+{{"title": "<yuqoridagi aynan o'sha sarlavha>", "content": ["bullet1", "bullet2", ...], "notes": "ma'ruzachi uchun 2 jumla"}}
+
+Faqat to'g'ri to'liq JSON massiv. Markdown yo'q."""
 
     for attempt in range(2):
         try:
-            content = await ai_generate(prompt, max_tokens=8000, temperature=0.7)
-            
+            content = await ai_generate(content_prompt, max_tokens=8000, temperature=0.7)
             content = content.strip()
             if content.startswith("```"):
                 content = content.split("\n", 1)[1]
                 if content.endswith("```"):
                     content = content[:-3]
             content = content.strip()
-            
-            return json.loads(content)
+            result = json.loads(content)
+            # Sarlavhalarni majburan to'g'rilash (AI o'zgartirgan bo'lsa)
+            for i, item in enumerate(result):
+                if i < len(full_titles):
+                    item["title"] = full_titles[i]
+            return result
         except json.JSONDecodeError as e:
             logger.warning(f"PPT JSON parse attempt {attempt + 1} failed: {e}")
             if attempt == 0:
-                prompt += "\n\nIMPORTANT: Previous attempt produced invalid JSON. Keep bullet points SHORT (max 15 words each). Ensure complete valid JSON array."
+                content_prompt += "\n\nMUHIM: Avvalgi javob buzuq JSON edi. Bulletlarni QISQA qil (max 15 so'z). To'liq, to'g'ri JSON massiv qaytar."
                 continue
             else:
-                logger.error(f"PPT JSON parse error (final): {e}\nContent preview: {content[:300]}")
-                raise Exception(f"AI noto'g'ri format qaytardi (JSONDecodeError)")
+                logger.error(f"PPT JSON parse error (final): {e}")
+                raise Exception("AI noto'g'ri format qaytardi (JSONDecodeError)")
 
 
 def _fetch_image(query: str) -> io.BytesIO:
@@ -577,18 +621,33 @@ async def generate_document_content(topic: str, doc_type: str, pages: int, lang:
     words_per_page = 250
     total_words = pages * words_per_page
     
-    # 1-QADAM: Reja tuzish — bo'limlar nomini olish
-    plan_prompt = f"""You are writing a GOST-standard academic {doc_type} in {lang_name} language.
-Topic: {topic}
-Total pages: {pages}
+    # 1-QADAM: Reja tuzish — HAQIQIY, mazmunli bo'lim nomlari
+    plan_prompt = f"""Sen "{lang_name}" tilida GOST standartidagi akademik "{doc_type}" yozayotgan professional mutaxassissan.
+Mavzu: "{topic}"
+Sahifalar soni: {pages}
 
-Create an outline with 4-6 section headings for the main body.
-Return ONLY a JSON object with title and section headings:
+VAZIFA: Shu mavzu bo'yicha REJA tuz. Asosiy qism uchun 4-6 ta BO'LIM sarlavhasini yoz.
+
+MUHIM QOIDALAR:
+- Har bir bo'lim sarlavhasi MAZMUNLI va MAVZUGA OID bo'lishi shart
+- "1-bo'lim", "2-bo'lim", "Bob 1", "Birinchi qism" kabi UMUMIY nomlar TAQIQLANADI
+- Har bir sarlavha mavzuning aniq bir jihatini ifodalashi kerak
+- Sarlavhalar akademik uslubda, to'liq va aniq bo'lsin
+
+YAXSHI MISOL (mavzu "O'zbekiston iqtisodiyoti" bo'lsa):
+- "O'zbekiston iqtisodiyotining zamonaviy holati va asosiy ko'rsatkichlari"
+- "Iqtisodiy islohotlar va ularning natijalari"
+- "Tashqi savdo va xalqaro hamkorlik"
+- "Iqtisodiy rivojlanish istiqbollari va muammolar"
+
+YOMON MISOL (ishlatma!): "1-bo'lim", "Kirish qismi", "Asosiy qism"
+
+Faqat JSON qaytar:
 {{
-    "title": "full academic title of the work",
-    "sections": ["Section 1 heading", "Section 2 heading", "Section 3 heading", "Section 4 heading"]
+    "title": "ishning to'liq akademik nomi",
+    "sections": ["birinchi mazmunli sarlavha", "ikkinchi mazmunli sarlavha", "uchinchi mazmunli sarlavha", "to'rtinchi mazmunli sarlavha"]
 }}
-Return ONLY valid JSON. No markdown."""
+Faqat to'g'ri JSON qaytar. Markdown ishlatma."""
 
     plan_text = await ai_generate(plan_prompt, max_tokens=1000, temperature=0.7)
     plan_text = plan_text.strip()
@@ -597,13 +656,58 @@ Return ONLY valid JSON. No markdown."""
         if plan_text.endswith("```"):
             plan_text = plan_text[:-3]
     
+    def _is_bad_sections(secs):
+        if not secs or len(secs) < 3:
+            return True
+        for s in secs:
+            sl = (s or "").lower().strip()
+            if not sl or len(sl) < 12:
+                return True
+            if sl.startswith(("bob", "1-", "2-", "3-", "4-", "5-", "bo'lim", "bolim")):
+                return True
+            if "bo'lim" in sl and len(sl) < 18:
+                return True
+        return False
+
+    plan = None
     try:
         plan = json.loads(plan_text.strip())
-    except json.JSONDecodeError:
-        plan = {"title": topic, "sections": [f"{topic} — 1-bo'lim", f"{topic} — 2-bo'lim", f"{topic} — 3-bo'lim", f"{topic} — 4-bo'lim"]}
-    
-    title = plan.get("title", topic)
-    section_headings = plan.get("sections", [f"Bo'lim {i}" for i in range(1, 5)])
+        if _is_bad_sections(plan.get("sections", [])):
+            raise ValueError("Generic section names")
+    except (json.JSONDecodeError, ValueError):
+        # Qayta urinish — yanada qattiqroq talab bilan
+        try:
+            retry_prompt = plan_prompt + "\n\nDIQQAT: Har bir sarlavha mavzuga oid TO'LIQ jumla bo'lsin (kamida 5 so'z). Umumiy nomlar mutlaqo mumkin emas!"
+            plan_text2 = await ai_generate(retry_prompt, max_tokens=1000, temperature=0.85)
+            plan_text2 = plan_text2.strip()
+            if plan_text2.startswith("```"):
+                plan_text2 = plan_text2.split("\n", 1)[1]
+                if plan_text2.endswith("```"):
+                    plan_text2 = plan_text2[:-3]
+            plan = json.loads(plan_text2.strip())
+            if _is_bad_sections(plan.get("sections", [])):
+                raise ValueError("still bad")
+        except Exception:
+            # Oxirgi chora — mavzu asosida mazmunli nomlar
+            plan = {
+                "title": topic,
+                "sections": [
+                    f"{topic}: mohiyati va asosiy tushunchalari",
+                    f"{topic}ning zamonaviy holati va tahlili",
+                    f"{topic} sohasidagi muammolar va ularning yechimlari",
+                    f"{topic}ning rivojlanish istiqbollari",
+                ],
+            }
+
+    title = plan.get("title", topic) or topic
+    section_headings = plan.get("sections", [])
+    if _is_bad_sections(section_headings):
+        section_headings = [
+            f"{topic}: mohiyati va asosiy tushunchalari",
+            f"{topic}ning zamonaviy holati va tahlili",
+            f"{topic} sohasidagi muammolar va ularning yechimlari",
+            f"{topic}ning rivojlanish istiqbollari",
+        ]
     
     # 2-QADAM: Kirish — batafsil
     words_per_section = total_words // (len(section_headings) + 2)
