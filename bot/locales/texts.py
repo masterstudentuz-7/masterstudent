@@ -110,6 +110,7 @@ Choose the section you need from the menu below 👇""",
     "btn_about": {"uz": "ℹ️ Haqimizda", "ru": "ℹ️ О нас", "en": "ℹ️ About Us"},
     "btn_contact": {"uz": "📞 Bog'lanish", "ru": "📞 Связаться", "en": "📞 Contact"},
     "btn_profile": {"uz": "👤 Profil", "ru": "👤 Профиль", "en": "👤 Profile"},
+    "btn_donate": {"uz": "🎗 Donat", "ru": "🎗 Донат", "en": "🎗 Donate"},
     "btn_back": {"uz": "⬅️ Ortga", "ru": "⬅️ Назад", "en": "⬅️ Back"},
     "btn_cancel": {"uz": "❌ Bekor qilish", "ru": "❌ Отмена", "en": "❌ Cancel"},
     "btn_confirm": {"uz": "✅ Tasdiqlash", "ru": "✅ Подтвердить", "en": "✅ Confirm"},
@@ -749,6 +750,75 @@ Thank you for choosing us! 🙏""",
         "uz": "Jarayon bekor qilindi ✅\nAsosiy menyuga qaytdingiz",
         "ru": "Действие отменено ✅\nВы вернулись в главное меню",
         "en": "Action cancelled ✅\nYou're back to the main menu",
+    },
+
+    # ===== DONATE =====
+    "donate_info": {
+        "uz": """🎗 <b>Loyihani qo'llab-quvvatlash</b>
+
+Hurmatli foydalanuvchi! 🙏
+
+Agar bizning xizmatlarimiz sizga yoqsa va foydali bo'lsa — loyihamizni rivojlantirishga yordam bering.
+
+<b>Sizning donatlaringiz nimaga sarflanadi:</b>
+• 🚀 Yangi xizmatlar yaratish
+• ⚡ Serverlarni kuchaytirish
+• 🤖 EVA'ni yanada aqlliroq qilish
+• 💎 Sifatni oshirish
+
+<b>💳 Karta raqami:</b>
+<code>{card}</code>
+
+<b>Qanday donat qilish:</b>
+1. Yuqoridagi karta raqamini bosing (nusxalanadi)
+2. Bank ilovangizda to'lov qiling
+3. Istalgan summa — har bir so'm qimmatli! 💰
+
+Yoki botdagi "🛍 Sotib olish" orqali ham hisobni to'ldirishingiz mumkin.
+
+<b>Rahmat, sizning qo'llab-quvvatlashingiz biz uchun juda muhim! 🙏❤️</b>""",
+        "ru": """🎗 <b>Поддержать проект</b>
+
+Уважаемый пользователь! 🙏
+
+Если наши услуги вам понравились — помогите развивать проект.
+
+<b>На что идут донаты:</b>
+• 🚀 Создание новых услуг
+• ⚡ Улучшение серверов
+• 🤖 Развитие EVA
+• 💎 Повышение качества
+
+<b>💳 Номер карты:</b>
+<code>{card}</code>
+
+<b>Как сделать донат:</b>
+1. Нажмите на номер карты (скопируется)
+2. Переведите любую сумму в банковском приложении
+3. Каждый сум важен! 💰
+
+<b>Спасибо за вашу поддержку! 🙏❤️</b>""",
+        "en": """🎗 <b>Support the Project</b>
+
+Dear user! 🙏
+
+If you find our services helpful — please support our development.
+
+<b>What donations are used for:</b>
+• 🚀 Creating new services
+• ⚡ Improving servers
+• 🤖 Making EVA smarter
+• 💎 Increasing quality
+
+<b>💳 Card number:</b>
+<code>{card}</code>
+
+<b>How to donate:</b>
+1. Tap the card number above (it copies)
+2. Transfer any amount via your banking app
+3. Every sum matters! 💰
+
+<b>Thank you for your support! 🙏❤️</b>""",
     },
 
     # ===== STATE INTERRUPTED =====

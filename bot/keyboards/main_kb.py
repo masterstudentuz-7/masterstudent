@@ -10,7 +10,8 @@ def get_main_menu_kb(lang: str = "uz") -> ReplyKeyboardMarkup:
         [KeyboardButton(text=get_text("btn_buy", lang)), KeyboardButton(text=get_text("btn_ai_helper", lang))],
         [KeyboardButton(text=get_text("btn_referral", lang)), KeyboardButton(text=get_text("btn_promotions", lang))],
         [KeyboardButton(text=get_text("btn_language", lang)), KeyboardButton(text=get_text("btn_about", lang))],
-        [KeyboardButton(text=get_text("btn_contact", lang)), KeyboardButton(text=get_text("btn_profile", lang))],
+        [KeyboardButton(text=get_text("btn_donate", lang)), KeyboardButton(text=get_text("btn_profile", lang))],
+        [KeyboardButton(text=get_text("btn_contact", lang))],
     ]
     return ReplyKeyboardMarkup(keyboard=buttons, resize_keyboard=True)
 

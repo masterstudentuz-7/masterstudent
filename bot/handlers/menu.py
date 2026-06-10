@@ -3,7 +3,7 @@ from aiogram.types import Message, CallbackQuery
 from aiogram.fsm.context import FSMContext
 
 import database as db
-from config import SUPPORT_USERNAME, CHANNEL_ID
+from config import SUPPORT_USERNAME, CHANNEL_ID, BANK_CARD
 from locales import get_text
 from keyboards.main_kb import get_main_menu_kb, get_back_kb, get_contact_kb
 from keyboards.inline_kb import get_language_kb, get_services_kb
@@ -140,6 +140,17 @@ async def menu_change_language(message: Message, state: FSMContext):
     await message.answer(
         get_text("choose_language", lang),
         reply_markup=get_language_kb()
+    )
+
+
+@router.message(F.text.in_(["🎗 Donat", "🎗 Донат", "🎗 Donate"]))
+async def menu_donate(message: Message, state: FSMContext):
+    """Show donate info."""
+    await state.clear()
+    lang = await db.get_user_language(message.from_user.id)
+    await message.answer(
+        get_text("donate_info", lang, card=BANK_CARD),
+        parse_mode="HTML"
     )
 
 
