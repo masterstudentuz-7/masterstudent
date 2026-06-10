@@ -12,7 +12,9 @@
 </head>
 <body>
 
-
+    <!-- CURSOR -->
+    <div class="cursor" id="cursor"></div>
+    <div class="cursor-follower" id="cursorFollower"></div>
 
     <!-- NAVBAR -->
     <header class="header" id="header">
@@ -315,6 +317,83 @@
                             Telegram Botga o'tish
                         </span>
                     </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- COMMENTS -->
+    <section class="comments-section" id="comments">
+        <div class="container">
+            <div class="section-head center">
+                <div class="section-tag">Izohlar</div>
+                <h2 class="section-title">Fikringizni <span class="accent-gradient">qoldiring</span></h2>
+                <p class="section-desc">Xizmatimiz haqida o'z fikringizni yozing — bu boshqalarga yordam beradi</p>
+            </div>
+            <div class="comments-container">
+                <form class="comment-form" id="commentForm">
+                    <div class="form-row">
+                        <input type="text" id="commentName" placeholder="Ismingiz" required class="form-input">
+                        <select id="commentRating" class="form-input form-select">
+                            <option value="5">★★★★★ A'lo</option>
+                            <option value="4">★★★★ Yaxshi</option>
+                            <option value="3">★★★ O'rtacha</option>
+                            <option value="2">★★ Yomon</option>
+                            <option value="1">★ Juda yomon</option>
+                        </select>
+                    </div>
+                    <textarea id="commentText" placeholder="Xizmatimiz haqida fikringizni yozing..." required class="form-input form-textarea"></textarea>
+                    <button type="submit" class="btn-submit">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+                        Yuborish
+                    </button>
+                </form>
+                <div class="comments-list" id="commentsList">
+                    <!-- Saqlangan izohlar shu yerda ko'rinadi -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- DONATE -->
+    <section class="donate-section" id="donate">
+        <div class="container">
+            <div class="donate-card">
+                <div class="donate-glow"></div>
+                <div class="donate-content">
+                    <div class="donate-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+                    </div>
+                    <h2>Loyihani qo'llab-quvvatlang</h2>
+                    <p>Agar xizmatlarimiz sizga yoqsa va foydali bo'lsa — loyihamizni rivojlantirishga yordam bering. 
+                    Har bir donat yangi xizmatlar yaratish, serverlarni kuchaytirish va sifatni oshirishga sarflanadi.</p>
+                    <div class="donate-amounts">
+                        <button class="donate-btn" data-amount="5000">5,000 so'm</button>
+                        <button class="donate-btn" data-amount="10000">10,000 so'm</button>
+                        <button class="donate-btn" data-amount="25000">25,000 so'm</button>
+                        <button class="donate-btn" data-amount="50000">50,000 so'm</button>
+                        <button class="donate-btn active" data-amount="100000">100,000 so'm</button>
+                        <button class="donate-btn" data-amount="0">Boshqa summa</button>
+                    </div>
+                    <div class="donate-methods">
+                        <div class="donate-method">
+                            <div class="dm-icon">💳</div>
+                            <div class="dm-info">
+                                <span class="dm-title">Bank karta</span>
+                                <code class="dm-card">8600 0000 0000 0000</code>
+                            </div>
+                            <button class="dm-copy" onclick="copyCard()">Nusxalash</button>
+                        </div>
+                        <div class="donate-method">
+                            <div class="dm-icon">💙</div>
+                            <div class="dm-info">
+                                <span class="dm-title">Telegram Bot orqali</span>
+                                <span class="dm-sub">Balansni to'ldirish = Donat</span>
+                            </div>
+                            <a href="https://t.me/masterstudentbottest_bot" class="dm-copy" target="_blank">Ochish</a>
+                        </div>
+                    </div>
+                    <p class="donate-thanks">Har bir qo'llab-quvvatlash uchun katta rahmat! 🙏</p>
                 </div>
             </div>
         </div>
