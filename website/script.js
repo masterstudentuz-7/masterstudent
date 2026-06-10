@@ -1,50 +1,86 @@
-// Navbar
-const navbar = document.getElementById('navbar');
-window.addEventListener('scroll', () => navbar.classList.toggle('scrolled', window.scrollY > 40));
-
-// Mobile menu
-document.getElementById('menuToggle').addEventListener('click', function() {
-    const menu = document.getElementById('navMenu');
-    menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
-    menu.style.position = 'absolute';
-    menu.style.top = '60px';
-    menu.style.left = '0';
-    menu.style.right = '0';
-    menu.style.background = 'rgba(9,9,11,.98)';
-    menu.style.flexDirection = 'column';
-    menu.style.padding = '24px';
-    menu.style.gap = '16px';
-    menu.style.borderBottom = '1px solid var(--border)';
+// Preloader
+window.addEventListener('load', () => {
+    setTimeout(() => {
+        document.getElementById('preloader').style.opacity = '0';
+        setTimeout(() => document.getElementById('preloader').style.display = 'none', 500);
+    }, 1200);
 });
 
-// Counter
-const counters = document.querySelectorAll('.metric-value');
-const obs = new IntersectionObserver(entries => {
+// Custom cursor (desktop only)
+if (window.innerWidth > 768) {
+    const cursor = document.getElementById('cursor');
+    const follower = document.getElementById('cursorFollower');
+    document.addEventListener('mousemove', e => {
+        cursor.style.left = e.clientX + 'px';
+        cursor.style.top = e.clientY + 'px';
+        setTimeout(() => {
+            follower.style.left = e.clientX + 'px';
+            follower.style.top = e.clientY + 'px';
+        }, 80);
+    });
+    document.querySelectorAll('a, button, .btn-hero, .btn-premium, .btn-card').forEach(el => {
+        el.addEventListener('mouseenter', () => { cursor.style.transform = 'scale(2)'; follower.style.transform = 'scale(1.5)'; });
+        el.addEventListener('mouseleave', () => { cursor.style.transform = 'scale(1)'; follower.style.transform = 'scale(1)'; });
+    });
+}
+
+// Navbar scroll
+const header = document.getElementById('header');
+window.addEventListener('scroll', () => header.classList.toggle('scrolled', window.scrollY > 60));
+
+// Mobile menu
+document.getElementById('mobileToggle').addEventListener('click', function() {
+    this.classList.toggle('active');
+    document.getElementById('nav').classList.toggle('open');
+});
+
+// Counter animation
+const statNums = document.querySelectorAll('.stat-num');
+const cObs = new IntersectionObserver(entries => {
     entries.forEach(entry => {
         if (entry.isIntersecting) {
-            const el = entry.target;
-            const target = parseInt(el.dataset.count);
-            let current = 0;
-            const step = target / 30;
+            const el = entry.target, target = parseInt(el.dataset.count);
+            let cur = 0;
+            const step = Math.max(1, target / 40);
             const timer = setInterval(() => {
-                current += step;
-                if (current >= target) { el.textContent = target.toLocaleString(); clearInterval(timer); }
-                else el.textContent = Math.floor(current).toLocaleString();
-            }, 30);
-            obs.unobserve(el);
+                cur += step;
+                if (cur >= target) { el.textContent = target.toLocaleString(); clearInterval(timer); }
+                else el.textContent = Math.floor(cur).toLocaleString();
+            }, 35);
+            cObs.unobserve(el);
         }
     });
 }, { threshold: 0.5 });
-counters.forEach(c => obs.observe(c));
+statNums.forEach(s => cObs.observe(s));
 
-// Scroll animation
-const animEls = document.querySelectorAll('.service-item, .p-step, .price-card, .testimonial');
-const sObs = new IntersectionObserver(entries => {
-    entries.forEach(e => { if (e.isIntersecting) { e.target.style.opacity='1'; e.target.style.transform='translateY(0)'; sObs.unobserve(e.target); }});
-}, { threshold: 0.05 });
-animEls.forEach(el => { el.style.opacity='0'; el.style.transform='translateY(20px)'; el.style.transition='all .5s ease'; sObs.observe(el); });
+// Scroll reveal
+const revealEls = document.querySelectorAll('.feature-card, .svc-row, .pricing-card, .review-item, .showcase-card');
+const rObs = new IntersectionObserver(entries => {
+    entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+            setTimeout(() => {
+                entry.target.classList.add('revealed');
+            }, i * 60);
+            rObs.unobserve(entry.target);
+        }
+    });
+}, { threshold: 0.08 });
+revealEls.forEach(el => rObs.observe(el));
 
 // Smooth scroll
 document.querySelectorAll('a[href^="#"]').forEach(a => {
-    a.addEventListener('click', e => { e.preventDefault(); const t=document.querySelector(a.getAttribute('href')); if(t) t.scrollIntoView({behavior:'smooth',block:'start'}); });
+    a.addEventListener('click', e => {
+        e.preventDefault();
+        const t = document.querySelector(a.getAttribute('href'));
+        if (t) { t.scrollIntoView({ behavior: 'smooth', block: 'start' }); document.getElementById('nav').classList.remove('open'); }
+    });
+});
+
+// Parallax showcase cards
+window.addEventListener('scroll', () => {
+    const scrolled = window.scrollY;
+    document.querySelectorAll('.showcase-card').forEach((card, i) => {
+        const speed = (i + 1) * 0.03;
+        card.style.transform = `translateY(${scrolled * speed}px)`;
+    });
 });
