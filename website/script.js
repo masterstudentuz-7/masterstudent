@@ -1,48 +1,50 @@
-// Navbar scroll
+// Navbar
 const navbar = document.getElementById('navbar');
-window.addEventListener('scroll', () => { navbar.classList.toggle('scrolled', window.scrollY > 50); });
+window.addEventListener('scroll', () => navbar.classList.toggle('scrolled', window.scrollY > 40));
 
 // Mobile menu
-const mobileBtn = document.getElementById('mobileMenuBtn');
-const navLinks = document.getElementById('navLinks');
-mobileBtn.addEventListener('click', () => { navLinks.classList.toggle('active'); });
-navLinks.querySelectorAll('a').forEach(l => l.addEventListener('click', () => navLinks.classList.remove('active')));
+document.getElementById('menuToggle').addEventListener('click', function() {
+    const menu = document.getElementById('navMenu');
+    menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
+    menu.style.position = 'absolute';
+    menu.style.top = '60px';
+    menu.style.left = '0';
+    menu.style.right = '0';
+    menu.style.background = 'rgba(9,9,11,.98)';
+    menu.style.flexDirection = 'column';
+    menu.style.padding = '24px';
+    menu.style.gap = '16px';
+    menu.style.borderBottom = '1px solid var(--border)';
+});
 
-// Counter animation
-const counters = document.querySelectorAll('.stat-number');
-const counterObs = new IntersectionObserver((entries) => {
+// Counter
+const counters = document.querySelectorAll('.metric-value');
+const obs = new IntersectionObserver(entries => {
     entries.forEach(entry => {
         if (entry.isIntersecting) {
-            const el = entry.target, target = parseInt(el.dataset.count);
+            const el = entry.target;
+            const target = parseInt(el.dataset.count);
             let current = 0;
+            const step = target / 30;
             const timer = setInterval(() => {
-                current += target / 40;
+                current += step;
                 if (current >= target) { el.textContent = target.toLocaleString(); clearInterval(timer); }
-                else { el.textContent = Math.floor(current).toLocaleString(); }
-            }, 40);
-            counterObs.unobserve(el);
+                else el.textContent = Math.floor(current).toLocaleString();
+            }, 30);
+            obs.unobserve(el);
         }
     });
 }, { threshold: 0.5 });
-counters.forEach(c => counterObs.observe(c));
+counters.forEach(c => obs.observe(c));
 
-// FAQ
-document.querySelectorAll('.faq-item').forEach(item => {
-    item.querySelector('.faq-question').addEventListener('click', () => {
-        const active = item.classList.contains('active');
-        document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('active'));
-        if (!active) item.classList.add('active');
-    });
-});
-
-// Scroll animations
-const animEls = document.querySelectorAll('.service-card, .step, .price-card, .review-card');
-const scrollObs = new IntersectionObserver((entries) => {
-    entries.forEach(e => { if (e.isIntersecting) { e.target.style.opacity='1'; e.target.style.transform='translateY(0)'; scrollObs.unobserve(e.target); }});
-}, { threshold: 0.1 });
-animEls.forEach(el => { el.style.opacity='0'; el.style.transform='translateY(30px)'; el.style.transition='all 0.6s ease'; scrollObs.observe(el); });
+// Scroll animation
+const animEls = document.querySelectorAll('.service-item, .p-step, .price-card, .testimonial');
+const sObs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.style.opacity='1'; e.target.style.transform='translateY(0)'; sObs.unobserve(e.target); }});
+}, { threshold: 0.05 });
+animEls.forEach(el => { el.style.opacity='0'; el.style.transform='translateY(20px)'; el.style.transition='all .5s ease'; sObs.observe(el); });
 
 // Smooth scroll
 document.querySelectorAll('a[href^="#"]').forEach(a => {
-    a.addEventListener('click', e => { e.preventDefault(); const t = document.querySelector(a.getAttribute('href')); if(t) t.scrollIntoView({behavior:'smooth'}); });
+    a.addEventListener('click', e => { e.preventDefault(); const t=document.querySelector(a.getAttribute('href')); if(t) t.scrollIntoView({behavior:'smooth',block:'start'}); });
 });
