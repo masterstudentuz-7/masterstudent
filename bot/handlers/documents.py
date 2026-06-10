@@ -468,7 +468,7 @@ async def qr_design_selected(callback: CallbackQuery, state: FSMContext):
 
 # ===== AI TEXT / CONTENT / SPEECH / BANNER =====
 
-@router.callback_query(F.data.in_(["svc_ai_text", "svc_ai_content", "svc_speech", "svc_banner", "svc_word", "svc_excel", "svc_pdf", "svc_pdf_word"]))
+@router.callback_query(F.data.in_(["svc_ai_text", "svc_ai_content", "svc_speech", "svc_banner"]))
 async def ai_text_start(callback: CallbackQuery, state: FSMContext):
     """Start AI text service."""
     lang = await db.get_user_language(callback.from_user.id)
@@ -477,10 +477,6 @@ async def ai_text_start(callback: CallbackQuery, state: FSMContext):
         "svc_ai_content": ("ai_content", "AI kontent yaratish"),
         "svc_speech": ("speech", "Nutq tayyorlash"),
         "svc_banner": ("banner_post", "Banner va postlar"),
-        "svc_word": ("word_service", "Word xizmatlari"),
-        "svc_excel": ("excel_service", "Excel xizmatlari"),
-        "svc_pdf": ("pdf_service", "PDF xizmatlari"),
-        "svc_pdf_word": ("pdf_word", "PDF ↔ Word"),
     }
     service_key, service_name = service_map.get(callback.data, ("ai_text", "AI Text"))
     

@@ -10,7 +10,7 @@ from aiogram.client.default import DefaultBotProperties
 from config import BOT_TOKEN
 from database import init_db
 from handlers import setup_routers
-from middlewares.antiflood import AntiFloodMiddleware
+from middlewares.antiflood import AntiFloodMiddleware, UserActivityMiddleware
 
 # Configure logging
 logging.basicConfig(
@@ -38,6 +38,8 @@ async def main():
     
     # Add middleware
     dp.message.middleware(AntiFloodMiddleware(rate_limit=0.5))
+    dp.message.middleware(UserActivityMiddleware())
+    dp.callback_query.middleware(UserActivityMiddleware())
     
     # Setup routers
     main_router = setup_routers()
