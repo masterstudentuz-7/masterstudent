@@ -1,5 +1,6 @@
 from aiogram import Router, F
 from aiogram.types import Message, CallbackQuery
+from aiogram.fsm.context import FSMContext
 
 import database as db
 from config import SUPPORT_USERNAME, CHANNEL_ID
@@ -11,8 +12,9 @@ router = Router()
 
 
 @router.message(F.text.in_(["🛒 Xizmatlar", "🛒 Услуги", "🛒 Services"]))
-async def menu_services(message: Message):
+async def menu_services(message: Message, state: FSMContext):
     """Show services menu."""
+    await state.clear()  # Oldingi jarayonni bekor qilish
     lang = await db.get_user_language(message.from_user.id)
     await message.answer(
         get_text("services_title", lang),
@@ -22,8 +24,9 @@ async def menu_services(message: Message):
 
 
 @router.message(F.text.in_(["📦 Buyurtmalarim", "📦 Мои заказы", "📦 My Orders"]))
-async def menu_my_orders(message: Message):
+async def menu_my_orders(message: Message, state: FSMContext):
     """Show user orders."""
+    await state.clear()
     user_id = message.from_user.id
     lang = await db.get_user_language(user_id)
     
@@ -57,8 +60,9 @@ async def menu_my_orders(message: Message):
 
 
 @router.message(F.text.in_(["📂 Mening fayllarim", "📂 Мои файлы", "📂 My Files"]))
-async def menu_my_files(message: Message):
+async def menu_my_files(message: Message, state: FSMContext):
     """Show user files."""
+    await state.clear()
     user_id = message.from_user.id
     lang = await db.get_user_language(user_id)
     
@@ -83,8 +87,9 @@ async def menu_my_files(message: Message):
 
 
 @router.message(F.text.in_(["💳 Balans", "💳 Баланс", "💳 Balance"]))
-async def menu_balance(message: Message):
+async def menu_balance(message: Message, state: FSMContext):
     """Show balance info."""
+    await state.clear()
     user_id = message.from_user.id
     lang = await db.get_user_language(user_id)
     user = await db.get_user(user_id)
@@ -103,8 +108,9 @@ async def menu_balance(message: Message):
 
 
 @router.message(F.text.in_(["🎁 Referal", "🎁 Реферал", "🎁 Referral"]))
-async def menu_referral(message: Message):
+async def menu_referral(message: Message, state: FSMContext):
     """Show referral info."""
+    await state.clear()
     user_id = message.from_user.id
     lang = await db.get_user_language(user_id)
     
@@ -119,15 +125,17 @@ async def menu_referral(message: Message):
 
 
 @router.message(F.text.in_(["📢 Aksiyalar", "📢 Акции", "📢 Promotions"]))
-async def menu_promotions(message: Message):
+async def menu_promotions(message: Message, state: FSMContext):
     """Show promotions."""
+    await state.clear()
     lang = await db.get_user_language(message.from_user.id)
     await message.answer(get_text("promotions_title", lang), parse_mode="HTML")
 
 
 @router.message(F.text.in_(["🌐 Til o'zgartirish", "🌐 Сменить язык", "🌐 Change Language"]))
-async def menu_change_language(message: Message):
+async def menu_change_language(message: Message, state: FSMContext):
     """Show language selection."""
+    await state.clear()
     lang = await db.get_user_language(message.from_user.id)
     await message.answer(
         get_text("choose_language", lang),
@@ -136,8 +144,9 @@ async def menu_change_language(message: Message):
 
 
 @router.message(F.text.in_(["ℹ️ Haqimizda", "ℹ️ О нас", "ℹ️ About Us"]))
-async def menu_about(message: Message):
+async def menu_about(message: Message, state: FSMContext):
     """Show about info."""
+    await state.clear()
     lang = await db.get_user_language(message.from_user.id)
     await message.answer(
         get_text("about_info", lang, support=SUPPORT_USERNAME, channel=CHANNEL_ID),
@@ -146,8 +155,9 @@ async def menu_about(message: Message):
 
 
 @router.message(F.text.in_(["📞 Bog'lanish", "📞 Связаться", "📞 Contact"]))
-async def menu_contact(message: Message):
+async def menu_contact(message: Message, state: FSMContext):
     """Show contact options."""
+    await state.clear()
     lang = await db.get_user_language(message.from_user.id)
     await message.answer(
         get_text("contact_info", lang),
@@ -200,8 +210,9 @@ async def contact_channel(message: Message):
 
 
 @router.message(F.text.in_(["👤 Profil", "👤 Профиль", "👤 Profile"]))
-async def menu_profile(message: Message):
+async def menu_profile(message: Message, state: FSMContext):
     """Show user profile."""
+    await state.clear()
     user_id = message.from_user.id
     lang = await db.get_user_language(user_id)
     user = await db.get_user(user_id)
@@ -231,8 +242,9 @@ async def menu_profile(message: Message):
 
 
 @router.message(F.text.in_(["⬅️ Ortga", "⬅️ Назад", "⬅️ Back"]))
-async def menu_back(message: Message):
-    """Go back to main menu."""
+async def menu_back(message: Message, state: FSMContext):
+    """Go back to main menu — HAR QANDAY state'dan chiqadi."""
+    await state.clear()  # Barcha jarayonlarni bekor qilish
     lang = await db.get_user_language(message.from_user.id)
     await message.answer(
         get_text("main_menu", lang),

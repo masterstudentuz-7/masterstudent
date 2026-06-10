@@ -21,6 +21,7 @@ class PaymentStates(StatesGroup):
 @router.message(F.text.in_(["🛍 Sotib olish", "🛍 Пополнить", "🛍 Top Up"]))
 async def buy_start(message: Message, state: FSMContext):
     """Start payment flow."""
+    await state.clear()  # Oldingi jarayonni bekor qilish
     lang = await db.get_user_language(message.from_user.id)
     await state.set_state(PaymentStates.choosing_amount)
     await message.answer(
@@ -165,8 +166,19 @@ async def payment_receipt_document(message: Message, state: FSMContext):
 async def payment_receipt_text(message: Message, state: FSMContext):
     """Handle non-photo message while waiting for receipt."""
     lang = await db.get_user_language(message.from_user.id)
+    
+    # Ortga tugmasi bosilganda — jarayonni bekor qilish
+    if message.text and message.text in ["⬅️ Ortga", "⬅️ Назад", "⬅️ Back"]:
+        await state.clear()
+        await message.answer(
+            get_text("cancelled", lang),
+            reply_markup=get_main_menu_kb(lang),
+            parse_mode="HTML"
+        )
+        return
+    
     await message.answer(
-        "📷 Iltimos, to'lov chekining rasmini yoki screenshotini yuboring!",
+        "📷 Iltimos, to'lov chekining rasmini yoki screenshotini yuboring!\n\n⬅️ Bekor qilish uchun \"Ortga\" tugmasini bosing",
         parse_mode="HTML"
     )
 

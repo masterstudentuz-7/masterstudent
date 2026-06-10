@@ -7,25 +7,27 @@ LANGUAGES = {
 TEXTS = {
     # ===== LANGUAGE SELECTION =====
     "choose_language": {
-        "uz": "🌐 Tilni tanlang:",
-        "ru": "🌐 Выберите язык:",
-        "en": "🌐 Choose language:",
+        "uz": "🌐 Iltimos, tilni tanlang:",
+        "ru": "🌐 Пожалуйста, выберите язык:",
+        "en": "🌐 Please choose your language:",
     },
     "language_set": {
-        "uz": "✅ Til o'zbekcha qilib o'rnatildi!",
-        "ru": "✅ Язык установлен на русский!",
-        "en": "✅ Language set to English!",
+        "uz": "✅ Rahmat! Til o'zbekcha qilib o'rnatildi!",
+        "ru": "✅ Спасибо! Язык установлен на русский!",
+        "en": "✅ Thank you! Language set to English!",
     },
 
     # ===== WELCOME =====
     "welcome": {
-        "uz": """🎉 <b>Xush kelibsiz!</b>
+        "uz": """🎉 <b>Assalomu alaykum! Xush kelibsiz!</b>
+
+Men EVA 🤖 — sizning shaxsiy AI yordamchingizman! Keling, birga ishlaylik ✨
 
 🖥 <b>Online Premium Kompyuter Xizmatlari</b> botiga xush kelibsiz!
 
 📋 <b>Biz taklif qilamiz:</b>
 • 25+ professional xizmatlar
-• AI yordamida tezkor natija (1-5 daqiqa)
+• EVA yordamida tezkor natija (1-5 daqiqa)
 • Professional dizayn xizmatlari
 • 24/7 ishlash
 
@@ -40,11 +42,13 @@ TEXTS = {
 Quyidagi menyudan kerakli bo'limni tanlang 👇""",
         "ru": """🎉 <b>Добро пожаловать!</b>
 
+Я EVA 🤖 — ваш персональный AI-помощник! Давайте работать вместе ✨
+
 🖥 Добро пожаловать в бот <b>Online Premium Компьютерных Услуг</b>!
 
 📋 <b>Мы предлагаем:</b>
 • 25+ профессиональных услуг
-• Быстрый результат с AI (1-5 минут)
+• Быстрый результат с EVA (1-5 минут)
 • Профессиональные дизайн-услуги
 • Работаем 24/7
 
@@ -59,11 +63,13 @@ Quyidagi menyudan kerakli bo'limni tanlang 👇""",
 Выберите нужный раздел из меню ниже 👇""",
         "en": """🎉 <b>Welcome!</b>
 
+I'm EVA 🤖 — your personal AI assistant! Let's work together ✨
+
 🖥 Welcome to <b>Online Premium Computer Services</b> bot!
 
 📋 <b>We offer:</b>
 • 25+ professional services
-• Fast AI-powered results (1-5 min)
+• Fast EVA-powered results (1-5 min)
 • Professional design services
 • 24/7 availability
 
@@ -79,16 +85,16 @@ Choose the section you need from the menu below 👇""",
     },
 
     "welcome_back": {
-        "uz": "👋 Qaytganingizdan xursandmiz! Menyudan tanlang 👇",
+        "uz": "👋 Qaytganingizdan xursandmiz, hurmatli mijoz! Menyudan tanlang 👇",
         "ru": "👋 Рады видеть вас снова! Выберите из меню 👇",
         "en": "👋 Welcome back! Choose from the menu 👇",
     },
 
     # ===== MAIN MENU =====
     "main_menu": {
-        "uz": "📋 Asosiy menyu",
-        "ru": "📋 Главное меню",
-        "en": "📋 Main menu",
+        "uz": "📋 Asosiy menyu — Sizga qanday yordam bera olaman?",
+        "ru": "📋 Главное меню — Чем могу помочь?",
+        "en": "📋 Main menu — How can I help you?",
     },
 
     # ===== MENU BUTTONS =====
@@ -97,7 +103,7 @@ Choose the section you need from the menu below 👇""",
     "btn_my_files": {"uz": "📂 Mening fayllarim", "ru": "📂 Мои файлы", "en": "📂 My Files"},
     "btn_balance": {"uz": "💳 Balans", "ru": "💳 Баланс", "en": "💳 Balance"},
     "btn_buy": {"uz": "🛍 Sotib olish", "ru": "🛍 Пополнить", "en": "🛍 Top Up"},
-    "btn_ai_helper": {"uz": "🤖 AI Yordamchi", "ru": "🤖 AI Помощник", "en": "🤖 AI Helper"},
+    "btn_ai_helper": {"uz": "🤖 EVA Yordamchi", "ru": "🤖 EVA Помощник", "en": "🤖 EVA Helper"},
     "btn_referral": {"uz": "🎁 Referal", "ru": "🎁 Реферал", "en": "🎁 Referral"},
     "btn_promotions": {"uz": "📢 Aksiyalar", "ru": "📢 Акции", "en": "📢 Promotions"},
     "btn_language": {"uz": "🌐 Til o'zgartirish", "ru": "🌐 Сменить язык", "en": "🌐 Change Language"},
@@ -110,22 +116,22 @@ Choose the section you need from the menu below 👇""",
 
     # ===== SERVICES =====
     "services_title": {
-        "uz": "🛒 <b>Xizmatlar</b>\n\nKategoriyani tanlang:",
-        "ru": "🛒 <b>Услуги</b>\n\nВыберите категорию:",
-        "en": "🛒 <b>Services</b>\n\nChoose a category:",
+        "uz": "🛒 <b>Xizmatlar</b>\n\nIltimos, kategoriyani tanlang 👇",
+        "ru": "🛒 <b>Услуги</b>\n\nПожалуйста, выберите категорию:",
+        "en": "🛒 <b>Services</b>\n\nPlease choose a category:",
     },
-    "btn_ai_services": {"uz": "🤖 AI Xizmatlari", "ru": "🤖 AI Услуги", "en": "🤖 AI Services"},
+    "btn_ai_services": {"uz": "🤖 EVA Xizmatlari", "ru": "🤖 EVA Услуги", "en": "🤖 EVA Services"},
     "btn_admin_services": {"uz": "👨‍💻 Admin Xizmatlari", "ru": "👨‍💻 Услуги админа", "en": "👨‍💻 Admin Services"},
 
     "ai_services_title": {
-        "uz": "🤖 <b>AI Xizmatlari</b>\n\n⚡ 1-5 daqiqada tayyor!\n\nXizmatni tanlang:",
-        "ru": "🤖 <b>AI Услуги</b>\n\n⚡ Готово за 1-5 минут!\n\nВыберите услугу:",
-        "en": "🤖 <b>AI Services</b>\n\n⚡ Ready in 1-5 minutes!\n\nChoose a service:",
+        "uz": "🤖 <b>EVA Xizmatlari</b>\n\n⚡ 1-5 daqiqada tayyor!\n\nIltimos, xizmatni tanlang 👇",
+        "ru": "🤖 <b>EVA Услуги</b>\n\n⚡ Готово за 1-5 минут!\n\nПожалуйста, выберите услугу:",
+        "en": "🤖 <b>EVA Services</b>\n\n⚡ Ready in 1-5 minutes!\n\nPlease choose a service:",
     },
     "admin_services_title": {
-        "uz": "👨‍💻 <b>Admin Xizmatlari</b>\n\n⏰ Professional mutaxassis tomonidan bajariladi\n\nXizmatni tanlang:",
-        "ru": "👨‍💻 <b>Услуги админа</b>\n\n⏰ Выполняются профессионалом\n\nВыберите услугу:",
-        "en": "👨‍💻 <b>Admin Services</b>\n\n⏰ Done by professional\n\nChoose a service:",
+        "uz": "👨‍💻 <b>Admin Xizmatlari</b>\n\n⏰ Professional mutaxassis tomonidan bajariladi\n\nIltimos, xizmatni tanlang 👇",
+        "ru": "👨‍💻 <b>Услуги админа</b>\n\n⏰ Выполняются профессионалом\n\nПожалуйста, выберите услугу:",
+        "en": "👨‍💻 <b>Admin Services</b>\n\n⏰ Done by a professional\n\nPlease choose a service:",
     },
 
     # AI service buttons
@@ -139,8 +145,8 @@ Choose the section you need from the menu below 👇""",
     "btn_esse": {"uz": "✍️ Esse", "ru": "✍️ Эссе", "en": "✍️ Essay"},
     "btn_tarjima": {"uz": "🌐 Tarjima", "ru": "🌐 Перевод", "en": "🌐 Translation"},
     "btn_qr": {"uz": "📱 QR Code", "ru": "📱 QR Код", "en": "📱 QR Code"},
-    "btn_ai_text": {"uz": "✏️ AI matn yozish", "ru": "✏️ AI написание текста", "en": "✏️ AI Text Writing"},
-    "btn_ai_content": {"uz": "📝 AI kontent yaratish", "ru": "📝 AI создание контента", "en": "📝 AI Content Creation"},
+    "btn_ai_text": {"uz": "✏️ EVA matn yozish", "ru": "✏️ EVA написание текста", "en": "✏️ EVA Text Writing"},
+    "btn_ai_content": {"uz": "📝 EVA kontent yaratish", "ru": "📝 EVA создание контента", "en": "📝 EVA Content Creation"},
     "btn_speech": {"uz": "🎤 Nutq tayyorlash", "ru": "🎤 Подготовка речи", "en": "🎤 Speech Preparation"},
     "btn_banner": {"uz": "🖼 Banner va postlar", "ru": "🖼 Баннеры и посты", "en": "🖼 Banners & Posts"},
 
@@ -160,14 +166,14 @@ Choose the section you need from the menu below 👇""",
 
     # ===== PPT FLOW =====
     "ppt_choose_design": {
-        "uz": "🎨 <b>Dizaynni tanlang:</b>",
-        "ru": "🎨 <b>Выберите дизайн:</b>",
-        "en": "🎨 <b>Choose design:</b>",
+        "uz": "🎨 <b>Zo'r tanlov!</b> Endi taqdimot dizaynini tanlang 👇",
+        "ru": "🎨 <b>Отличный выбор!</b> Теперь выберите дизайн презентации:",
+        "en": "🎨 <b>Great choice!</b> Now choose the presentation design:",
     },
     "ppt_choose_purpose": {
-        "uz": "🎯 <b>Taqdimot maqsadini tanlang:</b>",
-        "ru": "🎯 <b>Выберите назначение презентации:</b>",
-        "en": "🎯 <b>Choose presentation purpose:</b>",
+        "uz": "🎯 <b>Ajoyib!</b> Taqdimot maqsadini tanlang 👇",
+        "ru": "🎯 <b>Отлично!</b> Выберите назначение презентации:",
+        "en": "🎯 <b>Excellent!</b> Choose the presentation purpose:",
     },
     "ppt_purpose_university": {"uz": "🎓 Universitet uchun", "ru": "🎓 Для университета", "en": "🎓 For University"},
     "ppt_purpose_business": {"uz": "💼 Biznes uchun", "ru": "💼 Для бизнеса", "en": "💼 For Business"},
@@ -180,22 +186,22 @@ Choose the section you need from the menu below 👇""",
         "en": "🌐 <b>Choose presentation language:</b>",
     },
     "ppt_enter_topic": {
-        "uz": "📝 <b>Mavzuni kiriting:</b>",
-        "ru": "📝 <b>Введите тему:</b>",
-        "en": "📝 <b>Enter the topic:</b>",
+        "uz": "Zo'r tanlov! Endi taqdimot mavzusini yozib yuboring ✍️",
+        "ru": "📝 <b>Отлично!</b> Теперь напишите тему презентации:",
+        "en": "📝 <b>Great!</b> Now enter the presentation topic:",
     },
     "ppt_choose_slides": {
-        "uz": "📑 <b>Slaydlar sonini tanlang:</b>",
-        "ru": "📑 <b>Выберите количество слайдов:</b>",
-        "en": "📑 <b>Choose number of slides:</b>",
+        "uz": "Ajoyib! Slaydlar sonini tanlang 📑",
+        "ru": "📑 <b>Замечательно!</b> Выберите количество слайдов:",
+        "en": "📑 <b>Wonderful!</b> Choose number of slides:",
     },
     "ppt_extra_requirements": {
-        "uz": "📋 Qo'shimcha talablar bormi? (Ixtiyoriy)\n\n'Yo'q' deb yozing yoki talablarni kiriting:",
+        "uz": "📋 Qo'shimcha talablar bormi? (Ixtiyoriy)\n\n'Yo'q' deb yozing yoki talablarni yozib yuboring ✍️",
         "ru": "📋 Есть дополнительные требования? (Необязательно)\n\nНапишите 'Нет' или введите требования:",
         "en": "📋 Any extra requirements? (Optional)\n\nType 'No' or enter your requirements:",
     },
     "ppt_confirm": {
-        "uz": """✅ <b>Buyurtmangiz:</b>
+        "uz": """✅ <b>Buyurtmangiz tayyor!</b>
 
 🎨 Dizayn: {design}
 🎯 Maqsad: {purpose}
@@ -205,10 +211,10 @@ Choose the section you need from the menu below 👇""",
 📋 Qo'shimcha: {extra}
 
 💰 <b>Narx: {price} so'm</b>
-💳 Balans: {balance} so'm
+💳 Hisobingiz: {balance} so'm
 
-Tasdiqlaysizmi?""",
-        "ru": """✅ <b>Ваш заказ:</b>
+Tasdiqlaysizmi? ✅""",
+        "ru": """✅ <b>Ваш заказ готов!</b>
 
 🎨 Дизайн: {design}
 🎯 Назначение: {purpose}
@@ -221,7 +227,7 @@ Tasdiqlaysizmi?""",
 💳 Баланс: {balance} сум
 
 Подтверждаете?""",
-        "en": """✅ <b>Your order:</b>
+        "en": """✅ <b>Your order is ready!</b>
 
 🎨 Design: {design}
 🎯 Purpose: {purpose}
@@ -238,19 +244,19 @@ Confirm?""",
 
     # ===== REFERAT/MUSTAQIL ISH =====
     "referat_enter_topic": {
-        "uz": "📝 <b>Mavzuni kiriting:</b>",
-        "ru": "📝 <b>Введите тему:</b>",
-        "en": "📝 <b>Enter the topic:</b>",
+        "uz": "Iltimos, mavzuni yozib yuboring ✍️",
+        "ru": "📝 <b>Пожалуйста, введите тему:</b>",
+        "en": "📝 <b>Please enter the topic:</b>",
     },
     "referat_choose_lang": {
-        "uz": "🌐 <b>Tilni tanlang:</b>",
-        "ru": "🌐 <b>Выберите язык:</b>",
-        "en": "🌐 <b>Choose language:</b>",
+        "uz": "🌐 <b>Iltimos, tilni tanlang:</b>",
+        "ru": "🌐 <b>Пожалуйста, выберите язык:</b>",
+        "en": "🌐 <b>Please choose language:</b>",
     },
     "referat_pages": {
-        "uz": "📄 <b>Sahifalar sonini kiriting:</b> (5-50)",
-        "ru": "📄 <b>Введите количество страниц:</b> (5-50)",
-        "en": "📄 <b>Enter number of pages:</b> (5-50)",
+        "uz": "Necha sahifa bo'lishini xohlaysiz? (5 dan 50 gacha) 📄",
+        "ru": "📄 <b>Сколько страниц вы хотите?</b> (от 5 до 50)",
+        "en": "📄 <b>How many pages would you like?</b> (5-50)",
     },
     "referat_references": {
         "uz": "📚 Adabiyotlar ro'yxati kerakmi?",
@@ -262,9 +268,9 @@ Confirm?""",
 
     # ===== ESSAY =====
     "esse_enter_topic": {
-        "uz": "📝 <b>Esse mavzusini kiriting:</b>",
-        "ru": "📝 <b>Введите тему эссе:</b>",
-        "en": "📝 <b>Enter essay topic:</b>",
+        "uz": "Iltimos, esse mavzusini yozib yuboring ✍️",
+        "ru": "📝 <b>Пожалуйста, введите тему эссе:</b>",
+        "en": "📝 <b>Please enter the essay topic:</b>",
     },
     "esse_word_count": {
         "uz": "📊 <b>So'zlar sonini tanlang:</b>",
@@ -272,9 +278,9 @@ Confirm?""",
         "en": "📊 <b>Choose word count:</b>",
     },
     "esse_type": {
-        "uz": "📋 <b>Esse turini tanlang:</b>",
-        "ru": "📋 <b>Выберите тип эссе:</b>",
-        "en": "📋 <b>Choose essay type:</b>",
+        "uz": "📋 <b>Iltimos, esse turini tanlang:</b>",
+        "ru": "📋 <b>Пожалуйста, выберите тип эссе:</b>",
+        "en": "📋 <b>Please choose essay type:</b>",
     },
     "esse_type_argumentative": {"uz": "💬 Argumentativ", "ru": "💬 Аргументативное", "en": "💬 Argumentative"},
     "esse_type_descriptive": {"uz": "📖 Tasviriy", "ru": "📖 Описательное", "en": "📖 Descriptive"},
@@ -283,9 +289,9 @@ Confirm?""",
 
     # ===== TRANSLATION =====
     "tarjima_send_text": {
-        "uz": "📝 Tarjima qilinadigan matn yoki faylni yuboring:",
-        "ru": "📝 Отправьте текст или файл для перевода:",
-        "en": "📝 Send text or file to translate:",
+        "uz": "📝 Iltimos, tarjima qilinadigan matn yoki faylni yuboring 📎",
+        "ru": "📝 Пожалуйста, отправьте текст или файл для перевода:",
+        "en": "📝 Please send text or file to translate:",
     },
     "tarjima_choose_lang": {
         "uz": "🌐 Qaysi tilga tarjima qilish kerak?",
@@ -295,9 +301,9 @@ Confirm?""",
 
     # ===== QR CODE =====
     "qr_enter_data": {
-        "uz": "📱 Havola yoki matnni kiriting:",
-        "ru": "📱 Введите ссылку или текст:",
-        "en": "📱 Enter link or text:",
+        "uz": "📱 Iltimos, havola yoki matnni kiriting:",
+        "ru": "📱 Пожалуйста, введите ссылку или текст:",
+        "en": "📱 Please enter link or text:",
     },
     "qr_choose_design": {
         "uz": "🎨 QR Code dizaynini tanlang:",
@@ -307,12 +313,12 @@ Confirm?""",
 
     # ===== BALANCE =====
     "balance_info": {
-        "uz": """💳 <b>Balans ma'lumotlari</b>
+        "uz": """💳 <b>Hisobingiz ma'lumotlari</b>
 
 💸 Balans: <b>{balance} so'm</b>
 🪙 Bonus: <b>{bonus} so'm</b>
 📈 Jami xarajat: <b>{total_spent} so'm</b>
-📊 To'lovlar soni: <b>{total_orders}</b>""",
+📊 Buyurtmalar soni: <b>{total_orders}</b>""",
         "ru": """💳 <b>Информация о балансе</b>
 
 💸 Баланс: <b>{balance} сум</b>
@@ -329,14 +335,14 @@ Confirm?""",
 
     # ===== PAYMENT =====
     "choose_amount": {
-        "uz": "💰 <b>Summani tanlang:</b>",
-        "ru": "💰 <b>Выберите сумму:</b>",
-        "en": "💰 <b>Choose amount:</b>",
+        "uz": "💰 <b>Iltimos, summani tanlang:</b>",
+        "ru": "💰 <b>Пожалуйста, выберите сумму:</b>",
+        "en": "💰 <b>Please choose amount:</b>",
     },
     "choose_payment_method": {
-        "uz": "💳 <b>To'lov usulini tanlang:</b>",
-        "ru": "💳 <b>Выберите способ оплаты:</b>",
-        "en": "💳 <b>Choose payment method:</b>",
+        "uz": "💳 <b>Iltimos, to'lov usulini tanlang:</b>",
+        "ru": "💳 <b>Пожалуйста, выберите способ оплаты:</b>",
+        "en": "💳 <b>Please choose payment method:</b>",
     },
     "btn_payme": {"uz": "💙 Payme", "ru": "💙 Payme", "en": "💙 Payme"},
     "btn_click": {"uz": "🟢 Click", "ru": "🟢 Click", "en": "🟢 Click"},
@@ -349,9 +355,9 @@ Confirm?""",
 📋 <b>Qadamlar:</b>
 1. Payme ilovasini oching
 2. To'lovni amalga oshiring
-3. Chek/screenshot rasmini shu yerga yuboring
+3. Chek/screenshot rasmini shu yerga yuboring 📷
 
-⚠️ Admin tasdiqlagandan keyin balansingiz to'ldiriladi.""",
+⚠️ Admin tasdiqlagandan keyin hisobingiz to'ldiriladi.""",
         "ru": """💙 <b>Оплата через Payme</b>
 
 💰 Сумма: <b>{amount} сум</b>
@@ -381,9 +387,9 @@ Confirm?""",
 📋 <b>Qadamlar:</b>
 1. Click ilovasini oching
 2. To'lovni amalga oshiring
-3. Chek/screenshot rasmini shu yerga yuboring
+3. Chek/screenshot rasmini shu yerga yuboring 📷
 
-⚠️ Admin tasdiqlagandan keyin balansingiz to'ldiriladi.""",
+⚠️ Admin tasdiqlagandan keyin hisobingiz to'ldiriladi.""",
         "ru": """🟢 <b>Оплата через Click</b>
 
 💰 Сумма: <b>{amount} сум</b>
@@ -411,9 +417,9 @@ Confirm?""",
 Karta raqami: <code>{card}</code>
 Summa: <b>{amount} so'm</b>
 
-To'lovni amalga oshirgach, chek rasmini yuboring.
+To'lovni amalga oshirgach, chek rasmini yuboring 📷
 
-⚠️ Admin tasdiqlagandan keyin balansingiz to'ldiriladi.""",
+⚠️ Admin tasdiqlagandan keyin hisobingiz to'ldiriladi.""",
         "ru": """💳 <b>Оплата банковской картой</b>
 
 Номер карты: <code>{card}</code>
@@ -431,15 +437,20 @@ After payment, send a photo of the receipt.
 
 ⚠️ Balance will be topped up after admin confirmation.""",
     },
+    "payment_waiting_receipt": {
+        "uz": "Zo'r! Endi to'lov chekining rasmini yoki screenshotini shu yerga yuboring 📷\n\n⬅️ Bekor qilish uchun \"Ortga\" tugmasini bosing",
+        "ru": "Отлично! Теперь отправьте фото чека или скриншот оплаты сюда 📷\n\n⬅️ Для отмены нажмите \"Назад\"",
+        "en": "Great! Now send the payment receipt photo or screenshot here 📷\n\n⬅️ Press \"Back\" to cancel",
+    },
     "payment_pending": {
-        "uz": "⏳ To'lovingiz admin tomonidan tekshirilmoqda...",
-        "ru": "⏳ Ваш платёж проверяется администратором...",
-        "en": "⏳ Your payment is being verified by admin...",
+        "uz": "⏳ Rahmat! To'lovingiz admin tomonidan tekshirilmoqda...\nTez orada tasdiqlanadi ✅",
+        "ru": "⏳ Спасибо! Ваш платёж проверяется администратором...\nСкоро будет подтверждён ✅",
+        "en": "⏳ Thank you! Your payment is being verified by admin...\nWill be confirmed soon ✅",
     },
     "payment_confirmed": {
-        "uz": "✅ To'lov tasdiqlandi! Balansingizga {amount} so'm qo'shildi.",
-        "ru": "✅ Оплата подтверждена! На ваш баланс зачислено {amount} сум.",
-        "en": "✅ Payment confirmed! {amount} so'm added to your balance.",
+        "uz": "✅ Tabriklaymiz! To'lov tasdiqlandi! Hisobingizga {amount} so'm qo'shildi 🎉",
+        "ru": "✅ Поздравляем! Оплата подтверждена! На ваш баланс зачислено {amount} сум 🎉",
+        "en": "✅ Congratulations! Payment confirmed! {amount} so'm added to your balance 🎉",
     },
 
     # ===== REFERRAL =====
@@ -455,7 +466,9 @@ Sizning havolangiz:
 1 referal = 1,000 so'm
 5 referal = 5,000 so'm
 10 referal = 10,000 so'm
-20 referal = maxsus sovg'a""",
+20 referal = maxsus sovg'a 🎁
+
+Do'stlaringizni taklif qiling va bonus oling! 💰""",
         "ru": """🎁 <b>Реферальная система</b>
 
 Ваша ссылка:
@@ -467,7 +480,9 @@ Sizning havolangiz:
 1 реферал = 1,000 сум
 5 рефералов = 5,000 сум
 10 рефералов = 10,000 сум
-20 рефералов = особый подарок""",
+20 рефералов = особый подарок 🎁
+
+Приглашайте друзей и получайте бонусы! 💰""",
         "en": """🎁 <b>Referral System</b>
 
 Your link:
@@ -479,12 +494,14 @@ Your link:
 1 referral = 1,000 so'm
 5 referrals = 5,000 so'm
 10 referrals = 10,000 so'm
-20 referrals = special gift""",
+20 referrals = special gift 🎁
+
+Invite friends and earn bonuses! 💰""",
     },
 
     # ===== PROFILE =====
     "profile_info": {
-        "uz": """👤 <b>Profil</b>
+        "uz": """👤 <b>Sizning profilingiz</b>
 
 🆔 ID: <code>{user_id}</code>
 👤 Username: @{username}
@@ -494,7 +511,7 @@ Your link:
 📦 Buyurtmalar: <b>{orders}</b>
 📈 Jami xarajat: <b>{total_spent} so'm</b>
 ⭐ Daraja: <b>{premium}</b>""",
-        "ru": """👤 <b>Профиль</b>
+        "ru": """👤 <b>Ваш профиль</b>
 
 🆔 ID: <code>{user_id}</code>
 👤 Username: @{username}
@@ -504,7 +521,7 @@ Your link:
 📦 Заказы: <b>{orders}</b>
 📈 Всего потрачено: <b>{total_spent} сум</b>
 ⭐ Уровень: <b>{premium}</b>""",
-        "en": """👤 <b>Profile</b>
+        "en": """👤 <b>Your Profile</b>
 
 🆔 ID: <code>{user_id}</code>
 👤 Username: @{username}
@@ -523,9 +540,9 @@ Your link:
         "en": "📦 <b>My Orders</b>\n\n",
     },
     "no_orders": {
-        "uz": "📦 Sizda hali buyurtmalar yo'q.",
-        "ru": "📦 У вас пока нет заказов.",
-        "en": "📦 You don't have any orders yet.",
+        "uz": "📦 Sizda hali buyurtmalar yo'q.\nXizmatlarimizdan foydalanib ko'ring! 😊",
+        "ru": "📦 У вас пока нет заказов.\nПопробуйте наши услуги! 😊",
+        "en": "📦 You don't have any orders yet.\nTry our services! 😊",
     },
     "order_item": {
         "uz": "#{id} | {service} | {price} so'm | {status}\n",
@@ -540,9 +557,9 @@ Your link:
         "en": "📂 <b>My Files</b>\n\n",
     },
     "no_files": {
-        "uz": "📂 Sizda hali fayllar yo'q.",
-        "ru": "📂 У вас пока нет файлов.",
-        "en": "📂 You don't have any files yet.",
+        "uz": "📂 Sizda hali fayllar yo'q.\nBirorta xizmatdan foydalaning va natijani shu yerda ko'ring! 😊",
+        "ru": "📂 У вас пока нет файлов.\nВоспользуйтесь услугой и результат появится здесь! 😊",
+        "en": "📂 You don't have any files yet.\nUse a service and the result will appear here! 😊",
     },
 
     # ===== ABOUT =====
@@ -552,61 +569,67 @@ Your link:
 🖥 Online Premium Kompyuter Xizmatlari
 
 📋 25+ xizmatlar
-🤖 AI texnologiyalari
+🤖 EVA — sun'iy intellekt texnologiyasi
 👨‍💻 Professional jamoamiz
 ⏰ 24/7 ishlash
 
 📞 Aloqa: {support}
-📢 Kanal: {channel}""",
+📢 Kanal: {channel}
+
+Rahmat, bizni tanlaganingiz uchun! 🙏""",
         "ru": """ℹ️ <b>О нас</b>
 
 🖥 Online Premium Компьютерные Услуги
 
 📋 25+ услуг
-🤖 AI технологии
+🤖 EVA — технология искусственного интеллекта
 👨‍💻 Профессиональная команда
 ⏰ Работаем 24/7
 
 📞 Контакт: {support}
-📢 Канал: {channel}""",
+📢 Канал: {channel}
+
+Спасибо, что выбрали нас! 🙏""",
         "en": """ℹ️ <b>About Us</b>
 
 🖥 Online Premium Computer Services
 
 📋 25+ services
-🤖 AI technologies
+🤖 EVA — AI technology
 👨‍💻 Professional team
 ⏰ 24/7 availability
 
 📞 Contact: {support}
-📢 Channel: {channel}""",
+📢 Channel: {channel}
+
+Thank you for choosing us! 🙏""",
     },
 
     # ===== CONTACT =====
     "contact_info": {
-        "uz": "📞 <b>Bog'lanish</b>\n\nQuyidagilardan birini tanlang:",
-        "ru": "📞 <b>Связаться</b>\n\nВыберите один из вариантов:",
-        "en": "📞 <b>Contact</b>\n\nChoose one of the options:",
+        "uz": "📞 <b>Bog'lanish</b>\n\nIltimos, quyidagilardan birini tanlang 👇",
+        "ru": "📞 <b>Связаться</b>\n\nПожалуйста, выберите один из вариантов:",
+        "en": "📞 <b>Contact</b>\n\nPlease choose one of the options:",
     },
     "contact_admin_text": {
-        "uz": "📞 <b>Admin bilan bog'lanish</b>\n\n👤 Admin: {support}\n\nShu yerga yozing yoki admin'ga to'g'ridan-to'g'ri murojaat qiling.",
+        "uz": "📞 <b>Admin bilan bog'lanish</b>\n\n👤 Admin: {support}\n\nShu yerga yozing yoki admin'ga to'g'ridan-to'g'ri murojaat qiling 😊",
         "ru": "📞 <b>Связаться с админом</b>\n\n👤 Админ: {support}\n\nНапишите здесь или свяжитесь с админом напрямую.",
         "en": "📞 <b>Contact Admin</b>\n\n👤 Admin: {support}\n\nWrite here or contact admin directly.",
     },
     "suggestion_prompt": {
-        "uz": "💬 <b>Taklif yuborish</b>\n\nTaklifingizni yozing, biz albatta ko'rib chiqamiz!\n\n(Ortga qaytish uchun ⬅️ tugmasini bosing)",
-        "ru": "💬 <b>Отправить предложение</b>\n\nНапишите ваше предложение, мы обязательно рассмотрим!\n\n(Для возврата нажмите ⬅️)",
-        "en": "💬 <b>Send Suggestion</b>\n\nWrite your suggestion, we'll review it!\n\n(Press ⬅️ to go back)",
+        "uz": "💬 <b>Taklif yuborish</b>\n\nTaklifingizni yozing, biz albatta ko'rib chiqamiz! Sizning fikringiz biz uchun juda muhim 🙏\n\n⬅️ Ortga qaytish uchun \"Ortga\" tugmasini bosing",
+        "ru": "💬 <b>Отправить предложение</b>\n\nНапишите ваше предложение, мы обязательно рассмотрим! Ваше мнение очень важно для нас 🙏\n\n⬅️ Для возврата нажмите \"Назад\"",
+        "en": "💬 <b>Send Suggestion</b>\n\nWrite your suggestion, we'll review it! Your feedback matters to us 🙏\n\n⬅️ Press \"Back\" to go back",
     },
     "report_prompt": {
-        "uz": "⚠️ <b>Muammo haqida xabar</b>\n\nMuammoni yozing, biz tez orada hal qilamiz!\n\n(Ortga qaytish uchun ⬅️ tugmasini bosing)",
-        "ru": "⚠️ <b>Сообщить о проблеме</b>\n\nОпишите проблему, мы решим её в ближайшее время!\n\n(Для возврата нажмите ⬅️)",
-        "en": "⚠️ <b>Report Issue</b>\n\nDescribe the issue, we'll fix it soon!\n\n(Press ⬅️ to go back)",
+        "uz": "⚠️ <b>Muammo haqida xabar</b>\n\nMuammoni yozing, biz tez orada hal qilamiz! Sizga yordam berishdan xursandmiz 😊\n\n⬅️ Ortga qaytish uchun \"Ortga\" tugmasini bosing",
+        "ru": "⚠️ <b>Сообщить о проблеме</b>\n\nОпишите проблему, мы решим её в ближайшее время!\n\n⬅️ Для возврата нажмите \"Назад\"",
+        "en": "⚠️ <b>Report Issue</b>\n\nDescribe the issue, we'll fix it soon!\n\n⬅️ Press \"Back\" to go back",
     },
     "channel_link": {
-        "uz": "📢 <b>Bizning kanal:</b>\n\n👉 {channel}\n\nObuna bo'ling va yangiliklar, aksiyalardan xabardor bo'ling!",
-        "ru": "📢 <b>Наш канал:</b>\n\n👉 {channel}\n\nПодпишитесь и будьте в курсе новостей и акций!",
-        "en": "📢 <b>Our channel:</b>\n\n👉 {channel}\n\nSubscribe and stay updated on news and promotions!",
+        "uz": "📢 <b>Bizning kanal:</b>\n\n👉 {channel}\n\nObuna bo'ling va yangiliklar, aksiyalardan xabardor bo'ling! 🔔",
+        "ru": "📢 <b>Наш канал:</b>\n\n👉 {channel}\n\nПодпишитесь и будьте в курсе новостей и акций! 🔔",
+        "en": "📢 <b>Our channel:</b>\n\n👉 {channel}\n\nSubscribe and stay updated on news and promotions! 🔔",
     },
     "btn_admin_contact": {"uz": "📞 Admin", "ru": "📞 Админ", "en": "📞 Admin"},
     "btn_suggestion": {"uz": "💬 Taklif yuborish", "ru": "💬 Предложение", "en": "💬 Suggestion"},
@@ -615,21 +638,21 @@ Your link:
 
     # ===== AI PROCESSING =====
     "ai_processing": {
-        "uz": "🤖 AI ishlamoqda... ⏳\n\nTaxminiy vaqt: 1-5 daqiqa",
-        "ru": "🤖 AI работает... ⏳\n\nПримерное время: 1-5 минут",
-        "en": "🤖 AI is working... ⏳\n\nEstimated time: 1-5 minutes",
+        "uz": "🤖 EVA hozir sizning hujjatingizni tayyorlamoqda... ✨\n\n⏳ Taxminan 3-5 daqiqa kuting\n💡 Shu vaqtda choy ichib turing 😊",
+        "ru": "🤖 EVA сейчас готовит ваш документ... ✨\n\n⏳ Подождите примерно 3-5 минут\n💡 Пока можете выпить чаю 😊",
+        "en": "🤖 EVA is preparing your document... ✨\n\n⏳ Please wait approximately 3-5 minutes\n💡 Grab a cup of tea in the meantime 😊",
     },
     "ai_complete": {
-        "uz": "✅ Tayyor! Faylingiz quyida 👇",
-        "ru": "✅ Готово! Ваш файл ниже 👇",
-        "en": "✅ Done! Your file below 👇",
+        "uz": "Tabriklayman! 🎉 Hujjatingiz tayyor bo'ldi!\n\nEVA sizga sifatli natija tayyorladi 💫\nQuyida yuklab olishingiz mumkin 👇",
+        "ru": "Поздравляю! 🎉 Ваш документ готов!\n\nEVA подготовила для вас качественный результат 💫\nМожете скачать ниже 👇",
+        "en": "Congratulations! 🎉 Your document is ready!\n\nEVA prepared a quality result for you 💫\nYou can download it below 👇",
     },
 
     # ===== INSUFFICIENT BALANCE =====
     "insufficient_balance": {
-        "uz": "❌ Balans yetarli emas!\n\n💰 Kerakli summa: {price} so'm\n💳 Sizning balans: {balance} so'm\n\nBalansni to'ldiring.",
-        "ru": "❌ Недостаточно средств!\n\n💰 Требуется: {price} сум\n💳 Ваш баланс: {balance} сум\n\nПополните баланс.",
-        "en": "❌ Insufficient balance!\n\n💰 Required: {price} so'm\n💳 Your balance: {balance} so'm\n\nPlease top up.",
+        "uz": "Afsuski, hisobingizda yetarli mablag' yo'q 😔\n\n💰 Kerakli summa: {price} so'm\n💳 Hisobingiz: {balance} so'm\n\n🛍 Hisobni to'ldirish uchun \"Sotib olish\" tugmasini bosing",
+        "ru": "К сожалению, на вашем счёте недостаточно средств 😔\n\n💰 Необходимая сумма: {price} сум\n💳 Ваш баланс: {balance} сум\n\n🛍 Нажмите \"Пополнить\" для пополнения счёта",
+        "en": "Unfortunately, you don't have enough balance 😔\n\n💰 Required amount: {price} so'm\n💳 Your balance: {balance} so'm\n\n🛍 Press \"Top Up\" to add funds",
     },
 
     # ===== ORDER STATUS =====
@@ -639,23 +662,23 @@ Your link:
     "status_ready": {"uz": "🟢 Tayyor", "ru": "🟢 Готово", "en": "🟢 Ready"},
     "status_completed": {"uz": "⭐ Yakunlangan", "ru": "⭐ Завершён", "en": "⭐ Completed"},
     "status_cancelled": {"uz": "❌ Bekor qilingan", "ru": "❌ Отменён", "en": "❌ Cancelled"},
-    "status_creating": {"uz": "🤖 Yaratilmoqda", "ru": "🤖 Создаётся", "en": "🤖 Creating"},
+    "status_creating": {"uz": "🤖 EVA yaratmoqda", "ru": "🤖 EVA создаёт", "en": "🤖 EVA is creating"},
 
     # ===== RATING =====
     "rate_order": {
-        "uz": "⭐ Iltimos, xizmatni baholang:",
-        "ru": "⭐ Пожалуйста, оцените услугу:",
-        "en": "⭐ Please rate the service:",
+        "uz": "⭐ Iltimos, xizmatni baholang! Sizning fikringiz biz uchun muhim 🙏",
+        "ru": "⭐ Пожалуйста, оцените услугу! Ваше мнение важно для нас 🙏",
+        "en": "⭐ Please rate the service! Your feedback matters to us 🙏",
     },
     "rate_comment": {
-        "uz": "💬 Izoh qoldiring (ixtiyoriy). 'Yo'q' deb yozing o'tkazib yuborish uchun:",
-        "ru": "💬 Оставьте комментарий (необязательно). Напишите 'Нет' чтобы пропустить:",
-        "en": "💬 Leave a comment (optional). Type 'No' to skip:",
+        "uz": "💬 Iltimos, izoh qoldiring (ixtiyoriy). 'Yo'q' deb yozing o'tkazib yuborish uchun:",
+        "ru": "💬 Пожалуйста, оставьте комментарий (необязательно). Напишите 'Нет' чтобы пропустить:",
+        "en": "💬 Please leave a comment (optional). Type 'No' to skip:",
     },
     "rate_thanks": {
-        "uz": "🙏 Bahoyingiz uchun rahmat!",
-        "ru": "🙏 Спасибо за вашу оценку!",
-        "en": "🙏 Thank you for your rating!",
+        "uz": "🙏 Rahmat, bahoyingiz uchun! Sizga xizmat qilishdan mamnunmiz 😊",
+        "ru": "🙏 Спасибо за вашу оценку! Рады быть полезными 😊",
+        "en": "🙏 Thank you for your rating! Happy to serve you 😊",
     },
 
     # ===== ADMIN =====
@@ -692,40 +715,47 @@ Your link:
 
     # ===== ADMIN ORDER =====
     "admin_order_submitted": {
-        "uz": "✅ Buyurtmangiz qabul qilindi!\n\n📦 Buyurtma #{order_id}\n⏳ Admin tez orada bajaradi.",
-        "ru": "✅ Ваш заказ принят!\n\n📦 Заказ #{order_id}\n⏳ Админ выполнит в ближайшее время.",
-        "en": "✅ Your order has been submitted!\n\n📦 Order #{order_id}\n⏳ Admin will process it soon.",
+        "uz": "✅ Rahmat! Buyurtmangiz qabul qilindi!\n\n📦 Buyurtma #{order_id}\n⏳ Admin tez orada bajaradi 😊",
+        "ru": "✅ Спасибо! Ваш заказ принят!\n\n📦 Заказ #{order_id}\n⏳ Админ выполнит в ближайшее время 😊",
+        "en": "✅ Thank you! Your order has been submitted!\n\n📦 Order #{order_id}\n⏳ Admin will process it soon 😊",
     },
     "admin_service_details": {
-        "uz": "📋 Buyurtma tafsilotlarini kiriting (nima kerakligi haqida yozing):",
-        "ru": "📋 Введите детали заказа (опишите что нужно):",
-        "en": "📋 Enter order details (describe what you need):",
+        "uz": "📋 Iltimos, buyurtma tafsilotlarini yozib yuboring (nima kerakligi haqida) ✍️",
+        "ru": "📋 Пожалуйста, опишите детали заказа (что вам нужно):",
+        "en": "📋 Please enter order details (describe what you need):",
     },
 
     # ===== PROMOTIONS =====
     "promotions_title": {
-        "uz": "📢 <b>Aksiyalar</b>\n\nHozirda faol aksiyalar yo'q. Tez orada yangilari qo'shiladi!",
-        "ru": "📢 <b>Акции</b>\n\nСейчас нет активных акций. Скоро будут новые!",
-        "en": "📢 <b>Promotions</b>\n\nNo active promotions right now. New ones coming soon!",
+        "uz": "📢 <b>Aksiyalar</b>\n\nHozirda faol aksiyalar yo'q. Tez orada yangilari qo'shiladi!\nKanalimizga obuna bo'lib kuting 🔔",
+        "ru": "📢 <b>Акции</b>\n\nСейчас нет активных акций. Скоро будут новые!\nПодпишитесь на канал, чтобы не пропустить 🔔",
+        "en": "📢 <b>Promotions</b>\n\nNo active promotions right now. New ones coming soon!\nSubscribe to our channel to stay updated 🔔",
     },
 
     # ===== AI HELPER =====
     "ai_helper_prompt": {
-        "uz": "🤖 <b>AI Yordamchi</b>\n\nSavolingizni yozing, men javob beraman!\n\n❌ Chiqish uchun 'Bekor' deb yozing.",
-        "ru": "🤖 <b>AI Помощник</b>\n\nНапишите ваш вопрос, я отвечу!\n\n❌ Для выхода напишите 'Отмена'.",
-        "en": "🤖 <b>AI Helper</b>\n\nAsk your question, I'll answer!\n\n❌ Type 'Cancel' to exit.",
+        "uz": "Assalomu alaykum! Men EVA 🤖\n\nMen sizga har qanday savolda yordam bera olaman:\n• Xizmat tanlashda maslahat\n• Mavzu bo'yicha yordam\n• Texnik savollar\n\nSavolingizni yozing, men javob beraman! 💬\n\n⬅️ Chiqish uchun \"Ortga\" tugmasini bosing",
+        "ru": "Здравствуйте! Я EVA 🤖\n\nЯ могу помочь вам с любым вопросом:\n• Консультация по выбору услуги\n• Помощь по теме\n• Технические вопросы\n\nНапишите ваш вопрос, я отвечу! 💬\n\n⬅️ Для выхода нажмите \"Назад\"",
+        "en": "Hello! I'm EVA 🤖\n\nI can help you with any question:\n• Service selection advice\n• Topic assistance\n• Technical questions\n\nAsk your question, I'll answer! 💬\n\n⬅️ Press \"Back\" to exit",
     },
 
     # ===== ERRORS =====
     "error_generic": {
-        "uz": "❌ Xatolik yuz berdi. Iltimos qayta urinib ko'ring.",
-        "ru": "❌ Произошла ошибка. Попробуйте снова.",
-        "en": "❌ An error occurred. Please try again.",
+        "uz": "Uzr so'rayman, kutilmagan xatolik yuz berdi 😔\nIltimos, bir ozdan keyin qayta urinib ko'ring yoki admin bilan bog'laning",
+        "ru": "Извините, произошла непредвиденная ошибка 😔\nПожалуйста, попробуйте позже или свяжитесь с админом",
+        "en": "Sorry, an unexpected error occurred 😔\nPlease try again later or contact admin",
     },
     "cancelled": {
-        "uz": "❌ Bekor qilindi.",
-        "ru": "❌ Отменено.",
-        "en": "❌ Cancelled.",
+        "uz": "Jarayon bekor qilindi ✅\nAsosiy menyuga qaytdingiz",
+        "ru": "Действие отменено ✅\nВы вернулись в главное меню",
+        "en": "Action cancelled ✅\nYou're back to the main menu",
+    },
+
+    # ===== STATE INTERRUPTED =====
+    "state_interrupted": {
+        "uz": "Oldingi jarayon bekor qilindi ✅\nYangi bo'limga o'tdingiz",
+        "ru": "Предыдущий процесс отменён ✅\nВы перешли в новый раздел",
+        "en": "Previous process cancelled ✅\nYou've moved to a new section",
     },
 }
 
