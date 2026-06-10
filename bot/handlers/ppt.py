@@ -211,11 +211,14 @@ async def ppt_confirmed(callback: CallbackQuery, state: FSMContext):
     
     await db.update_order_status(order_id, "creating")
     
-    # Show processing message
-    await callback.message.edit_text(
+    # Show processing message with progress bar
+    progress_msg = await callback.message.edit_text(
         get_text("ai_processing", lang),
         parse_mode="HTML"
     )
+    
+    from utils.progress import start_progress_task, stop_progress_task
+    progress_task = await start_progress_task(progress_msg, lang, is_ppt=True)
     
     try:
         # Generate PPT
@@ -227,6 +230,9 @@ async def ppt_confirmed(callback: CallbackQuery, state: FSMContext):
             lang=data["ppt_lang"],
             extra=data.get("extra", "")
         )
+        
+        # Progress to'xtatish
+        stop_progress_task(progress_task)
         
         # Send file
         filename = f"presentation_{order_id}.pptx"
@@ -253,6 +259,7 @@ async def ppt_confirmed(callback: CallbackQuery, state: FSMContext):
         await state.update_data(rate_order_id=order_id)
         
     except Exception as e:
+        stop_progress_task(progress_task)
         import logging
         logging.getLogger(__name__).error(f"PPT creation error: {type(e).__name__}: {e}")
         await callback.message.answer(

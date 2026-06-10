@@ -211,7 +211,11 @@ async def doc_confirmed(callback: CallbackQuery, state: FSMContext):
     )
     
     await db.update_order_status(order_id, "creating")
-    await callback.message.edit_text(get_text("ai_processing", lang), parse_mode="HTML")
+    progress_msg = await callback.message.edit_text(get_text("ai_processing", lang), parse_mode="HTML")
+    
+    # Progress bar ishga tushirish
+    from utils.progress import start_progress_task, stop_progress_task
+    progress_task = await start_progress_task(progress_msg, lang, is_ppt=False)
     
     try:
         doc_file = await create_document_file(
@@ -225,6 +229,9 @@ async def doc_confirmed(callback: CallbackQuery, state: FSMContext):
         filename = f"{data['doc_type']}_{order_id}.docx"
         doc = BufferedInputFile(doc_file.read(), filename=filename)
         
+        # Progress to'xtatish
+        stop_progress_task(progress_task)
+        
         sent_msg = await callback.message.answer_document(doc, caption=get_text("ai_complete", lang))
         
         if sent_msg.document:
@@ -234,6 +241,7 @@ async def doc_confirmed(callback: CallbackQuery, state: FSMContext):
         await callback.message.answer(get_text("rate_order", lang), reply_markup=get_rating_kb())
         
     except Exception as e:
+        stop_progress_task(progress_task)
         import logging
         logging.getLogger(__name__).error(f"Document creation error: {type(e).__name__}: {e}")
         await callback.message.answer(
