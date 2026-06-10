@@ -329,9 +329,13 @@ STRICT STRUCTURE (GOST standard):
 7. Last slide: "{structure[5]}" - list of 5-8 academic sources
 
 Return a JSON array with exactly {slides} objects. Each object must have:
-- "title": slide title
-- "content": array of 3-5 bullet points (academic style)
-- "notes": speaker notes (1-2 sentences)
+- "title": slide title (clear, specific)
+- "content": array of 5-7 detailed bullet points (each bullet should be a FULL sentence, 15-25 words, with facts/data)
+- "notes": speaker notes (2-3 detailed sentences for presenting)
+
+IMPORTANT: Each bullet point must be INFORMATIVE and DETAILED. Not short phrases — full academic sentences with facts.
+Example good bullet: "O'zbekiston YaIMi 2023-yilda 80 mlrd dollarni tashkil etib, oldingi yilga nisbatan 5.5% o'sdi"
+Example bad bullet: "Iqtisodiyot o'sdi" (TOO SHORT!)
 
 Return ONLY valid JSON array, no other text, no markdown. ENSURE the JSON is COMPLETE."""
 
@@ -417,9 +421,9 @@ async def create_ppt_file(topic: str, slides_count: int, design: str, purpose: s
                     p = tf.add_paragraph()
                 p.text = f"• {bullet}"
                 p.font.name = "Times New Roman"  # GOST
-                p.font.size = Pt(20)             # GOST: 18-24pt
+                p.font.size = Pt(18)             # GOST: 18-24pt (18 = ko'proq matn sig'adi)
                 p.font.color.rgb = RGBColor.from_string(colors["text"])
-                p.space_after = Pt(14)
+                p.space_after = Pt(10)
         
         # Notes
         if slide_data.get("notes"):
@@ -437,72 +441,125 @@ async def create_ppt_file(topic: str, slides_count: int, design: str, purpose: s
 # ============================================================
 
 async def generate_document_content(topic: str, doc_type: str, pages: int, lang: str, references: bool = True) -> dict:
-    """Generate GOST-compliant document content using AI."""
+    """
+    Generate GOST-compliant document — BO'LIB-BO'LIB generatsiya.
+    Har bir bo'limni alohida so'raydi — shu tarzda kontent TO'LIQ va BOY bo'ladi.
+    Varoqni to'ldirib yozadi, o'qituvchiga topshirishga yaroqli.
+    """
     lang_name = {"uz": "O'zbek", "ru": "Русский", "en": "English"}.get(lang, "O'zbek")
     words_per_page = 250
     total_words = pages * words_per_page
     
-    # GOST tuzilishi
-    structure_desc = {
-        "uz": "Kirish, Asosiy qism (bir nechta bo'lim), Xulosa, Foydalanilgan adabiyotlar",
-        "ru": "Введение, Основная часть (несколько разделов), Заключение, Список литературы",
-        "en": "Introduction, Main body (multiple sections), Conclusion, References",
-    }
-    
-    # Sahifalar ko'p bo'lsa, kontentni qisqartirish
-    # AI max_tokens limiti tufayli 
-    effective_pages = min(pages, 15)  # 15 sahifadan ko'p bo'lsa ham, kontentni siqamiz
-    effective_words = effective_pages * 200  # Kamroq so'z so'rab, JSON tugallanishini ta'minlaymiz
-    
-    prompt = f"""Write a GOST-standard academic {doc_type} in {lang_name} language.
+    # 1-QADAM: Reja tuzish — bo'limlar nomini olish
+    plan_prompt = f"""You are writing a GOST-standard academic {doc_type} in {lang_name} language.
 Topic: {topic}
-Length: approximately {effective_words} words
+Total pages: {pages}
 
-GOST STRUCTURE:
-1. Title
-2. Introduction — relevance, goal, tasks (1 paragraph)
-3. Main body — 3-4 sections (each section 2-3 paragraphs)
-4. Conclusion — summary (1 paragraph)
-5. References — 5-7 academic sources
-
-IMPORTANT: Keep response SHORT enough to fit in valid JSON. Do NOT write very long paragraphs.
-
-Return as JSON (make sure JSON is COMPLETE and VALID):
+Create an outline with 4-6 section headings for the main body.
+Return ONLY a JSON object with title and section headings:
 {{
-    "title": "title text",
-    "introduction": "introduction text",
-    "sections": [
-        {{"heading": "heading", "content": "content"}},
-        {{"heading": "heading", "content": "content"}}
-    ],
-    "conclusion": "conclusion text",
-    "references": ["source 1", "source 2"]
+    "title": "full academic title of the work",
+    "sections": ["Section 1 heading", "Section 2 heading", "Section 3 heading", "Section 4 heading"]
 }}
+Return ONLY valid JSON. No markdown."""
 
-Return ONLY valid JSON. No markdown. Make sure all strings are properly closed."""
+    plan_text = await ai_generate(plan_prompt, max_tokens=1000, temperature=0.7)
+    plan_text = plan_text.strip()
+    if plan_text.startswith("```"):
+        plan_text = plan_text.split("\n", 1)[1]
+        if plan_text.endswith("```"):
+            plan_text = plan_text[:-3]
+    
+    try:
+        plan = json.loads(plan_text.strip())
+    except json.JSONDecodeError:
+        plan = {"title": topic, "sections": [f"{topic} — 1-bo'lim", f"{topic} — 2-bo'lim", f"{topic} — 3-bo'lim", f"{topic} — 4-bo'lim"]}
+    
+    title = plan.get("title", topic)
+    section_headings = plan.get("sections", [f"Bo'lim {i}" for i in range(1, 5)])
+    
+    # 2-QADAM: Kirish — batafsil
+    words_per_section = total_words // (len(section_headings) + 2)
+    
+    intro_prompt = f"""Write a detailed INTRODUCTION (Kirish) for a GOST-standard {doc_type} in {lang_name} language.
+Topic: {title}
+Length: {max(words_per_section, 300)} words minimum.
 
-    # 2 marta sinash — birinchi marta JSON xato bo'lsa, qayta so'rash
-    for attempt in range(2):
-        try:
-            content = await ai_generate(prompt, max_tokens=16000, temperature=0.7)
-            
-            content = content.strip()
-            if content.startswith("```"):
-                content = content.split("\n", 1)[1]
-                if content.endswith("```"):
-                    content = content[:-3]
-            content = content.strip()
-            
-            return json.loads(content)
-        except json.JSONDecodeError as e:
-            logger.warning(f"Document JSON parse attempt {attempt + 1} failed: {e}")
-            if attempt == 0:
-                # Qayta urinish — yanada qisqaroq so'rash
-                prompt += "\n\nPREVIOUS ATTEMPT FAILED. Make JSON SHORTER. Use shorter paragraphs. ENSURE valid complete JSON."
-                continue
-            else:
-                logger.error(f"Document JSON parse error (final): {e}\nContent preview: {content[:300]}")
-                raise Exception(f"AI noto'g'ri format qaytardi (JSONDecodeError)")
+The introduction MUST include:
+1. Mavzuning dolzarbligi (relevance) — why this topic matters today (2-3 paragraphs)
+2. Ishning maqsadi (goal) — clearly state the main goal
+3. Vazifalar (tasks) — list 4-5 specific tasks
+4. Tadqiqot usullari (methods) — what methods were used
+5. Ishning tuzilishi — brief overview of the structure
+
+Write in academic style. Use LONG, detailed paragraphs. Fill the page completely.
+Return ONLY the text, no JSON, no markdown formatting."""
+
+    introduction = await ai_generate(intro_prompt, max_tokens=4000, temperature=0.7)
+    
+    # 3-QADAM: Har bir bo'limni alohida generatsiya — TO'LIQ va BOY kontent
+    sections = []
+    for i, heading in enumerate(section_headings):
+        section_prompt = f"""Write section "{heading}" for a GOST-standard academic {doc_type} in {lang_name} language.
+Topic: {title}
+This is section {i+1} of {len(section_headings)}.
+
+REQUIREMENTS:
+- Length: minimum {max(words_per_section, 400)} words
+- Write 4-6 LONG detailed paragraphs
+- Use academic writing style
+- Include facts, statistics, analysis
+- Each paragraph should be at least 4-5 sentences long
+- Fill the page completely — o'qituvchi "kam" demasligi kerak!
+- Write substantive academic content, not filler
+
+Return ONLY the section text, no heading, no JSON, no markdown."""
+
+        section_content = await ai_generate(section_prompt, max_tokens=4000, temperature=0.7)
+        sections.append({"heading": heading, "content": section_content.strip()})
+    
+    # 4-QADAM: Xulosa — batafsil
+    conclusion_prompt = f"""Write a detailed CONCLUSION (Xulosa) for a GOST-standard {doc_type} in {lang_name} language.
+Topic: {title}
+Sections covered: {', '.join(section_headings)}
+
+Length: minimum {max(words_per_section, 300)} words.
+
+The conclusion MUST include:
+1. Summary of key findings from each section
+2. Main results achieved
+3. Practical significance
+4. Recommendations for further research
+
+Write in academic style. Use detailed paragraphs. Fill the page.
+Return ONLY the text, no JSON, no markdown."""
+
+    conclusion = await ai_generate(conclusion_prompt, max_tokens=3000, temperature=0.7)
+    
+    # 5-QADAM: Adabiyotlar
+    refs = []
+    if references:
+        refs_prompt = f"""Generate a list of 8-10 academic references/bibliography for a {doc_type} about "{title}" in {lang_name} language.
+Format each reference in GOST standard (Author. Title. — City: Publisher, Year. — Pages.)
+Include: books, journal articles, laws/regulations, internet sources.
+Return each reference on a new line, numbered 1-10. Return ONLY the list."""
+        
+        refs_text = await ai_generate(refs_prompt, max_tokens=2000, temperature=0.7)
+        for line in refs_text.strip().split("\n"):
+            line = line.strip()
+            if line and len(line) > 10:
+                # Remove numbering
+                if line[0].isdigit() and "." in line[:4]:
+                    line = line.split(".", 1)[1].strip()
+                refs.append(line)
+    
+    return {
+        "title": title,
+        "introduction": introduction.strip(),
+        "sections": sections,
+        "conclusion": conclusion.strip(),
+        "references": refs[:10]
+    }
 
 
 async def create_document_file(topic: str, doc_type: str, pages: int, lang: str, references: bool = True) -> io.BytesIO:
