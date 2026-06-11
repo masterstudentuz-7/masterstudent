@@ -131,7 +131,7 @@ document.querySelectorAll('.donate-btn').forEach(btn => {
 });
 
 function copyCard() {
-    navigator.clipboard.writeText('8600000000000000').then(() => {
+    navigator.clipboard.writeText('9860010128293650').then(() => {
         const btn = document.querySelector('.dm-copy');
         const orig = btn.textContent;
         btn.textContent = '✓ Nusxalandi!';
