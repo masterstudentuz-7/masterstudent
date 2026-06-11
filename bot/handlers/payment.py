@@ -4,7 +4,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 
 import database as db
-from config import BANK_CARD, ADMIN_IDS, PAYME_TOKEN, CLICK_TOKEN
+from config import BANK_CARD, CARD_HOLDER, ADMIN_IDS, PAYME_TOKEN, CLICK_TOKEN
 from locales import get_text
 from keyboards.inline_kb import get_payment_amounts_kb, get_payment_method_kb, get_admin_payment_kb
 from keyboards.main_kb import get_main_menu_kb
@@ -86,7 +86,7 @@ async def payment_method_selected(callback: CallbackQuery, state: FSMContext):
         await state.set_state(PaymentStates.waiting_receipt)
         
         await callback.message.edit_text(
-            get_text("payment_card_info", lang, card=BANK_CARD, amount=amount),
+            get_text("payment_card_info", lang, card=BANK_CARD, holder=CARD_HOLDER, amount=amount),
             parse_mode="HTML"
         )
     

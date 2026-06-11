@@ -416,6 +416,7 @@ Confirm?""",
         "uz": """💳 <b>Bank karta orqali to'lov</b>
 
 Karta raqami: <code>{card}</code>
+Karta egasi: <b>{holder}</b>
 Summa: <b>{amount} so'm</b>
 
 To'lovni amalga oshirgach, chek rasmini yuboring 📷
@@ -424,6 +425,7 @@ To'lovni amalga oshirgach, chek rasmini yuboring 📷
         "ru": """💳 <b>Оплата банковской картой</b>
 
 Номер карты: <code>{card}</code>
+Владелец карты: <b>{holder}</b>
 Сумма: <b>{amount} сум</b>
 
 После оплаты отправьте фото чека.
@@ -432,6 +434,7 @@ To'lovni amalga oshirgach, chek rasmini yuboring 📷
         "en": """💳 <b>Bank card payment</b>
 
 Card number: <code>{card}</code>
+Card holder: <b>{holder}</b>
 Amount: <b>{amount} so'm</b>
 
 After payment, send a photo of the receipt.
@@ -768,6 +771,7 @@ Agar bizning xizmatlarimiz sizga yoqsa va foydali bo'lsa — loyihamizni rivojla
 
 <b>💳 Karta raqami:</b>
 <code>{card}</code>
+<b>Karta egasi:</b> {holder}
 
 <b>Qanday donat qilish:</b>
 1. Yuqoridagi karta raqamini bosing (nusxalanadi)
@@ -791,6 +795,7 @@ Yoki botdagi "🛍 Sotib olish" orqali ham hisobni to'ldirishingiz mumkin.
 
 <b>💳 Номер карты:</b>
 <code>{card}</code>
+<b>Владелец:</b> {holder}
 
 <b>Как сделать донат:</b>
 1. Нажмите на номер карты (скопируется)
@@ -812,6 +817,7 @@ If you find our services helpful — please support our development.
 
 <b>💳 Card number:</b>
 <code>{card}</code>
+<b>Card holder:</b> {holder}
 
 <b>How to donate:</b>
 1. Tap the card number above (it copies)

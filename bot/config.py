@@ -8,6 +8,7 @@ ADMIN_IDS = [int(x) for x in os.getenv("ADMIN_IDS", "").split(",") if x.strip()]
 PAYME_TOKEN = os.getenv("PAYME_TOKEN", "")
 CLICK_TOKEN = os.getenv("CLICK_TOKEN", "")
 BANK_CARD = os.getenv("BANK_CARD", "8600000000000000")
+CARD_HOLDER = os.getenv("CARD_HOLDER", "Familiya Ism")
 CHANNEL_ID = os.getenv("CHANNEL_ID", "")
 SUPPORT_USERNAME = os.getenv("SUPPORT_USERNAME", "@admin")
 
