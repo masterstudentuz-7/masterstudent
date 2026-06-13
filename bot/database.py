@@ -127,8 +127,33 @@ async def init_db():
         """)
         await db.commit()
 
+        # ===== MIGRATSIYALAR (eski bazaga yangi ustun qo'shish) =====
+        try:
+            await db.execute("ALTER TABLE users ADD COLUMN pending_order TEXT")
+            await db.commit()
+        except Exception:
+            pass  # Ustun allaqachon mavjud
 
-# ===== USER OPERATIONS =====
+
+# ===== PENDING ORDER (balans yetmaganda saqlanadi) =====
+
+async def set_pending_order(user_id: int, order_json: str):
+    async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute("UPDATE users SET pending_order = ? WHERE user_id = ?", (order_json, user_id))
+        await db.commit()
+
+
+async def get_pending_order(user_id: int):
+    async with aiosqlite.connect(DB_PATH) as db:
+        cursor = await db.execute("SELECT pending_order FROM users WHERE user_id = ?", (user_id,))
+        row = await cursor.fetchone()
+        return row[0] if row and row[0] else None
+
+
+async def clear_pending_order(user_id: int):
+    async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute("UPDATE users SET pending_order = NULL WHERE user_id = ?", (user_id,))
+        await db.commit()
 
 async def get_user(user_id: int):
     async with aiosqlite.connect(DB_PATH) as db:

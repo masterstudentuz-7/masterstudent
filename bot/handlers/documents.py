@@ -10,7 +10,8 @@ from locales import get_text
 from keyboards.inline_kb import (
     get_ppt_lang_kb, get_yes_no_kb, get_confirm_kb,
     get_esse_type_kb, get_esse_words_kb, get_qr_design_kb,
-    get_rating_kb, get_admin_order_kb, get_buy_now_kb, get_doc_pages_kb
+    get_rating_kb, get_admin_order_kb, get_buy_now_kb, get_doc_pages_kb,
+    get_back_inline_kb
 )
 from keyboards.main_kb import get_cancel_kb, get_main_menu_kb
 from services.ai_service import (
@@ -90,11 +91,12 @@ async def doc_lang_selected(callback: CallbackQuery, state: FSMContext):
     await state.update_data(doc_lang=doc_lang)
     await state.set_state(DocumentStates.entering_topic)
 
-    lang_names = {"uz": "O'zbek", "ru": "Rus", "en": "Ingliz"}
+    lang_names = {"uz": "O'zbek tili", "ru": "Rus tili", "en": "Ingliz tili"}
     await callback.message.edit_text(
         f"✅ Til tanlandi: <b>{lang_names.get(doc_lang, doc_lang)}</b>\n\n"
         f"📝 Endi, iltimos, <b>mavzuni yozib yuboring</b> ✍️\n\n"
         f"💡 <i>Masalan: «O'zbekiston iqtisodiyotining rivojlanishi»</i>",
+        reply_markup=get_back_inline_kb(lang),
         parse_mode="HTML"
     )
     await callback.answer()
@@ -176,13 +178,23 @@ async def doc_references_selected(callback: CallbackQuery, state: FSMContext):
     balance = user["balance"] + user["bonus"]
     
     if balance < price:
+        # Kutilayotgan buyurtmani saqlash — balans to'ldirilgach davom ettiriladi
+        import json as _json
+        pending = {
+            "kind": "document", "doc_type": data["doc_type"], "doc_lang": data["doc_lang"],
+            "topic": data["topic"], "pages": data["pages"],
+            "pages_name": data.get("pages_name", ""), "references": references, "price": price
+        }
+        await db.set_pending_order(callback.from_user.id, _json.dumps(pending))
+
         bal_str = f"{balance:,}".replace(",", " ")
         price_str = f"{price:,}".replace(",", " ")
         await callback.message.edit_text(
             f"😔 <b>Afsuski, hisobingizda mablag' yetarli emas</b>\n\n"
             f"💰 Xizmat narxi: <b>{price_str} so'm</b>\n"
             f"💳 Sizning hisobingiz: <b>{bal_str} so'm</b>\n\n"
-            f"Iltimos, hisobingizni to'ldiring va qaytadan urinib ko'ring 👇",
+            f"✅ Buyurtmangiz eslab qolindi!\n"
+            f"Hisobni to'ldirgach, boshidan emas — shu yerdan davom ettirasiz 👇",
             reply_markup=get_buy_now_kb(lang),
             parse_mode="HTML"
         )
@@ -191,7 +203,7 @@ async def doc_references_selected(callback: CallbackQuery, state: FSMContext):
         return
     
     await state.set_state(DocumentStates.confirming)
-    lang_names = {"uz": "O'zbek", "ru": "Rus", "en": "Ingliz"}
+    lang_names = {"uz": "O'zbek tili", "ru": "Rus tili", "en": "Ingliz tili"}
     ref_text = "Ha" if references else "Yo'q"
     pages_name = data.get('pages_name', str(data['pages']) + ' sahifa')
     price_str = f"{price:,}".replace(",", " ")

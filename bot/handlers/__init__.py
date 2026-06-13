@@ -8,6 +8,7 @@ from .documents import router as documents_router
 from .payment import router as payment_router
 from .admin import router as admin_router
 from .ai_helper import router as ai_helper_router
+from .resume import router as resume_router
 
 
 def setup_routers() -> Router:
@@ -15,6 +16,7 @@ def setup_routers() -> Router:
     main_router = Router()
     main_router.include_router(start_router)
     main_router.include_router(admin_router)
+    main_router.include_router(resume_router)
     main_router.include_router(ppt_router)
     main_router.include_router(documents_router)
     main_router.include_router(payment_router)

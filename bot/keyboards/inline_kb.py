@@ -7,11 +7,18 @@ from config import PAYMENT_AMOUNTS, PPT_DESIGNS, PPT_SLIDES
 def get_language_kb() -> InlineKeyboardMarkup:
     """Language selection keyboard."""
     buttons = [
-        [InlineKeyboardButton(text="🇺🇿 O'zbekcha", callback_data="lang_uz")],
-        [InlineKeyboardButton(text="🇷🇺 Русский", callback_data="lang_ru")],
-        [InlineKeyboardButton(text="🇬🇧 English", callback_data="lang_en")],
+        [InlineKeyboardButton(text="🇺🇿 O'zbek tili", callback_data="lang_uz")],
+        [InlineKeyboardButton(text="🇷🇺 Rus tili", callback_data="lang_ru")],
+        [InlineKeyboardButton(text="🇬🇧 Ingliz tili", callback_data="lang_en")],
     ]
     return InlineKeyboardMarkup(inline_keyboard=buttons)
+
+
+def get_back_inline_kb(lang: str = "uz") -> InlineKeyboardMarkup:
+    """Faqat 'Ortga' tugmasi — matn kiritish bosqichlarida ishlatiladi."""
+    return InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text=get_text("btn_back", lang), callback_data="cancel_order")]
+    ])
 
 
 def get_services_kb(lang: str = "uz") -> InlineKeyboardMarkup:
@@ -89,7 +96,7 @@ def get_ppt_design_kb(lang: str = "uz") -> InlineKeyboardMarkup:
     for design in PPT_DESIGNS:
         label = design_styles.get(design, f"🎨 {design}")
         builder.button(text=label, callback_data=f"ppt_design_{design.lower()}")
-    builder.button(text=get_text("btn_cancel", lang), callback_data="cancel_order")
+    builder.button(text=get_text("btn_back", lang), callback_data="cancel_order")
     builder.adjust(1)
     return builder.as_markup()
 
@@ -102,7 +109,7 @@ def get_ppt_purpose_kb(lang: str = "uz") -> InlineKeyboardMarkup:
         [InlineKeyboardButton(text=get_text("ppt_purpose_report", lang), callback_data="ppt_purp_report")],
         [InlineKeyboardButton(text=get_text("ppt_purpose_startup", lang), callback_data="ppt_purp_startup")],
         [InlineKeyboardButton(text=get_text("ppt_purpose_educational", lang), callback_data="ppt_purp_educational")],
-        [InlineKeyboardButton(text=get_text("btn_cancel", lang), callback_data="cancel_order")],
+        [InlineKeyboardButton(text=get_text("btn_back", lang), callback_data="cancel_order")],
     ]
     return InlineKeyboardMarkup(inline_keyboard=buttons)
 
@@ -110,10 +117,10 @@ def get_ppt_purpose_kb(lang: str = "uz") -> InlineKeyboardMarkup:
 def get_ppt_lang_kb(lang: str = "uz") -> InlineKeyboardMarkup:
     """PPT language selection keyboard."""
     buttons = [
-        [InlineKeyboardButton(text="🇺🇿 O'zbek", callback_data="ppt_lang_uz")],
-        [InlineKeyboardButton(text="🇷🇺 Rus", callback_data="ppt_lang_ru")],
-        [InlineKeyboardButton(text="🇬🇧 Ingliz", callback_data="ppt_lang_en")],
-        [InlineKeyboardButton(text=get_text("btn_cancel", lang), callback_data="cancel_order")],
+        [InlineKeyboardButton(text="🇺🇿 O'zbek tili", callback_data="ppt_lang_uz")],
+        [InlineKeyboardButton(text="🇷🇺 Rus tili", callback_data="ppt_lang_ru")],
+        [InlineKeyboardButton(text="🇬🇧 Ingliz tili", callback_data="ppt_lang_en")],
+        [InlineKeyboardButton(text=get_text("btn_back", lang), callback_data="cancel_order")],
     ]
     return InlineKeyboardMarkup(inline_keyboard=buttons)
 
@@ -127,7 +134,7 @@ def get_ppt_slides_kb(lang: str = "uz", is_pro: bool = False) -> InlineKeyboardM
         price = PRICES.get(price_key, 0)
         price_str = f"{price:,}".replace(",", " ")
         builder.button(text=f"📑 {count} slayd — {price_str} so'm", callback_data=f"ppt_slides_{count}")
-    builder.button(text=get_text("btn_cancel", lang), callback_data="cancel_order")
+    builder.button(text=get_text("btn_back", lang), callback_data="cancel_order")
     builder.adjust(1)
     return builder.as_markup()
 
@@ -137,7 +144,7 @@ def get_confirm_kb(lang: str = "uz") -> InlineKeyboardMarkup:
     buttons = [
         [
             InlineKeyboardButton(text=get_text("btn_confirm", lang), callback_data="confirm_order"),
-            InlineKeyboardButton(text=get_text("btn_cancel", lang), callback_data="cancel_order"),
+            InlineKeyboardButton(text=get_text("btn_back", lang), callback_data="cancel_order"),
         ]
     ]
     return InlineKeyboardMarkup(inline_keyboard=buttons)
@@ -178,7 +185,7 @@ def get_doc_pages_kb(lang: str = "uz") -> InlineKeyboardMarkup:
     for key, name, pages, price in DOC_PAGE_OPTIONS:
         price_str = f"{price:,}".replace(",", " ")
         builder.button(text=f"📄 {name} — {price_str} so'm", callback_data=f"docpages_{key}")
-    builder.button(text=get_text("btn_cancel", lang), callback_data="cancel_order")
+    builder.button(text=get_text("btn_back", lang), callback_data="cancel_order")
     builder.adjust(1)
     return builder.as_markup()
 
@@ -213,7 +220,7 @@ def get_esse_type_kb(lang: str = "uz") -> InlineKeyboardMarkup:
         [InlineKeyboardButton(text=get_text("esse_type_descriptive", lang), callback_data="esse_descriptive")],
         [InlineKeyboardButton(text=get_text("esse_type_narrative", lang), callback_data="esse_narrative")],
         [InlineKeyboardButton(text=get_text("esse_type_analytical", lang), callback_data="esse_analytical")],
-        [InlineKeyboardButton(text=get_text("btn_cancel", lang), callback_data="cancel_order")],
+        [InlineKeyboardButton(text=get_text("btn_back", lang), callback_data="cancel_order")],
     ]
     return InlineKeyboardMarkup(inline_keyboard=buttons)
 
@@ -223,7 +230,7 @@ def get_esse_words_kb(lang: str = "uz") -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
     for count in [300, 500, 700, 1000, 1500, 2000]:
         builder.button(text=str(count), callback_data=f"esse_words_{count}")
-    builder.button(text=get_text("btn_cancel", lang), callback_data="cancel_order")
+    builder.button(text=get_text("btn_back", lang), callback_data="cancel_order")
     builder.adjust(3)
     return builder.as_markup()
 
@@ -235,7 +242,7 @@ def get_qr_design_kb(lang: str = "uz") -> InlineKeyboardMarkup:
         [InlineKeyboardButton(text="🔲 Minimal", callback_data="qr_design_minimal")],
         [InlineKeyboardButton(text="💼 Business", callback_data="qr_design_business")],
         [InlineKeyboardButton(text="✨ Premium", callback_data="qr_design_premium")],
-        [InlineKeyboardButton(text=get_text("btn_cancel", lang), callback_data="cancel_order")],
+        [InlineKeyboardButton(text=get_text("btn_back", lang), callback_data="cancel_order")],
     ]
     return InlineKeyboardMarkup(inline_keyboard=buttons)
 

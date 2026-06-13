@@ -361,7 +361,14 @@ async def admin_confirm_payment(callback: CallbackQuery):
             )
         except Exception:
             pass
-        
+
+        # Balans to'ldirildi — kutilayotgan buyurtma bo'lsa, davom ettirishni taklif qilamiz
+        try:
+            from handlers.resume import notify_if_can_resume
+            await notify_if_can_resume(callback.bot, user_id)
+        except Exception:
+            pass
+
         await callback.message.edit_caption(
             caption=callback.message.caption + "\n\n✅ <b>TASDIQLANDI</b>",
             parse_mode="HTML"

@@ -128,8 +128,10 @@ async def ppt_lang_selected(callback: CallbackQuery, state: FSMContext):
     await state.update_data(ppt_lang=ppt_lang)
     await state.set_state(PPTStates.entering_topic)
     
+    from keyboards.inline_kb import get_back_inline_kb
     await callback.message.edit_text(
         get_text("ppt_enter_topic", lang),
+        reply_markup=get_back_inline_kb(lang),
         parse_mode="HTML"
     )
     await callback.answer()
@@ -211,7 +213,7 @@ async def ppt_extra_entered(message: Message, state: FSMContext):
         "educational": "O'quv materiali",
     }
     
-    lang_names = {"uz": "O'zbek", "ru": "Rus", "en": "Ingliz"}
+    lang_names = {"uz": "O'zbek tili", "ru": "Rus tili", "en": "Ingliz tili"}
     
     await message.answer(
         get_text("ppt_confirm", lang,
@@ -244,8 +246,22 @@ async def ppt_confirmed(callback: CallbackQuery, state: FSMContext):
     if not success:
         user = await db.get_user(user_id)
         balance = user["balance"] + user["bonus"]
+        # Kutilayotgan buyurtmani saqlash
+        import json as _json
+        pending = {
+            "kind": "ppt", "design": data["design"], "purpose": data.get("purpose", "educational"),
+            "ppt_lang": data["ppt_lang"], "topic": data["topic"], "slides": data["slides"],
+            "is_pro": data.get("is_pro", False), "extra": data.get("extra", ""), "price": price
+        }
+        await db.set_pending_order(user_id, _json.dumps(pending))
+        bal_str = f"{balance:,}".replace(",", " ")
+        price_str = f"{price:,}".replace(",", " ")
         await callback.message.edit_text(
-            get_text("insufficient_balance", lang, price=price, balance=balance),
+            f"😔 <b>Afsuski, hisobingizda mablag' yetarli emas</b>\n\n"
+            f"💰 Xizmat narxi: <b>{price_str} so'm</b>\n"
+            f"💳 Sizning hisobingiz: <b>{bal_str} so'm</b>\n\n"
+            f"✅ Buyurtmangiz eslab qolindi!\n"
+            f"Hisobni to'ldirgach, boshidan emas — shu yerdan davom ettirasiz 👇",
             reply_markup=get_buy_now_kb(lang),
             parse_mode="HTML"
         )
