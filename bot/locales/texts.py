@@ -102,7 +102,7 @@ Choose the section you need from the menu below 👇""",
     "btn_my_orders": {"uz": "📦 Buyurtmalarim", "ru": "📦 Мои заказы", "en": "📦 My Orders"},
     "btn_my_files": {"uz": "📂 Mening fayllarim", "ru": "📂 Мои файлы", "en": "📂 My Files"},
     "btn_balance": {"uz": "💳 Balans", "ru": "💳 Баланс", "en": "💳 Balance"},
-    "btn_buy": {"uz": "🛍 Sotib olish", "ru": "🛍 Пополнить", "en": "🛍 Top Up"},
+    "btn_buy": {"uz": "💳 To'lov qilish", "ru": "💳 Оплата", "en": "💳 Payment"},
     "btn_ai_helper": {"uz": "🤖 EVA Yordamchi", "ru": "🤖 EVA Помощник", "en": "🤖 EVA Helper"},
     "btn_referral": {"uz": "🎁 Referal", "ru": "🎁 Реферал", "en": "🎁 Referral"},
     "btn_promotions": {"uz": "📢 Aksiyalar", "ru": "📢 Акции", "en": "📢 Promotions"},
@@ -350,7 +350,7 @@ Confirm?""",
     "btn_payme": {"uz": "💙 Payme", "ru": "💙 Payme", "en": "💙 Payme"},
     "btn_click": {"uz": "🟢 Click", "ru": "🟢 Click", "en": "🟢 Click"},
     "btn_bank_card": {"uz": "💳 Bank karta", "ru": "💳 Банк. карта", "en": "💳 Bank Card"},
-    "btn_buy_now": {"uz": "🛍 Sotib olish", "ru": "🛍 Пополнить баланс", "en": "🛍 Top Up Now"},
+    "btn_buy_now": {"uz": "💳 To'lov qilish", "ru": "💳 Оплатить", "en": "💳 Pay Now"},
     "payment_payme_info": {
         "uz": """💙 <b>Payme orqali to'lov</b>
 
@@ -418,31 +418,64 @@ Confirm?""",
     "payment_card_info": {
         "uz": """💳 <b>Bank karta orqali to'lov</b>
 
-Karta raqami: <code>{card}</code>
-Karta egasi: <b>{holder}</b>
-Summa: <b>{amount} so'm</b>
+💳 Karta raqami: <code>{card}</code>
+👤 Karta egasi: <b>{holder}</b>
+💰 To'lov summasi: <b>{amount} so'm</b>
 
-To'lovni amalga oshirgach, chek rasmini yuboring 📷
+━━━━━━━━━━━━━━━
+📌 <b>To'lov tartibi:</b>
+1️⃣ Yuqoridagi karta raqamini bosing (nusxalanadi)
+2️⃣ Bank ilovangiz orqali to'lovni amalga oshiring
+3️⃣ Chek yoki skrinshotni shu yerga yuboring 📷
 
-⚠️ Admin tasdiqlagandan keyin hisobingiz to'ldiriladi.""",
+━━━━━━━━━━━━━━━
+⚠️ <b>Diqqat — muhim ma'lumot:</b>
+
+⏱ Kartaga o'tkazilgan to'lovlar <b>qo'lda tekshirilgani</b> uchun tasdiqlash <b>10–15 daqiqa</b> vaqt olishi mumkin.
+
+🌙 Tungi soat <b>00:00–05:00</b> oralig'ida adminlar dam olganligi sababli to'lovlaringiz biroz kechroq tasdiqlanadi.
+
+🙏 Sabringiz uchun oldindan rahmat! Hisobingiz tasdiqlangach avtomatik to'ldiriladi ✅""",
         "ru": """💳 <b>Оплата банковской картой</b>
 
-Номер карты: <code>{card}</code>
-Владелец карты: <b>{holder}</b>
-Сумма: <b>{amount} сум</b>
+💳 Номер карты: <code>{card}</code>
+👤 Владелец: <b>{holder}</b>
+💰 Сумма: <b>{amount} сум</b>
 
-После оплаты отправьте фото чека.
+━━━━━━━━━━━━━━━
+📌 <b>Порядок оплаты:</b>
+1️⃣ Нажмите на номер карты (скопируется)
+2️⃣ Оплатите через банковское приложение
+3️⃣ Отправьте чек/скриншот сюда 📷
 
-⚠️ Баланс пополнится после подтверждения админом.""",
+━━━━━━━━━━━━━━━
+⚠️ <b>Внимание:</b>
+
+⏱ Платежи проверяются вручную — подтверждение может занять <b>10–15 минут</b>.
+
+🌙 С <b>00:00 до 05:00</b> админы отдыхают, поэтому подтверждение может задержаться.
+
+🙏 Спасибо за терпение! Баланс пополнится автоматически ✅""",
         "en": """💳 <b>Bank card payment</b>
 
-Card number: <code>{card}</code>
-Card holder: <b>{holder}</b>
-Amount: <b>{amount} so'm</b>
+💳 Card: <code>{card}</code>
+👤 Holder: <b>{holder}</b>
+💰 Amount: <b>{amount} so'm</b>
 
-After payment, send a photo of the receipt.
+━━━━━━━━━━━━━━━
+📌 <b>How to pay:</b>
+1️⃣ Tap the card number (it copies)
+2️⃣ Pay via your banking app
+3️⃣ Send the receipt/screenshot here 📷
 
-⚠️ Balance will be topped up after admin confirmation.""",
+━━━━━━━━━━━━━━━
+⚠️ <b>Please note:</b>
+
+⏱ Payments are checked manually — confirmation may take <b>10–15 minutes</b>.
+
+🌙 Between <b>00:00–05:00</b> admins are resting, so confirmation may be delayed.
+
+🙏 Thank you for your patience! Your balance will be topped up automatically ✅""",
     },
     "payment_waiting_receipt": {
         "uz": "Zo'r! Endi to'lov chekining rasmini yoki screenshotini shu yerga yuboring 📷\n\n⬅️ Bekor qilish uchun \"Ortga\" tugmasini bosing",
@@ -657,9 +690,9 @@ Thank you for choosing us! 🙏""",
 
     # ===== INSUFFICIENT BALANCE =====
     "insufficient_balance": {
-        "uz": "Afsuski, hisobingizda yetarli mablag' yo'q 😔\n\n💰 Kerakli summa: {price} so'm\n💳 Hisobingiz: {balance} so'm\n\n🛍 Hisobni to'ldirish uchun \"Sotib olish\" tugmasini bosing",
-        "ru": "К сожалению, на вашем счёте недостаточно средств 😔\n\n💰 Необходимая сумма: {price} сум\n💳 Ваш баланс: {balance} сум\n\n🛍 Нажмите \"Пополнить\" для пополнения счёта",
-        "en": "Unfortunately, you don't have enough balance 😔\n\n💰 Required amount: {price} so'm\n💳 Your balance: {balance} so'm\n\n🛍 Press \"Top Up\" to add funds",
+        "uz": "Afsuski, hisobingizda yetarli mablag' yo'q 😔\n\n💰 Kerakli summa: {price} so'm\n💳 Hisobingiz: {balance} so'm\n\n💳 Hisobni to'ldirish uchun \"To'lov qilish\" tugmasini bosing",
+        "ru": "К сожалению, на вашем счёте недостаточно средств 😔\n\n💰 Необходимая сумма: {price} сум\n💳 Ваш баланс: {balance} сум\n\n💳 Нажмите \"Оплата\" для пополнения счёта",
+        "en": "Unfortunately, you don't have enough balance 😔\n\n💰 Required amount: {price} so'm\n💳 Your balance: {balance} so'm\n\n💳 Press \"Payment\" to add funds",
     },
 
     # ===== ORDER STATUS =====
@@ -781,7 +814,7 @@ Agar bizning xizmatlarimiz sizga yoqsa va foydali bo'lsa — loyihamizni rivojla
 2. Bank ilovangizda to'lov qiling
 3. Istalgan summa — har bir so'm qimmatli! 💰
 
-Yoki botdagi "🛍 Sotib olish" orqali ham hisobni to'ldirishingiz mumkin.
+Yoki botdagi "💳 To'lov qilish" orqali ham hisobni to'ldirishingiz mumkin.
 
 <b>Rahmat, sizning qo'llab-quvvatlashingiz biz uchun juda muhim! 🙏❤️</b>""",
         "ru": """🎗 <b>Поддержать проект</b>

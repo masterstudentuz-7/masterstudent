@@ -1,11 +1,12 @@
 from aiogram import Router, F
 from aiogram.types import CallbackQuery
+from aiogram.fsm.context import FSMContext
 
 import database as db
 from locales import get_text
 from keyboards.inline_kb import (
     get_services_kb, get_ai_services_kb, get_admin_services_kb,
-    get_ppt_design_kb, get_buy_now_kb
+    get_ppt_design_kb, get_buy_now_kb, get_back_inline_kb
 )
 
 router = Router()
@@ -67,46 +68,31 @@ ADMIN_SERVICE_MAP = {
 
 
 @router.callback_query(F.data.startswith("adm_"))
-async def admin_service_selected(callback: CallbackQuery, state=None):
-    """Handle admin service selection."""
-    from aiogram.fsm.context import FSMContext
+async def admin_service_selected(callback: CallbackQuery, state: FSMContext):
+    """Admin xizmati tanlandi — TO'LOVSIZ, faqat buyurtma olinadi.
+    Narx mijoz va admin o'rtasida kelishiladi."""
     from handlers.documents import AdminOrderStates
-    
+
     service_key = callback.data
     if service_key not in ADMIN_SERVICE_MAP:
         await callback.answer()
         return
-    
+
     lang = await db.get_user_language(callback.from_user.id)
     price_key, service_name = ADMIN_SERVICE_MAP[service_key]
-    
-    from config import PRICES
-    price = PRICES.get(price_key, 20000)
-    
-    # Check balance
-    user = await db.get_user(callback.from_user.id)
-    total_balance = user["balance"] + user["bonus"]
-    
-    if total_balance < price:
-        await callback.message.edit_text(
-            get_text("insufficient_balance", lang, price=price, balance=total_balance),
-            reply_markup=get_buy_now_kb(lang),
-            parse_mode="HTML"
-        )
-        await callback.answer()
-        return
-    
-    # Ask for details using FSM
-    if state:
-        await state.update_data(
-            service_key=price_key,
-            service_name=service_name,
-            price=price
-        )
-        await state.set_state(AdminOrderStates.waiting_details)
-    
+
+    # Admin xizmatlari uchun to'lov SHART EMAS — narx admin bilan kelishiladi
+    await state.update_data(service_key=price_key, service_name=service_name)
+    await state.set_state(AdminOrderStates.waiting_details)
+
     await callback.message.edit_text(
-        get_text("admin_service_details", lang),
+        f"✨ <b>{service_name}</b>\n\n"
+        f"Ajoyib tanlov! 😊\n\n"
+        f"Bu xizmat <b>mutaxassisimiz</b> tomonidan qo'lda, sifatli tarzda bajariladi.\n"
+        f"💰 Narx siz bilan kelishilgan holda belgilanadi — hech qanday oldindan to'lov shart emas!\n\n"
+        f"📝 Iltimos, nima kerakligini batafsil yozib yuboring.\n"
+        f"💡 <i>Masalan: mavzu, talablar, muddat, qo'shimcha istaklaringiz...</i>",
+        reply_markup=get_back_inline_kb(lang),
         parse_mode="HTML"
     )
     await callback.answer()

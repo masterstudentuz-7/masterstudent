@@ -591,53 +591,55 @@ async def ai_text_topic(message: Message, state: FSMContext):
 
 @router.message(AdminOrderStates.waiting_details)
 async def admin_order_details(message: Message, state: FSMContext):
-    """Handle admin service order details."""
+    """Admin xizmati buyurtmasi — TO'LOVSIZ. Faqat buyurtma olinadi, narx admin bilan kelishiladi."""
     user_id = message.from_user.id
     lang = await db.get_user_language(user_id)
     data = await state.get_data()
-    
-    price = data["price"]
-    
-    success = await db.deduct_balance(user_id, price)
-    if not success:
-        user = await db.get_user(user_id)
-        balance = user["balance"] + user["bonus"]
-        await message.answer(get_text("insufficient_balance", lang, price=price, balance=balance), parse_mode="HTML")
+
+    # Ortga bosilsa
+    if message.text in ["⬅️ Ortga", "⬅️ Назад", "⬅️ Back"]:
         await state.clear()
+        await message.answer(get_text("cancelled", lang), reply_markup=get_main_menu_kb(lang))
         return
-    
+
+    # To'lov YO'Q — to'g'ridan-to'g'ri buyurtma yaratamiz (narx admin bilan kelishiladi)
     order_id = await db.create_order(
         user_id=user_id,
         service_type=data["service_key"],
         service_name=data["service_name"],
         details=message.text,
-        price=price,
+        price=0,  # narx admin bilan kelishiladi
         is_ai=0
     )
-    
+
     await message.answer(
-        get_text("admin_order_submitted", lang, order_id=order_id),
+        f"✅ <b>Buyurtmangiz qabul qilindi!</b>\n\n"
+        f"📦 Buyurtma raqami: <b>#{order_id}</b>\n"
+        f"🛠 Xizmat: <b>{data['service_name']}</b>\n\n"
+        f"👨‍💻 Mutaxassisimiz tez orada siz bilan bog'lanib, narx va muddatni kelishadi.\n"
+        f"⏰ Odatda 10-30 daqiqa ichida javob beramiz.\n\n"
+        f"Sabringiz uchun rahmat! 😊",
         reply_markup=get_main_menu_kb(lang),
         parse_mode="HTML"
     )
-    
-    # Notify admins
+
+    # Adminlarga xabar
     for admin_id in ADMIN_IDS:
         try:
             await message.bot.send_message(
                 admin_id,
-                get_text("admin_new_order", "uz",
-                         order_id=order_id,
-                         user=f"@{message.from_user.username or message.from_user.id}",
-                         service=data["service_name"],
-                         price=price,
-                         details=message.text[:200]),
+                f"🆕 <b>Yangi ADMIN buyurtma!</b>\n\n"
+                f"📦 #{order_id}\n"
+                f"👤 @{message.from_user.username or message.from_user.id}\n"
+                f"🛠 {data['service_name']}\n"
+                f"💬 Narx: mijoz bilan kelishiladi\n"
+                f"📋 Tafsilot: {message.text[:300]}",
                 reply_markup=get_admin_order_kb(order_id),
                 parse_mode="HTML"
             )
         except Exception:
             pass
-    
+
     await state.clear()
 
 

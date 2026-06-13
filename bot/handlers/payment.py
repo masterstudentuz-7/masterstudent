@@ -18,7 +18,7 @@ class PaymentStates(StatesGroup):
     waiting_receipt = State()
 
 
-@router.message(F.text.in_(["🛍 Sotib olish", "🛍 Пополнить", "🛍 Top Up"]))
+@router.message(F.text.in_(["💳 To'lov qilish", "💳 Оплата", "💳 Payment", "🛍 Sotib olish", "🛍 Пополнить", "🛍 Top Up"]))
 async def buy_start(message: Message, state: FSMContext):
     """Start payment flow."""
     await state.clear()  # Oldingi jarayonni bekor qilish

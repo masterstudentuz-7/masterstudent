@@ -441,17 +441,27 @@ def _fetch_image(query: str) -> io.BytesIO:
         return None
 
 
-async def _get_image_keyword(topic: str, slide_title: str) -> str:
-    """AI yordamida slayd uchun mos rasm kalit so'zini (inglizcha) oladi."""
+async def _get_image_keyword(topic: str, slide_title: str, purpose: str = "") -> str:
+    """AI yordamida slayd uchun mos rasm kalit so'zini (inglizcha) oladi. Maqsadga moslashtiriladi."""
+    # Maqsadga qarab kontekst (o'quv → kitob/kutubxona, biznes → iqtisodiyot)
+    purpose_hint = {
+        "university": "education, students, library, books",
+        "educational": "education, books, learning, school",
+        "business": "business, economy, office, finance",
+        "report": "data, charts, analytics, business",
+        "startup": "startup, innovation, technology, teamwork",
+    }.get(purpose, "")
     try:
         prompt = f"""Presentation topic: {topic}
 Slide title: {slide_title}
-Give ONE simple English keyword (1-2 words) for searching a relevant background photo.
-Return ONLY the keyword, nothing else. Example: "business meeting" or "technology"."""
+Context theme: {purpose_hint or 'general'}
+Give ONE simple English keyword (1-2 words) for searching a relevant, high-quality background photo that matches BOTH the topic and the context theme.
+Return ONLY the keyword, nothing else. Example: "business economy" or "library books"."""
         kw = await ai_generate(prompt, max_tokens=20, temperature=0.5)
-        return kw.strip().strip('"').strip()[:40] or topic
+        kw = kw.strip().strip('"').strip()[:40]
+        return kw or (purpose_hint.split(",")[0] if purpose_hint else topic)
     except Exception:
-        return topic
+        return purpose_hint.split(",")[0] if purpose_hint else topic
 
 
 def _add_decorative_elements(slide, colors, idx, total_slides):
@@ -518,7 +528,7 @@ async def create_ppt_file(topic: str, slides_count: int, design: str, purpose: s
         # Adabiyotlar va xulosa slaydlariga rasm qo'ymaymiz
         if PEXELS_API_KEY and idx < total - 1:
             try:
-                keyword = await _get_image_keyword(topic, slide_data.get("title", topic))
+                keyword = await _get_image_keyword(topic, slide_data.get("title", topic), purpose)
                 img_stream = _fetch_image(keyword)
             except Exception:
                 img_stream = None
