@@ -72,12 +72,25 @@ def get_admin_services_kb(lang: str = "uz") -> InlineKeyboardMarkup:
 
 
 def get_ppt_design_kb(lang: str = "uz") -> InlineKeyboardMarkup:
-    """PPT design selection keyboard."""
+    """PPT design selection keyboard — har dizaynga alohida emoji va nom."""
+    design_styles = {
+        "Business":   "💼 Business — ishbilarmon",
+        "Minimal":    "⚪ Minimal — sodda, toza",
+        "Dark":       "🌑 Dark — qora fon",
+        "Modern":     "🔷 Modern — zamonaviy",
+        "Education":  "📚 Education — o'quv",
+        "Corporate":  "🏢 Corporate — korporativ",
+        "Startup":    "🚀 Startup — yorqin",
+        "Creative":   "🎨 Creative — ijodiy",
+        "Elegant":    "✨ Elegant — nafis",
+        "Premium":    "👑 Premium — hashamatli",
+    }
     builder = InlineKeyboardBuilder()
     for design in PPT_DESIGNS:
-        builder.button(text=f"🎨 {design}", callback_data=f"ppt_design_{design.lower()}")
+        label = design_styles.get(design, f"🎨 {design}")
+        builder.button(text=label, callback_data=f"ppt_design_{design.lower()}")
     builder.button(text=get_text("btn_cancel", lang), callback_data="cancel_order")
-    builder.adjust(2)
+    builder.adjust(1)
     return builder.as_markup()
 
 

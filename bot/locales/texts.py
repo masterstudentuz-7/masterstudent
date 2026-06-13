@@ -168,9 +168,9 @@ Choose the section you need from the menu below 👇""",
 
     # ===== PPT FLOW =====
     "ppt_choose_design": {
-        "uz": "🎨 <b>Zo'r tanlov!</b> Endi taqdimot dizaynini tanlang 👇",
-        "ru": "🎨 <b>Отличный выбор!</b> Теперь выберите дизайн презентации:",
-        "en": "🎨 <b>Great choice!</b> Now choose the presentation design:",
+        "uz": "🎨 <b>Taqdimot sozlamalari</b>\n\n1-qadam: Taqdimotingiz uchun <b>dizayn</b>ni tanlang 👇\n\n💡 Har bir dizayn o'ziga xos uslubga ega:",
+        "ru": "🎨 <b>Настройки презентации</b>\n\nШаг 1: Выберите <b>дизайн</b> для вашей презентации 👇",
+        "en": "🎨 <b>Presentation settings</b>\n\nStep 1: Choose a <b>design</b> for your presentation 👇",
     },
     "ppt_choose_purpose": {
         "uz": "🎯 <b>Ajoyib!</b> Taqdimot maqsadini tanlang 👇",
