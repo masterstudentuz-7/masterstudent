@@ -1,11 +1,11 @@
 from aiogram import Router, F
-from aiogram.types import CallbackQuery, Message
+from aiogram.types import CallbackQuery, Message, BufferedInputFile
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, WebAppInfo
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
-from aiogram.types import BufferedInputFile
 
 import database as db
-from config import PRICES
+from config import PRICES, WEBAPP_URL
 from locales import get_text
 from keyboards.inline_kb import (
     get_ppt_design_kb, get_ppt_purpose_kb, get_ppt_lang_kb,
@@ -43,8 +43,33 @@ async def ppt_start(callback: CallbackQuery, state: FSMContext):
 
 @router.callback_query(F.data == "svc_ppt_pro")
 async def ppt_pro_start(callback: CallbackQuery, state: FSMContext):
-    """Start Taqdimot PRO flow — rasmlar bilan, boy kontent."""
+    """Taqdimot PRO — Web App (Mini App) ni Telegram ICHIDA ochadi."""
     lang = await db.get_user_language(callback.from_user.id)
+
+    if WEBAPP_URL:
+        kb = ReplyKeyboardMarkup(
+            keyboard=[[KeyboardButton(
+                text="🌟 Taqdimot PRO — ochish",
+                web_app=WebAppInfo(url=WEBAPP_URL)
+            )]],
+            resize_keyboard=True
+        )
+        await callback.message.answer(
+            "🌟 <b>Taqdimot PRO</b>\n\n"
+            "Premium taqdimot — rasmlar va boy ma'lumot bilan! 💎\n\n"
+            "Web ilovada:\n"
+            "• 🎨 15 ta tayyor dizayn (rasmli ko'rinish)\n"
+            "• 🖼 Avtomatik rasmlar\n"
+            "• ⭐ 3 xil sifat tarifi\n"
+            "• 📄 PPTX yoki PDF format\n\n"
+            "Quyidagi tugmani bosing 👇",
+            reply_markup=kb,
+            parse_mode="HTML"
+        )
+        await callback.answer()
+        return
+
+    # WEBAPP_URL sozlanmagan bo'lsa — oddiy ichki oqim ishlaydi
     await state.update_data(is_pro=True)
     await state.set_state(PPTStates.choosing_design)
     await callback.message.edit_text(
