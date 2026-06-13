@@ -29,6 +29,7 @@ def get_ai_services_kb(lang: str = "uz") -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
     services = [
         ("btn_ppt", "svc_ppt"),
+        ("btn_ppt_pro", "svc_ppt_pro"),
         ("btn_referat", "svc_referat"),
         ("btn_mustaqil", "svc_mustaqil"),
         ("btn_esse", "svc_esse"),

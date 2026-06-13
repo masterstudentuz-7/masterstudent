@@ -29,12 +29,31 @@ class PPTStates(StatesGroup):
 
 @router.callback_query(F.data == "svc_ppt")
 async def ppt_start(callback: CallbackQuery, state: FSMContext):
-    """Start PPT creation flow."""
+    """Start PPT creation flow (oddiy)."""
     lang = await db.get_user_language(callback.from_user.id)
-    
+    await state.update_data(is_pro=False)
     await state.set_state(PPTStates.choosing_design)
     await callback.message.edit_text(
         get_text("ppt_choose_design", lang),
+        reply_markup=get_ppt_design_kb(lang),
+        parse_mode="HTML"
+    )
+    await callback.answer()
+
+
+@router.callback_query(F.data == "svc_ppt_pro")
+async def ppt_pro_start(callback: CallbackQuery, state: FSMContext):
+    """Start Taqdimot PRO flow — rasmlar bilan, boy kontent."""
+    lang = await db.get_user_language(callback.from_user.id)
+    await state.update_data(is_pro=True)
+    await state.set_state(PPTStates.choosing_design)
+    await callback.message.edit_text(
+        "🌟 <b>Taqdimot PRO</b>\n\n"
+        "Bu — premium taqdimot:\n"
+        "• 🖼 Mavzuga mos professional rasmlar\n"
+        "• 📚 Oddiyga qaraganda 2 baravar ko'p ma'lumot\n"
+        "• 🎨 Yuqori sifatli dizayn\n\n"
+        "Keling, boshlaymiz! Avval dizaynni tanlang 👇",
         reply_markup=get_ppt_design_kb(lang),
         parse_mode="HTML"
     )
@@ -142,9 +161,15 @@ async def ppt_extra_entered(message: Message, state: FSMContext):
     data = await state.get_data()
     slides = data["slides"]
     
-    # Calculate price
-    price_key = f"ppt_{slides}"
-    price = PRICES.get(price_key, PRICES["ppt_10"])
+    # Calculate price (PRO bo'lsa qimmatroq)
+    data_now = await state.get_data()
+    is_pro = data_now.get("is_pro", False)
+    if is_pro:
+        price_key = f"ppt_pro_{slides}"
+        price = PRICES.get(price_key, PRICES["ppt_pro_10"])
+    else:
+        price_key = f"ppt_{slides}"
+        price = PRICES.get(price_key, PRICES["ppt_10"])
     await state.update_data(price=price)
     
     # Get user balance
@@ -229,7 +254,8 @@ async def ppt_confirmed(callback: CallbackQuery, state: FSMContext):
             design=data["design"],
             purpose=data["purpose"],
             lang=data["ppt_lang"],
-            extra=data.get("extra", "")
+            extra=data.get("extra", ""),
+            is_pro=data.get("is_pro", False)
         )
         
         # Progress to'xtatish

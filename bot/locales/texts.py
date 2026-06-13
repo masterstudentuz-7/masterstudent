@@ -136,7 +136,8 @@ Choose the section you need from the menu below 👇""",
     },
 
     # AI service buttons
-    "btn_ppt": {"uz": "📊 Professional PPT", "ru": "📊 Профессиональная PPT", "en": "📊 Professional PPT"},
+    "btn_ppt": {"uz": "📊 Taqdimot (PPT)", "ru": "📊 Презентация (PPT)", "en": "📊 Presentation (PPT)"},
+    "btn_ppt_pro": {"uz": "🌟 Taqdimot PRO (rasmli)", "ru": "🌟 Презентация PRO (с фото)", "en": "🌟 Presentation PRO (with images)"},
     "btn_referat": {"uz": "📝 Referat", "ru": "📝 Реферат", "en": "📝 Essay/Report"},
     "btn_mustaqil": {"uz": "📄 Mustaqil ish", "ru": "📄 Самостоятельная работа", "en": "📄 Independent Work"},
     "btn_word": {"uz": "📘 Word xizmatlari", "ru": "📘 Услуги Word", "en": "📘 Word Services"},

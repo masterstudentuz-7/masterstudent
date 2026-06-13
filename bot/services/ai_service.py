@@ -306,7 +306,7 @@ GOST_SLIDE_STRUCTURE = {
 }
 
 
-async def generate_ppt_content(topic: str, slides: int, purpose: str, lang: str, extra: str = "") -> list:
+async def generate_ppt_content(topic: str, slides: int, purpose: str, lang: str, extra: str = "", is_pro: bool = False) -> list:
     """
     GOST standartidagi taqdimot — avval REJA tuziladi, keyin har slayd real sarlavha bilan.
     Reja nomlari mazmunli bo'ladi, "1-bo'lim" emas.
@@ -364,6 +364,8 @@ Faqat to'g'ri JSON. Markdown yo'q."""
     full_titles = [topic, plan_t, intro_t] + main_titles + [concl_t, refs_t]
 
     # 2-QADAM: Har slayd uchun kontent generatsiya (bitta so'rovda)
+    bullets_per_slide = "6-8" if is_pro else "4-6"
+    pro_note = "\n- PRO sifat: chuqurroq tahlil, aniq raqamlar, statistika va misollar bilan boyit" if is_pro else ""
     titles_for_prompt = "\n".join([f"{i+1}. {t}" for i, t in enumerate(full_titles)])
     content_prompt = f"""Sen "{lang_name}" tilida GOST standartidagi akademik taqdimot kontentini yozayotgan mutaxassissan.
 Mavzu: "{topic}"
@@ -374,9 +376,9 @@ Quyidagi slaydlar uchun kontent yoz (sarlavhalar ALREADY berilgan, ularni O'ZGAR
 
 QOIDALAR:
 - 2-slayd "Reja" — unda barcha bo'limlar ro'yxati bullet sifatida
-- Har slaydda 4-6 ta to'liq, ma'lumotli bullet (har biri 12-20 so'z, faktlar bilan)
+- Har slaydda {bullets_per_slide} ta to'liq, ma'lumotli bullet (har biri 12-20 so'z, faktlar bilan)
 - "Foydalanilgan adabiyotlar" slaydida 5-6 ta manba
-- Akademik, aniq, mazmunli yoz
+- Akademik, aniq, mazmunli yoz{pro_note}
 
 Aniq {len(full_titles)} ta obyektli JSON massiv qaytar. Har obyekt:
 {{"title": "<yuqoridagi aynan o'sha sarlavha>", "content": ["bullet1", "bullet2", ...], "notes": "ma'ruzachi uchun 2 jumla"}}
@@ -481,9 +483,10 @@ def _add_decorative_elements(slide, colors, idx, total_slides):
         logger.warning(f"Dekorativ element qo'shilmadi: {e}")
 
 
-async def create_ppt_file(topic: str, slides_count: int, design: str, purpose: str, lang: str, extra: str = "") -> io.BytesIO:
-    """Create GOST-standard PPTX file with images and decorative design."""
-    slides_data = await generate_ppt_content(topic, slides_count, purpose, lang, extra)
+async def create_ppt_file(topic: str, slides_count: int, design: str, purpose: str, lang: str, extra: str = "", is_pro: bool = False) -> io.BytesIO:
+    """Create GOST-standard PPTX file with images and decorative design.
+    is_pro=True: rasmlar har slaydda, boyroq kontent."""
+    slides_data = await generate_ppt_content(topic, slides_count, purpose, lang, extra, is_pro=is_pro)
     
     prs = Presentation()
     prs.slide_width = Inches(13.333)

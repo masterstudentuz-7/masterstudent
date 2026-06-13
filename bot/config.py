@@ -83,8 +83,18 @@ PRICES = {
     "ppt_20": 15000,
     "ppt_25": 18000,
     "ppt_30": 22000,
+    # Taqdimot PRO — rasmlar bilan, ko'proq ma'lumot (oddiydan qimmatroq)
+    "ppt_pro_5": 9000,
+    "ppt_pro_10": 14000,
+    "ppt_pro_15": 20000,
+    "ppt_pro_20": 26000,
+    "ppt_pro_25": 32000,
+    "ppt_pro_30": 38000,
     "referat": 10000,
     "mustaqil_ish": 10000,
+    # Ilmiy & Ideal sifat (Premium tarif) — chuqurroq, ilmiy manbalar bilan
+    "referat_premium": 7000,
+    "mustaqil_ish_premium": 7000,
     "esse": 5000,
     "tarjima_page": 3000,
     "qr_code": 2000,
