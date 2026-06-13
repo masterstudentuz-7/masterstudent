@@ -105,13 +105,17 @@ def get_ppt_lang_kb(lang: str = "uz") -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(inline_keyboard=buttons)
 
 
-def get_ppt_slides_kb(lang: str = "uz") -> InlineKeyboardMarkup:
-    """PPT slides count selection keyboard."""
+def get_ppt_slides_kb(lang: str = "uz", is_pro: bool = False) -> InlineKeyboardMarkup:
+    """PPT slides count selection keyboard — narxlari bilan."""
+    from config import PRICES
     builder = InlineKeyboardBuilder()
     for count in PPT_SLIDES:
-        builder.button(text=str(count), callback_data=f"ppt_slides_{count}")
+        price_key = f"ppt_pro_{count}" if is_pro else f"ppt_{count}"
+        price = PRICES.get(price_key, 0)
+        price_str = f"{price:,}".replace(",", " ")
+        builder.button(text=f"📑 {count} slayd — {price_str} so'm", callback_data=f"ppt_slides_{count}")
     builder.button(text=get_text("btn_cancel", lang), callback_data="cancel_order")
-    builder.adjust(3)
+    builder.adjust(1)
     return builder.as_markup()
 
 
@@ -152,6 +156,18 @@ def get_buy_now_kb(lang: str = "uz") -> InlineKeyboardMarkup:
         [InlineKeyboardButton(text=get_text("btn_buy_now", lang), callback_data="open_buy")],
     ]
     return InlineKeyboardMarkup(inline_keyboard=buttons)
+
+
+def get_doc_pages_kb(lang: str = "uz") -> InlineKeyboardMarkup:
+    """Hujjat varoqlari ro'yxati — har biri narxi bilan."""
+    from config import DOC_PAGE_OPTIONS
+    builder = InlineKeyboardBuilder()
+    for key, name, pages, price in DOC_PAGE_OPTIONS:
+        price_str = f"{price:,}".replace(",", " ")
+        builder.button(text=f"📄 {name} — {price_str} so'm", callback_data=f"docpages_{key}")
+    builder.button(text=get_text("btn_cancel", lang), callback_data="cancel_order")
+    builder.adjust(1)
+    return builder.as_markup()
 
 
 def get_yes_no_kb(lang: str = "uz") -> InlineKeyboardMarkup:

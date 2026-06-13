@@ -5,12 +5,12 @@ from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import BufferedInputFile
 
 import database as db
-from config import PRICES, ADMIN_IDS
+from config import PRICES, ADMIN_IDS, DOC_PAGE_OPTIONS
 from locales import get_text
 from keyboards.inline_kb import (
     get_ppt_lang_kb, get_yes_no_kb, get_confirm_kb,
     get_esse_type_kb, get_esse_words_kb, get_qr_design_kb,
-    get_rating_kb, get_admin_order_kb, get_buy_now_kb
+    get_rating_kb, get_admin_order_kb, get_buy_now_kb, get_doc_pages_kb
 )
 from keyboards.main_kb import get_cancel_kb, get_main_menu_kb
 from services.ai_service import (
@@ -27,6 +27,7 @@ class DocumentStates(StatesGroup):
     choosing_lang = State()
     entering_topic = State()
     entering_pages = State()
+    choosing_pages = State()
     choosing_references = State()
     confirming = State()
 
@@ -62,15 +63,38 @@ class AdminOrderStates(StatesGroup):
 
 @router.callback_query(F.data.in_(["svc_referat", "svc_mustaqil"]))
 async def doc_start(callback: CallbackQuery, state: FSMContext):
-    """Start document creation flow."""
+    """Hujjat yaratishni boshlash — avval TIL tanlanadi."""
     lang = await db.get_user_language(callback.from_user.id)
     doc_type = "referat" if callback.data == "svc_referat" else "mustaqil_ish"
-    
+    doc_name = "Referat" if doc_type == "referat" else "Mustaqil ish"
+
     await state.update_data(doc_type=doc_type)
-    await state.set_state(DocumentStates.entering_topic)
-    
+    await state.set_state(DocumentStates.choosing_lang)
+
     await callback.message.edit_text(
-        get_text("referat_enter_topic", lang),
+        f"📝 <b>{doc_name}</b>\n\n"
+        f"Ajoyib tanlov! 😊\n\n"
+        f"Keling, boshlaymiz. Avvalo, hujjat qaysi <b>tilda</b> bo'lishini tanlang 👇",
+        reply_markup=get_ppt_lang_kb(lang),
+        parse_mode="HTML"
+    )
+    await callback.answer()
+
+
+@router.callback_query(DocumentStates.choosing_lang, F.data.startswith("ppt_lang_"))
+async def doc_lang_selected(callback: CallbackQuery, state: FSMContext):
+    """Til tanlandi — endi MAVZU so'raladi (xushmuomala)."""
+    doc_lang = callback.data.replace("ppt_lang_", "")
+    lang = await db.get_user_language(callback.from_user.id)
+
+    await state.update_data(doc_lang=doc_lang)
+    await state.set_state(DocumentStates.entering_topic)
+
+    lang_names = {"uz": "O'zbek", "ru": "Rus", "en": "Ingliz"}
+    await callback.message.edit_text(
+        f"✅ Til tanlandi: <b>{lang_names.get(doc_lang, doc_lang)}</b>\n\n"
+        f"📝 Endi, iltimos, <b>mavzuni yozib yuboring</b> ✍️\n\n"
+        f"💡 <i>Masalan: «O'zbekiston iqtisodiyotining rivojlanishi»</i>",
         parse_mode="HTML"
     )
     await callback.answer()
@@ -78,61 +102,59 @@ async def doc_start(callback: CallbackQuery, state: FSMContext):
 
 @router.message(DocumentStates.entering_topic)
 async def doc_topic_entered(message: Message, state: FSMContext):
-    """Handle topic input for document."""
+    """Mavzu kiritildi — endi VAROQLAR ro'yxati (narxlari bilan)."""
     lang = await db.get_user_language(message.from_user.id)
-    
-    if message.text in ["❌ Bekor qilish", "❌ Отмена", "❌ Cancel"]:
+
+    if message.text in ["❌ Bekor qilish", "❌ Отмена", "❌ Cancel", "⬅️ Ortga", "⬅️ Назад", "⬅️ Back"]:
         await state.clear()
         await message.answer(get_text("cancelled", lang), reply_markup=get_main_menu_kb(lang))
         return
-    
+
     await state.update_data(topic=message.text)
-    await state.set_state(DocumentStates.choosing_lang)
-    
+    await state.set_state(DocumentStates.choosing_pages)
+
+    # Foydalanuvchi balansini ko'rsatamiz
+    user = await db.get_user(message.from_user.id)
+    balance = (user["balance"] + user["bonus"]) if user else 0
+    bal_str = f"{balance:,}".replace(",", " ")
+
     await message.answer(
-        get_text("referat_choose_lang", lang),
-        reply_markup=get_ppt_lang_kb(lang),
+        f"📝 Mavzu qabul qilindi: <b>{message.text}</b>\n\n"
+        f"📄 Endi hujjat necha <b>sahifa</b> bo'lishini tanlang.\n"
+        f"Har bir variant yonida narxi ko'rsatilgan 👇\n\n"
+        f"💳 Sizning hisobingiz: <b>{bal_str} so'm</b>",
+        reply_markup=get_doc_pages_kb(lang),
         parse_mode="HTML"
     )
 
 
-@router.callback_query(DocumentStates.choosing_lang, F.data.startswith("ppt_lang_"))
-async def doc_lang_selected(callback: CallbackQuery, state: FSMContext):
-    """Handle document language selection."""
-    doc_lang = callback.data.replace("ppt_lang_", "")
+@router.callback_query(DocumentStates.choosing_pages, F.data.startswith("docpages_"))
+async def doc_pages_selected(callback: CallbackQuery, state: FSMContext):
+    """Varoq tanlandi — narx hisoblanadi, balans tekshiriladi."""
+    key = callback.data.replace("docpages_", "")
     lang = await db.get_user_language(callback.from_user.id)
-    
-    await state.update_data(doc_lang=doc_lang)
-    await state.set_state(DocumentStates.entering_pages)
-    
-    await callback.message.edit_text(
-        get_text("referat_pages", lang),
-        parse_mode="HTML"
-    )
-    await callback.answer()
 
-
-@router.message(DocumentStates.entering_pages)
-async def doc_pages_entered(message: Message, state: FSMContext):
-    """Handle pages count input."""
-    lang = await db.get_user_language(message.from_user.id)
-    
-    try:
-        pages = int(message.text)
-        if pages < 5 or pages > 50:
-            raise ValueError()
-    except (ValueError, TypeError):
-        await message.answer(get_text("referat_pages", lang), parse_mode="HTML")
+    # Tanlangan variantni topamiz
+    selected = None
+    for k, name, pages, price in DOC_PAGE_OPTIONS:
+        if k == key:
+            selected = (name, pages, price)
+            break
+    if not selected:
+        await callback.answer("❌ Xatolik")
         return
-    
-    await state.update_data(pages=pages)
+
+    name, pages, price = selected
+    await state.update_data(pages=pages, price=price, pages_name=name)
     await state.set_state(DocumentStates.choosing_references)
-    
-    await message.answer(
+
+    await callback.message.edit_text(
+        f"📄 Tanlandi: <b>{name}</b> — {price:,} so'm\n\n".replace(",", " ") +
         get_text("referat_references", lang),
         reply_markup=get_yes_no_kb(lang),
         parse_mode="HTML"
     )
+    await callback.answer()
 
 
 @router.callback_query(DocumentStates.choosing_references, F.data.in_(["answer_yes", "answer_no"]))
@@ -144,8 +166,7 @@ async def doc_references_selected(callback: CallbackQuery, state: FSMContext):
     await state.update_data(references=references)
     
     data = await state.get_data()
-    price = PRICES.get(data["doc_type"], 10000)
-    await state.update_data(price=price)
+    price = data.get("price", PRICES.get(data["doc_type"], 10000))
     
     user = await db.get_user(callback.from_user.id)
     if not user:
@@ -155,8 +176,13 @@ async def doc_references_selected(callback: CallbackQuery, state: FSMContext):
     balance = user["balance"] + user["bonus"]
     
     if balance < price:
+        bal_str = f"{balance:,}".replace(",", " ")
+        price_str = f"{price:,}".replace(",", " ")
         await callback.message.edit_text(
-            get_text("insufficient_balance", lang, price=price, balance=balance),
+            f"😔 <b>Afsuski, hisobingizda mablag' yetarli emas</b>\n\n"
+            f"💰 Xizmat narxi: <b>{price_str} so'm</b>\n"
+            f"💳 Sizning hisobingiz: <b>{bal_str} so'm</b>\n\n"
+            f"Iltimos, hisobingizni to'ldiring va qaytadan urinib ko'ring 👇",
             reply_markup=get_buy_now_kb(lang),
             parse_mode="HTML"
         )
@@ -165,14 +191,20 @@ async def doc_references_selected(callback: CallbackQuery, state: FSMContext):
         return
     
     await state.set_state(DocumentStates.confirming)
+    lang_names = {"uz": "O'zbek", "ru": "Rus", "en": "Ingliz"}
+    ref_text = "Ha" if references else "Yo'q"
+    pages_name = data.get('pages_name', str(data['pages']) + ' sahifa')
+    price_str = f"{price:,}".replace(",", " ")
+    bal_str = f"{balance:,}".replace(",", " ")
     await callback.message.edit_text(
-        f"📋 <b>Tasdiqlang:</b>\n\n"
-        f"📝 Mavzu: {data['topic']}\n"
-        f"🌐 Til: {data['doc_lang']}\n"
-        f"📄 Sahifalar: {data['pages']}\n"
-        f"📚 Adabiyotlar: {'Ha' if references else 'Yoq'}\n"
-        f"💰 Narx: {price} so'm\n"
-        f"💳 Balans: {balance} so'm",
+        f"✅ <b>Buyurtmangizni tasdiqlang:</b>\n\n"
+        f"📝 Mavzu: <b>{data['topic']}</b>\n"
+        f"🌐 Til: <b>{lang_names.get(data['doc_lang'], data['doc_lang'])}</b>\n"
+        f"📄 Hajmi: <b>{pages_name}</b>\n"
+        f"📚 Adabiyotlar: <b>{ref_text}</b>\n"
+        f"💰 Narx: <b>{price_str} so'm</b>\n"
+        f"💳 Balans: <b>{bal_str} so'm</b>\n\n"
+        f"Tasdiqlaysizmi? 👇",
         reply_markup=get_confirm_kb(lang),
         parse_mode="HTML"
     )

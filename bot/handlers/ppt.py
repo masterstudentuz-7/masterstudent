@@ -123,9 +123,11 @@ async def ppt_topic_entered(message: Message, state: FSMContext):
     await state.update_data(topic=message.text)
     await state.set_state(PPTStates.choosing_slides)
     
+    data = await state.get_data()
+    is_pro = data.get("is_pro", False)
     await message.answer(
         get_text("ppt_choose_slides", lang),
-        reply_markup=get_ppt_slides_kb(lang),
+        reply_markup=get_ppt_slides_kb(lang, is_pro=is_pro),
         parse_mode="HTML"
     )
 

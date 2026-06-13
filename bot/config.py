@@ -75,6 +75,16 @@ PPT_PURPOSES = [
 # PPT Slide counts
 PPT_SLIDES = [5, 10, 15, 20, 25, 30]
 
+# Hujjat (referat/mustaqil ish) varoq oralig'i va narxlari
+# Har bir element: (kalit, ko'rinadigan nom, sahifa soni, narx)
+DOC_PAGE_OPTIONS = [
+    ("p_5_10",  "5-10 sahifa",   8,  8000),
+    ("p_10_15", "10-15 sahifa", 13, 12000),
+    ("p_15_20", "15-20 sahifa", 18, 16000),
+    ("p_20_25", "20-25 sahifa", 23, 20000),
+    ("p_25_30", "25-30 sahifa", 28, 25000),
+]
+
 # Service prices (in so'm)
 PRICES = {
     "ppt_5": 5000,
