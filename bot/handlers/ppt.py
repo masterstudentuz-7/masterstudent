@@ -27,18 +27,48 @@ class PPTStates(StatesGroup):
     confirming = State()
 
 
+_designs_preview_cache = None
+
+
+def _get_designs_preview_bytes():
+    """Dizayn preview rasmini bir marta yaratib, keshda saqlaydi."""
+    global _designs_preview_cache
+    if _designs_preview_cache is None:
+        try:
+            from services.ai_service import generate_designs_preview
+            _designs_preview_cache = generate_designs_preview().read()
+        except Exception:
+            _designs_preview_cache = b""
+    return _designs_preview_cache
+
+
 @router.callback_query(F.data == "svc_ppt")
 async def ppt_start(callback: CallbackQuery, state: FSMContext):
-    """Start PPT creation flow (oddiy)."""
+    """Start PPT creation flow (oddiy) — dizayn preview rasmi bilan."""
     lang = await db.get_user_language(callback.from_user.id)
     await state.update_data(is_pro=False)
     await state.set_state(PPTStates.choosing_design)
-    await callback.message.edit_text(
+    await _send_design_picker(callback, lang)
+    await callback.answer()
+
+
+async def _send_design_picker(callback: CallbackQuery, lang: str):
+    """15 ta dizayn preview rasmini va tanlash tugmalarini yuboradi."""
+    photo_bytes = _get_designs_preview_bytes()
+    try:
+        if photo_bytes:
+            await callback.message.answer_photo(
+                BufferedInputFile(photo_bytes, filename="designs.png"),
+                caption="🎨 <b>15 ta tayyor dizayn</b> — quyida ko'rinishini ko'ring 👇",
+                parse_mode="HTML"
+            )
+    except Exception:
+        pass
+    await callback.message.answer(
         get_text("ppt_choose_design", lang),
         reply_markup=get_ppt_design_kb(lang),
         parse_mode="HTML"
     )
-    await callback.answer()
 
 
 @router.callback_query(F.data == "svc_ppt_pro")
@@ -69,9 +99,19 @@ async def ppt_pro_start(callback: CallbackQuery, state: FSMContext):
         await callback.answer()
         return
 
-    # WEBAPP_URL sozlanmagan bo'lsa — oddiy ichki oqim ishlaydi
+    # WEBAPP_URL sozlanmagan bo'lsa — ichki oqim (dizayn preview bilan)
     await state.update_data(is_pro=True)
     await state.set_state(PPTStates.choosing_design)
+    await callback.message.answer(
+        "🌟 <b>Taqdimot PRO</b>\n\n"
+        "Premium taqdimot — rasmlar va 2 baravar boy ma'lumot bilan! 💎",
+        parse_mode="HTML"
+    )
+    await _send_design_picker(callback, lang)
+    await callback.answer()
+
+
+async def _ppt_pro_internal_OLD(callback, state, lang):
     await callback.message.edit_text(
         "🌟 <b>Taqdimot PRO</b>\n\n"
         "Bu — premium taqdimot:\n"

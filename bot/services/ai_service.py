@@ -311,6 +311,70 @@ GOST_SLIDE_STRUCTURE = {
 }
 
 
+def generate_designs_preview() -> io.BytesIO:
+    """15 ta dizaynni mini-slayd ko'rinishida bitta rasmga chizadi (3x5 grid)."""
+    from PIL import Image, ImageDraw, ImageFont
+
+    designs = [
+        ("Business", "business"), ("Minimal", "minimal"), ("Dark", "dark"),
+        ("Modern", "modern"), ("Education", "education"), ("Corporate", "corporate"),
+        ("Startup", "startup"), ("Creative", "creative"), ("Elegant", "elegant"),
+        ("Premium", "premium"), ("Ocean", "ocean"), ("Sunset", "sunset"),
+        ("Forest", "forest"), ("Royal", "royal"), ("Neon", "neon"),
+    ]
+    cols, rows = 3, 5
+    cw, ch = 340, 215
+    pad = 18
+    W = cols * cw + (cols + 1) * pad
+    H = rows * ch + (rows + 1) * pad
+    img = Image.new("RGB", (W, H), (13, 17, 28))
+    d = ImageDraw.Draw(img)
+
+    def load_font(size, bold=False):
+        names = (["DejaVuSans-Bold.ttf", "Arial Bold.ttf"] if bold else ["DejaVuSans.ttf", "Arial.ttf"])
+        for n in names:
+            try:
+                return ImageFont.truetype(n, size)
+            except Exception:
+                continue
+        return ImageFont.load_default()
+
+    f_title = load_font(22, bold=True)
+    f_label = load_font(15)
+
+    def hx(h):
+        return tuple(int(h[j:j+2], 16) for j in (0, 2, 4))
+
+    for i, (name, key) in enumerate(designs):
+        c = PPT_COLOR_SCHEMES.get(key, PPT_COLOR_SCHEMES["business"])
+        r = i // cols
+        col = i % cols
+        x = pad + col * (cw + pad)
+        y = pad + r * (ch + pad)
+        sh = ch - 38
+        bg, title, text = hx(c["bg"]), hx(c["title"]), hx(c["text"])
+
+        # slayd foni
+        d.rectangle([x, y, x + cw, y + sh], fill=bg)
+        # accent burchak
+        d.ellipse([x + cw - 46, y - 14, x + cw + 14, y + 46], fill=title)
+        # sarlavha
+        d.text((x + 18, y + 20), name, fill=title, font=f_title)
+        d.rectangle([x + 18, y + 56, x + 18 + 130, y + 61], fill=title)
+        # matn chiziqlari
+        for k in range(3):
+            ly = y + 82 + k * 24
+            w = (cw - 60) if k < 2 else (cw - 60) // 2
+            d.rectangle([x + 18, ly, x + 18 + w, ly + 7], fill=text)
+        # pastki yorliq (raqam + nom)
+        d.text((x + 18, y + sh + 9), f"#{i + 1}  {name}", fill=(205, 210, 220), font=f_label)
+
+    out = io.BytesIO()
+    img.save(out, format="PNG")
+    out.seek(0)
+    return out
+
+
 async def generate_ppt_content(topic: str, slides: int, purpose: str, lang: str, extra: str = "", is_pro: bool = False) -> list:
     """
     GOST standartidagi taqdimot — avval REJA tuziladi, keyin har slayd real sarlavha bilan.

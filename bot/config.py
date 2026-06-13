@@ -66,10 +66,11 @@ PAYMENT_AMOUNTS = [
     99000, 101000
 ]
 
-# PPT Designs
+# PPT Designs (15 ta)
 PPT_DESIGNS = [
     "Business", "Minimal", "Dark", "Modern", "Education",
-    "Corporate", "Startup", "Creative", "Elegant", "Premium"
+    "Corporate", "Startup", "Creative", "Elegant", "Premium",
+    "Ocean", "Sunset", "Forest", "Royal", "Neon"
 ]
 
 # PPT Purposes
