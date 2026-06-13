@@ -73,12 +73,12 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
 // Sozlash: pastdagi firebaseConfig ni o'z loyihangiz ma'lumotlari bilan to'ldiring.
 // Firebase bepul: https://console.firebase.google.com → Firestore Database yarating.
 const firebaseConfig = {
-    apiKey: "SIZNING_API_KEY",
-    authDomain: "SIZNING_PROJECT.firebaseapp.com",
-    projectId: "SIZNING_PROJECT_ID",
-    storageBucket: "SIZNING_PROJECT.appspot.com",
-    messagingSenderId: "SIZNING_SENDER_ID",
-    appId: "SIZNING_APP_ID"
+    apiKey: "AIzaSyBx9FnQyRnymIF163TWaV81Cti4oelx73o",
+    authDomain: "master-student-58976.firebaseapp.com",
+    projectId: "master-student-58976",
+    storageBucket: "master-student-58976.firebasestorage.app",
+    messagingSenderId: "22664104679",
+    appId: "1:22664104679:web:60aa70dcd821758b6f7042"
 };
 
 // Admin kaliti — izoh o'chirish uchun. URL'ga ?admin=KALIT qo'shilsa, o'chirish tugmasi chiqadi.
