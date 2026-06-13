@@ -35,6 +35,56 @@ async def cmd_admin(message: Message):
     )
 
 
+@router.message(Command("elon"))
+async def cmd_elon(message: Message, state: FSMContext):
+    """Tezkor e'lon — admin barcha foydalanuvchilarga xabar yuboradi.
+    Foydalanish: /elon Bot yangilanmoqda, biroz kuting!
+    yoki shunchaki /elon yozsa, keyingi xabarni so'raydi."""
+    if not is_admin(message.from_user.id):
+        return
+
+    text = message.text.replace("/elon", "", 1).strip()
+    if text:
+        # Matn buyruq bilan birga yuborilgan — darhol yuboramiz
+        await _do_broadcast(message, text)
+    else:
+        # Matn yo'q — keyingi xabarni so'raymiz
+        await state.set_state(AdminStates.broadcasting)
+        await message.answer(
+            "📢 <b>E'lon yuborish</b>\n\n"
+            "Barcha foydalanuvchilarga yubormoqchi bo'lgan xabaringizni yozing.\n\n"
+            "💡 Masalan: <i>«Hurmatli mijozlar! Botda yangi bo'lim qo'shildi 🎉»</i>\n\n"
+            "❌ Bekor qilish uchun: /bekor",
+            parse_mode="HTML"
+        )
+
+
+@router.message(Command("bekor"))
+async def cmd_bekor(message: Message, state: FSMContext):
+    """Admin amalini bekor qilish."""
+    if not is_admin(message.from_user.id):
+        return
+    await state.clear()
+    await message.answer("✅ Bekor qilindi")
+
+
+async def _do_broadcast(message: Message, text: str):
+    """Barcha foydalanuvchilarga xabar yuboradi."""
+    users = await db.get_all_users()
+    sent = 0
+    failed = 0
+    for user in users:
+        try:
+            await message.bot.send_message(user["user_id"], text, parse_mode="HTML")
+            sent += 1
+        except Exception:
+            failed += 1
+    await message.answer(
+        f"📢 <b>E'lon yuborildi!</b>\n\n✅ Yetkazildi: {sent} ta\n❌ Yuborilmadi: {failed} ta",
+        parse_mode="HTML"
+    )
+
+
 @router.callback_query(F.data == "admin_dashboard")
 async def admin_dashboard(callback: CallbackQuery):
     """Show dashboard."""
@@ -355,19 +405,11 @@ async def admin_broadcast_send(message: Message, state: FSMContext):
     """Send broadcast message."""
     if not is_admin(message.from_user.id):
         return
-    
-    users = await db.get_all_users()
-    sent = 0
-    failed = 0
-    
-    for user in users:
-        try:
-            await message.bot.send_message(user["user_id"], message.text, parse_mode="HTML")
-            sent += 1
-        except Exception:
-            failed += 1
-    
-    await message.answer(f"📢 Xabar yuborildi!\n✅ Yuborildi: {sent}\n❌ Xato: {failed}")
+    if message.text and message.text.strip() in ["/bekor", "bekor", "❌"]:
+        await state.clear()
+        await message.answer("✅ Bekor qilindi")
+        return
+    await _do_broadcast(message, message.text)
     await state.clear()
 
 
