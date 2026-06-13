@@ -274,6 +274,11 @@ PPT_COLOR_SCHEMES = {
     "creative": {"bg": "F3E5F5", "title": "6A1B9A", "text": "8E24AA"},
     "elegant": {"bg": "FBE9E7", "title": "3E2723", "text": "5D4037"},
     "premium": {"bg": "212121", "title": "FFD700", "text": "BDBDBD"},
+    "ocean": {"bg": "01579B", "title": "FFFFFF", "text": "B3E5FC"},
+    "sunset": {"bg": "BF360C", "title": "FFF3E0", "text": "FFCCBC"},
+    "forest": {"bg": "1B5E20", "title": "FFFFFF", "text": "C8E6C9"},
+    "royal": {"bg": "4A148C", "title": "FFD700", "text": "E1BEE7"},
+    "neon": {"bg": "0D0D0D", "title": "00E5FF", "text": "B2EBF2"},
 }
 
 # GOST slayd tuzilishi

@@ -12,6 +12,11 @@ CARD_HOLDER = os.getenv("CARD_HOLDER", "Familiya Ism")
 CHANNEL_ID = os.getenv("CHANNEL_ID", "")
 SUPPORT_USERNAME = os.getenv("SUPPORT_USERNAME", "@admin")
 
+# Web App (Mini App) — taqdimot yaratish web oynasi
+# Sayt deploy qilingach (Netlify/GitHub Pages), shu manzilni .env ga yozing
+# Masalan: WEBAPP_URL=https://master-student.netlify.app/app/
+WEBAPP_URL = os.getenv("WEBAPP_URL", "")
+
 # ===== AI PROVIDER SETTINGS =====
 # Active provider: "gemini" or "openai"
 AI_PROVIDER = os.getenv("AI_PROVIDER", "gemini")

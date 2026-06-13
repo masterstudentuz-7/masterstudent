@@ -315,3 +315,113 @@ async def cancel_order(callback: CallbackQuery, state: FSMContext):
         parse_mode="HTML"
     )
     await callback.answer()
+
+
+
+# ============================================================
+# WEB APP (Mini App) — taqdimot sozlamalari web oynadan keladi
+# ============================================================
+
+@router.message(F.web_app_data)
+async def handle_webapp_data(message: Message, state: FSMContext):
+    """Web App formasidan kelgan ma'lumotni qabul qiladi va taqdimot yaratadi."""
+    import json
+    import logging
+    from utils.progress import start_progress_task, stop_progress_task
+
+    user_id = message.from_user.id
+    lang = await db.get_user_language(user_id)
+
+    try:
+        data = json.loads(message.web_app_data.data)
+    except Exception:
+        await message.answer(get_text("error_generic", lang), reply_markup=get_main_menu_kb(lang))
+        return
+
+    if data.get("type") != "ppt_webapp":
+        return
+
+    topic = (data.get("topic") or "").strip()
+    if len(topic) < 3:
+        await message.answer("❗ Mavzu juda qisqa. Iltimos qaytadan urinib ko'ring.", reply_markup=get_main_menu_kb(lang))
+        return
+
+    ppt_lang = data.get("lang", "uz")
+    slides = int(data.get("slides", 10))
+    design = data.get("design", "business")
+    image_mode = data.get("image_mode", "auto")
+    tariff = data.get("tariff", "standart")
+    author = (data.get("author") or "").strip()
+
+    # Narx hisoblash: rasm bo'lsa PRO narx, tarif bo'yicha qo'shimcha
+    is_pro = (image_mode == "auto")
+    base_key = f"ppt_pro_{slides}" if is_pro else f"ppt_{slides}"
+    price = PRICES.get(base_key, PRICES.get("ppt_10", 8000))
+    # Tarif qo'shimchasi
+    if tariff == "premium":
+        price += 3000
+    elif tariff == "ilmiy":
+        price += 5000
+
+    # Balans tekshirish
+    user = await db.get_user(user_id)
+    balance = (user["balance"] + user["bonus"]) if user else 0
+    if balance < price:
+        bal_str = f"{balance:,}".replace(",", " ")
+        price_str = f"{price:,}".replace(",", " ")
+        await message.answer(
+            f"😔 <b>Afsuski, hisobingizda mablag' yetarli emas</b>\n\n"
+            f"💰 Xizmat narxi: <b>{price_str} so'm</b>\n"
+            f"💳 Sizning hisobingiz: <b>{bal_str} so'm</b>\n\n"
+            f"Iltimos, hisobingizni to'ldiring 👇",
+            reply_markup=get_buy_now_kb(lang),
+            parse_mode="HTML"
+        )
+        return
+
+    # To'lovni yechish
+    success = await db.deduct_balance(user_id, price)
+    if not success:
+        await message.answer(get_text("error_generic", lang), reply_markup=get_main_menu_kb(lang))
+        return
+
+    tariff_names = {"standart": "Standart", "premium": "Premium", "ilmiy": "Yuqori Sifatli Premium"}
+    order_id = await db.create_order(
+        user_id=user_id, service_type="ppt_webapp", service_name="Taqdimot (Web App)",
+        details=f"Topic: {topic}, Design: {design}, Slides: {slides}, Tarif: {tariff}, Rasm: {image_mode}",
+        price=price, is_ai=1
+    )
+    await db.update_order_status(order_id, "creating")
+
+    progress_msg = await message.answer(get_text("ai_processing", lang), parse_mode="HTML")
+    progress_task = await start_progress_task(progress_msg, lang, is_ppt=True)
+
+    try:
+        # Mavzuga muallif ismini qo'shamiz (titul uchun)
+        extra = f"Muallif: {author}. Tarif: {tariff_names.get(tariff, tariff)}." if author else f"Tarif: {tariff_names.get(tariff, tariff)}."
+        ppt_file = await create_ppt_file(
+            topic=topic, slides_count=slides, design=design,
+            purpose="educational", lang=ppt_lang, extra=extra, is_pro=is_pro
+        )
+        stop_progress_task(progress_task)
+
+        filename = f"presentation_{order_id}.pptx"
+        doc = BufferedInputFile(ppt_file.read(), filename=filename)
+        sent_msg = await message.answer_document(doc, caption=get_text("ai_complete", lang))
+        if sent_msg.document:
+            await db.save_file(user_id, order_id, filename, sent_msg.document.file_id, "pptx")
+        await db.update_order_status(order_id, "completed")
+
+        from keyboards.inline_kb import get_rating_kb
+        await message.answer(get_text("rate_order", lang), reply_markup=get_rating_kb())
+    except Exception as e:
+        stop_progress_task(progress_task)
+        logging.getLogger(__name__).error(f"WebApp PPT error: {type(e).__name__}: {e}")
+        await message.answer(
+            f"❌ Xatolik: {type(e).__name__}\n\nUzr, qaytadan urinib ko'ring.",
+            reply_markup=get_main_menu_kb(lang)
+        )
+        await db.update_order_status(order_id, "cancelled")
+        await db.add_balance(user_id, price)
+
+    await state.clear()

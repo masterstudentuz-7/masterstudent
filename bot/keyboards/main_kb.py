@@ -1,10 +1,18 @@
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, WebAppInfo
 from locales import get_text
+from config import WEBAPP_URL
 
 
 def get_main_menu_kb(lang: str = "uz") -> ReplyKeyboardMarkup:
     """Get the main menu keyboard."""
-    buttons = [
+    buttons = []
+    # Web App tugmasi — faqat WEBAPP_URL sozlangan bo'lsa
+    if WEBAPP_URL:
+        buttons.append([KeyboardButton(
+            text=get_text("btn_webapp", lang),
+            web_app=WebAppInfo(url=WEBAPP_URL)
+        )])
+    buttons += [
         [KeyboardButton(text=get_text("btn_services", lang)), KeyboardButton(text=get_text("btn_my_orders", lang))],
         [KeyboardButton(text=get_text("btn_my_files", lang)), KeyboardButton(text=get_text("btn_balance", lang))],
         [KeyboardButton(text=get_text("btn_buy", lang)), KeyboardButton(text=get_text("btn_ai_helper", lang))],
