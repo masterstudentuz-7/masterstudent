@@ -33,63 +33,20 @@ async def buy_start(message: Message, state: FSMContext):
 
 @router.callback_query(PaymentStates.choosing_amount, F.data.startswith("pay_amount_"))
 async def payment_amount_selected(callback: CallbackQuery, state: FSMContext):
-    """Handle amount selection."""
+    """Summa tanlangach — to'g'ridan-to'g'ri karta to'loviga o'tadi (faqat karta)."""
     amount = int(callback.data.replace("pay_amount_", ""))
-    lang = await db.get_user_language(callback.from_user.id)
-    
-    await state.update_data(amount=amount)
-    await state.set_state(PaymentStates.choosing_method)
-    
-    await callback.message.edit_text(
-        get_text("choose_payment_method", lang),
-        reply_markup=get_payment_method_kb(lang),
-        parse_mode="HTML"
-    )
-    await callback.answer()
-
-
-@router.callback_query(PaymentStates.choosing_method, F.data.startswith("pay_method_"))
-async def payment_method_selected(callback: CallbackQuery, state: FSMContext):
-    """Handle payment method selection."""
-    method = callback.data.replace("pay_method_", "")
     user_id = callback.from_user.id
     lang = await db.get_user_language(user_id)
-    data = await state.get_data()
-    amount = data["amount"]
-    
-    if method == "payme":
-        # Payme — chek yuborilishi kerak, admin tasdiqlaydi
-        payment_id = await db.create_payment(user_id, amount, "payme")
-        await state.update_data(payment_id=payment_id)
-        await state.set_state(PaymentStates.waiting_receipt)
-        
-        await callback.message.edit_text(
-            get_text("payment_payme_info", lang, amount=amount),
-            parse_mode="HTML"
-        )
-    
-    elif method == "click":
-        # Click — chek yuborilishi kerak, admin tasdiqlaydi
-        payment_id = await db.create_payment(user_id, amount, "click")
-        await state.update_data(payment_id=payment_id)
-        await state.set_state(PaymentStates.waiting_receipt)
-        
-        await callback.message.edit_text(
-            get_text("payment_click_info", lang, amount=amount),
-            parse_mode="HTML"
-        )
-    
-    elif method == "card":
-        # Bank karta — chek yuborilishi kerak, admin tasdiqlaydi
-        payment_id = await db.create_payment(user_id, amount, "card")
-        await state.update_data(payment_id=payment_id)
-        await state.set_state(PaymentStates.waiting_receipt)
-        
-        await callback.message.edit_text(
-            get_text("payment_card_info", lang, card=BANK_CARD, holder=CARD_HOLDER, amount=amount),
-            parse_mode="HTML"
-        )
-    
+
+    await state.update_data(amount=amount, method="card")
+    payment_id = await db.create_payment(user_id, amount, "card")
+    await state.update_data(payment_id=payment_id)
+    await state.set_state(PaymentStates.waiting_receipt)
+
+    await callback.message.edit_text(
+        get_text("payment_card_info", lang, card=BANK_CARD, holder=CARD_HOLDER, amount=amount),
+        parse_mode="HTML"
+    )
     await callback.answer()
 
 
@@ -189,4 +146,25 @@ async def cancel_payment(callback: CallbackQuery, state: FSMContext):
     lang = await db.get_user_language(callback.from_user.id)
     await state.clear()
     await callback.message.edit_text(get_text("cancelled", lang), parse_mode="HTML")
+    await callback.answer()
+
+
+@router.callback_query(F.data == "open_buy")
+async def open_buy_from_button(callback: CallbackQuery, state: FSMContext):
+    """Balans yetmaganda 'Sotib olish' tugmasi bosilganda — to'lov bo'limiga o'tadi."""
+    await state.clear()
+    lang = await db.get_user_language(callback.from_user.id)
+    await state.set_state(PaymentStates.choosing_amount)
+    try:
+        await callback.message.edit_text(
+            get_text("choose_amount", lang),
+            reply_markup=get_payment_amounts_kb(lang),
+            parse_mode="HTML"
+        )
+    except Exception:
+        await callback.message.answer(
+            get_text("choose_amount", lang),
+            reply_markup=get_payment_amounts_kb(lang),
+            parse_mode="HTML"
+        )
     await callback.answer()

@@ -10,7 +10,7 @@ from locales import get_text
 from keyboards.inline_kb import (
     get_ppt_lang_kb, get_yes_no_kb, get_confirm_kb,
     get_esse_type_kb, get_esse_words_kb, get_qr_design_kb,
-    get_rating_kb, get_admin_order_kb
+    get_rating_kb, get_admin_order_kb, get_buy_now_kb
 )
 from keyboards.main_kb import get_cancel_kb, get_main_menu_kb
 from services.ai_service import (
@@ -157,6 +157,7 @@ async def doc_references_selected(callback: CallbackQuery, state: FSMContext):
     if balance < price:
         await callback.message.edit_text(
             get_text("insufficient_balance", lang, price=price, balance=balance),
+            reply_markup=get_buy_now_kb(lang),
             parse_mode="HTML"
         )
         await state.clear()
@@ -195,6 +196,7 @@ async def doc_confirmed(callback: CallbackQuery, state: FSMContext):
         balance = user["balance"] + user["bonus"]
         await callback.message.edit_text(
             get_text("insufficient_balance", lang, price=price, balance=balance),
+            reply_markup=get_buy_now_kb(lang),
             parse_mode="HTML"
         )
         await state.clear()
@@ -317,6 +319,7 @@ async def esse_type_selected(callback: CallbackQuery, state: FSMContext):
     if balance < price:
         await callback.message.edit_text(
             get_text("insufficient_balance", lang, price=price, balance=balance),
+            reply_markup=get_buy_now_kb(lang),
             parse_mode="HTML"
         )
         await state.clear()
@@ -389,7 +392,7 @@ async def tarjima_lang_selected(callback: CallbackQuery, state: FSMContext):
     
     if balance < price:
         await callback.message.edit_text(
-            get_text("insufficient_balance", lang, price=price, balance=balance), parse_mode="HTML")
+            get_text("insufficient_balance", lang, price=price, balance=balance), reply_markup=get_buy_now_kb(lang), parse_mode="HTML")
         await state.clear()
         return
     
@@ -448,7 +451,7 @@ async def qr_design_selected(callback: CallbackQuery, state: FSMContext):
     
     if balance < price:
         await callback.message.edit_text(
-            get_text("insufficient_balance", lang, price=price, balance=balance), parse_mode="HTML")
+            get_text("insufficient_balance", lang, price=price, balance=balance), reply_markup=get_buy_now_kb(lang), parse_mode="HTML")
         await state.clear()
         return
     

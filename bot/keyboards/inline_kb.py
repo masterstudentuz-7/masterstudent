@@ -137,12 +137,18 @@ def get_payment_amounts_kb(lang: str = "uz") -> InlineKeyboardMarkup:
 
 
 def get_payment_method_kb(lang: str = "uz") -> InlineKeyboardMarkup:
-    """Payment method keyboard."""
+    """Payment method keyboard — faqat bank karta."""
     buttons = [
-        [InlineKeyboardButton(text=get_text("btn_payme", lang), callback_data="pay_method_payme")],
-        [InlineKeyboardButton(text=get_text("btn_click", lang), callback_data="pay_method_click")],
         [InlineKeyboardButton(text=get_text("btn_bank_card", lang), callback_data="pay_method_card")],
         [InlineKeyboardButton(text=get_text("btn_cancel", lang), callback_data="cancel_payment")],
+    ]
+    return InlineKeyboardMarkup(inline_keyboard=buttons)
+
+
+def get_buy_now_kb(lang: str = "uz") -> InlineKeyboardMarkup:
+    """Balans yetmaganda — 'Sotib olish' tugmasi."""
+    buttons = [
+        [InlineKeyboardButton(text=get_text("btn_buy_now", lang), callback_data="open_buy")],
     ]
     return InlineKeyboardMarkup(inline_keyboard=buttons)
 

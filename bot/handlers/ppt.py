@@ -9,7 +9,7 @@ from config import PRICES
 from locales import get_text
 from keyboards.inline_kb import (
     get_ppt_design_kb, get_ppt_purpose_kb, get_ppt_lang_kb,
-    get_ppt_slides_kb, get_confirm_kb
+    get_ppt_slides_kb, get_confirm_kb, get_buy_now_kb
 )
 from keyboards.main_kb import get_cancel_kb, get_main_menu_kb
 from services.ai_service import create_ppt_file
@@ -194,6 +194,7 @@ async def ppt_confirmed(callback: CallbackQuery, state: FSMContext):
         balance = user["balance"] + user["bonus"]
         await callback.message.edit_text(
             get_text("insufficient_balance", lang, price=price, balance=balance),
+            reply_markup=get_buy_now_kb(lang),
             parse_mode="HTML"
         )
         await state.clear()

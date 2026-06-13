@@ -5,7 +5,7 @@ import database as db
 from locales import get_text
 from keyboards.inline_kb import (
     get_services_kb, get_ai_services_kb, get_admin_services_kb,
-    get_ppt_design_kb
+    get_ppt_design_kb, get_buy_now_kb
 )
 
 router = Router()
@@ -90,6 +90,7 @@ async def admin_service_selected(callback: CallbackQuery, state=None):
     if total_balance < price:
         await callback.message.edit_text(
             get_text("insufficient_balance", lang, price=price, balance=total_balance),
+            reply_markup=get_buy_now_kb(lang),
             parse_mode="HTML"
         )
         await callback.answer()

@@ -348,6 +348,7 @@ Confirm?""",
     "btn_payme": {"uz": "💙 Payme", "ru": "💙 Payme", "en": "💙 Payme"},
     "btn_click": {"uz": "🟢 Click", "ru": "🟢 Click", "en": "🟢 Click"},
     "btn_bank_card": {"uz": "💳 Bank karta", "ru": "💳 Банк. карта", "en": "💳 Bank Card"},
+    "btn_buy_now": {"uz": "🛍 Sotib olish", "ru": "🛍 Пополнить баланс", "en": "🛍 Top Up Now"},
     "payment_payme_info": {
         "uz": """💙 <b>Payme orqali to'lov</b>
 
