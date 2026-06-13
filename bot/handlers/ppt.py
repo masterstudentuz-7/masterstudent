@@ -53,17 +53,33 @@ async def ppt_start(callback: CallbackQuery, state: FSMContext):
 
 
 async def _send_design_picker(callback: CallbackQuery, lang: str):
-    """15 ta dizayn preview rasmini va tanlash tugmalarini yuboradi."""
+    """15 ta dizayn preview rasmini va tanlash tugmalarini yuboradi.
+    Pastda (reply klaviatura) doimo 'Ortga' tugmasi turadi."""
+    from keyboards.main_kb import get_back_kb
     photo_bytes = _get_designs_preview_bytes()
-    try:
-        if photo_bytes:
+
+    # Pastki 'Ortga' tugmasi bilan header (rasm yoki matn)
+    sent = False
+    if photo_bytes:
+        try:
             await callback.message.answer_photo(
                 BufferedInputFile(photo_bytes, filename="designs.png"),
                 caption="🎨 <b>15 ta tayyor dizayn</b> — quyida ko'rinishini ko'ring 👇",
+                reply_markup=get_back_kb(lang),
                 parse_mode="HTML"
             )
-    except Exception:
-        pass
+            sent = True
+        except Exception:
+            sent = False
+    if not sent:
+        # Rasm chiqmasa ham — pastda Ortga tugmasi bilan matn yuboramiz
+        await callback.message.answer(
+            "🎨 <b>15 ta tayyor dizayn</b>\n\nQuyidagi ro'yxatdan tanlang 👇",
+            reply_markup=get_back_kb(lang),
+            parse_mode="HTML"
+        )
+
+    # Dizayn tanlash (inline) — har dizayn alohida
     await callback.message.answer(
         get_text("ppt_choose_design", lang),
         reply_markup=get_ppt_design_kb(lang),

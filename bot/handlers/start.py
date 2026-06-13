@@ -1,6 +1,7 @@
 from aiogram import Router, F
 from aiogram.types import Message, CallbackQuery
 from aiogram.filters import Command
+from aiogram.fsm.context import FSMContext
 
 import database as db
 from config import NEW_USER_BONUS
@@ -9,6 +10,18 @@ from keyboards.inline_kb import get_language_kb
 from keyboards.main_kb import get_main_menu_kb
 
 router = Router()
+
+
+@router.message(F.text.in_(["⬅️ Ortga", "⬅️ Назад", "⬅️ Back"]))
+async def global_back(message: Message, state: FSMContext):
+    """GLOBAL 'Ortga' — har qanday holatda ishlaydi, mijoz hech qachon qotib qolmaydi."""
+    await state.clear()
+    lang = await db.get_user_language(message.from_user.id)
+    await message.answer(
+        get_text("main_menu", lang),
+        reply_markup=get_main_menu_kb(lang),
+        parse_mode="HTML"
+    )
 
 
 @router.message(Command("start"))
