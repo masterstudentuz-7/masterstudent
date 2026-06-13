@@ -127,20 +127,6 @@ async def ppt_pro_start(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
 
 
-async def _ppt_pro_internal_OLD(callback, state, lang):
-    await callback.message.edit_text(
-        "🌟 <b>Taqdimot PRO</b>\n\n"
-        "Bu — premium taqdimot:\n"
-        "• 🖼 Mavzuga mos professional rasmlar\n"
-        "• 📚 Oddiyga qaraganda 2 baravar ko'p ma'lumot\n"
-        "• 🎨 Yuqori sifatli dizayn\n\n"
-        "Keling, boshlaymiz! Avval dizaynni tanlang 👇",
-        reply_markup=get_ppt_design_kb(lang),
-        parse_mode="HTML"
-    )
-    await callback.answer()
-
-
 @router.callback_query(PPTStates.choosing_design, F.data.startswith("ppt_design_"))
 async def ppt_design_selected(callback: CallbackQuery, state: FSMContext):
     """Handle design selection."""
@@ -149,12 +135,20 @@ async def ppt_design_selected(callback: CallbackQuery, state: FSMContext):
     
     await state.update_data(design=design)
     await state.set_state(PPTStates.choosing_purpose)
-    
-    await callback.message.edit_text(
-        get_text("ppt_choose_purpose", lang),
-        reply_markup=get_ppt_purpose_kb(lang),
-        parse_mode="HTML"
-    )
+
+    # Xabar rasm bo'lishi mumkin — edit_text ishlamasligi mumkin, shuning uchun yangi xabar
+    try:
+        await callback.message.edit_text(
+            get_text("ppt_choose_purpose", lang),
+            reply_markup=get_ppt_purpose_kb(lang),
+            parse_mode="HTML"
+        )
+    except Exception:
+        await callback.message.answer(
+            get_text("ppt_choose_purpose", lang),
+            reply_markup=get_ppt_purpose_kb(lang),
+            parse_mode="HTML"
+        )
     await callback.answer()
 
 
