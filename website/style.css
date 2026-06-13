@@ -221,3 +221,7 @@ section{padding:100px 0}
     .donate-method{flex-wrap:wrap;gap:10px}
     .dm-copy{width:100%}
 }
+
+/* Admin: izoh o'chirish tugmasi */
+.comment-del{margin-top:10px;padding:6px 14px;background:rgba(239,68,68,.12);color:#ef4444;border:1px solid rgba(239,68,68,.3);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;font-family:var(--font)}
+.comment-del:hover{background:#ef4444;color:#fff}
