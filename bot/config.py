@@ -43,6 +43,10 @@ OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 # Agar bo'sh bo'lsa, slaydlar chiroyli dizayn elementlari bilan yaratiladi
 PEXELS_API_KEY = os.getenv("PEXELS_API_KEY", "")
 
+# Pixabay API — Pexels ishlamasa zaxira rasm manbasi (IXTIYORIY, bepul)
+# Bepul kalit: https://pixabay.com/api/docs/
+PIXABAY_API_KEY = os.getenv("PIXABAY_API_KEY", "")
+
 # Database
 DB_PATH = "database.db"
 

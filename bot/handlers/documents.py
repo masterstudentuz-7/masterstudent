@@ -361,8 +361,19 @@ async def esse_type_selected(callback: CallbackQuery, state: FSMContext):
     balance = user["balance"] + user["bonus"]
     
     if balance < price:
+        import json as _json
+        pending = {
+            "kind": "esse", "topic": data["topic"], "essay_lang": data["essay_lang"],
+            "word_count": data["word_count"], "essay_type": essay_type, "price": price
+        }
+        await db.set_pending_order(user_id, _json.dumps(pending))
+        bal_str = f"{balance:,}".replace(",", " ")
+        price_str = f"{price:,}".replace(",", " ")
         await callback.message.edit_text(
-            get_text("insufficient_balance", lang, price=price, balance=balance),
+            f"😔 <b>Afsuski, hisobingizda mablag' yetarli emas</b>\n\n"
+            f"💰 Xizmat narxi: <b>{price_str} so'm</b>\n"
+            f"💳 Hisobingiz: <b>{bal_str} so'm</b>\n\n"
+            f"✅ Buyurtmangiz eslab qolindi! To'lovdan keyin shu yerdan davom etasiz 👇",
             reply_markup=get_buy_now_kb(lang),
             parse_mode="HTML"
         )

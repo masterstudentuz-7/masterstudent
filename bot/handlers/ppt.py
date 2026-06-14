@@ -459,13 +459,20 @@ async def handle_webapp_data(message: Message, state: FSMContext):
     user = await db.get_user(user_id)
     balance = (user["balance"] + user["bonus"]) if user else 0
     if balance < price:
+        import json as _json
+        pending = {
+            "kind": "ppt", "design": design, "purpose": "educational",
+            "ppt_lang": ppt_lang, "topic": topic, "slides": slides,
+            "is_pro": is_pro, "extra": (f"Muallif: {author}." if author else ""), "price": price
+        }
+        await db.set_pending_order(user_id, _json.dumps(pending))
         bal_str = f"{balance:,}".replace(",", " ")
         price_str = f"{price:,}".replace(",", " ")
         await message.answer(
             f"😔 <b>Afsuski, hisobingizda mablag' yetarli emas</b>\n\n"
             f"💰 Xizmat narxi: <b>{price_str} so'm</b>\n"
             f"💳 Sizning hisobingiz: <b>{bal_str} so'm</b>\n\n"
-            f"Iltimos, hisobingizni to'ldiring 👇",
+            f"✅ Buyurtmangiz eslab qolindi! To'lovdan keyin shu yerdan davom etasiz 👇",
             reply_markup=get_buy_now_kb(lang),
             parse_mode="HTML"
         )

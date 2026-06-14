@@ -18,7 +18,7 @@ import qrcode
 
 from config import (
     AI_PROVIDER, GEMINI_API_KEY, GEMINI_API_KEYS, GEMINI_MODELS,
-    OPENAI_API_KEY, OPENAI_MODEL, PEXELS_API_KEY
+    OPENAI_API_KEY, OPENAI_MODEL, PEXELS_API_KEY, PIXABAY_API_KEY
 )
 
 logger = logging.getLogger(__name__)
@@ -479,30 +479,49 @@ Faqat to'g'ri to'liq JSON massiv. Markdown yo'q."""
                 raise Exception("AI noto'g'ri format qaytardi (JSONDecodeError)")
 
 
+def _has_image_source() -> bool:
+    """Hech bo'lmaganda bitta rasm manbasi sozlanganmi?"""
+    return bool(PEXELS_API_KEY or PIXABAY_API_KEY)
+
+
 def _fetch_image(query: str) -> io.BytesIO:
     """
-    Pexels'dan mavzuga oid rasm yuklab oladi.
-    PEXELS_API_KEY bo'lmasa yoki xato bo'lsa None qaytaradi.
+    Mavzuga oid rasm yuklab oladi. Avval Pexels, keyin Pixabay sinaladi.
+    Hech qaysi ishlamasa None qaytaradi.
     """
-    if not PEXELS_API_KEY:
-        return None
-    try:
-        url = f"https://api.pexels.com/v1/search?query={urllib.parse.quote(query)}&per_page=5&orientation=landscape"
-        req = urllib.request.Request(url, headers={"Authorization": PEXELS_API_KEY})
-        with urllib.request.urlopen(req, timeout=10) as resp:
-            data = json.loads(resp.read().decode())
-        photos = data.get("photos", [])
-        if not photos:
-            return None
-        import random as _r
-        photo = _r.choice(photos)
-        img_url = photo["src"]["large"]
-        with urllib.request.urlopen(img_url, timeout=10) as img_resp:
-            img_data = img_resp.read()
-        return io.BytesIO(img_data)
-    except Exception as e:
-        logger.warning(f"Rasm yuklab olinmadi: {e}")
-        return None
+    import random as _r
+
+    # 1) PEXELS
+    if PEXELS_API_KEY:
+        try:
+            url = f"https://api.pexels.com/v1/search?query={urllib.parse.quote(query)}&per_page=8&orientation=landscape"
+            req = urllib.request.Request(url, headers={"Authorization": PEXELS_API_KEY})
+            with urllib.request.urlopen(req, timeout=12) as resp:
+                data = json.loads(resp.read().decode())
+            photos = data.get("photos", [])
+            if photos:
+                img_url = _r.choice(photos)["src"]["large"]
+                with urllib.request.urlopen(img_url, timeout=12) as img_resp:
+                    return io.BytesIO(img_resp.read())
+        except Exception as e:
+            logger.warning(f"Pexels ishlamadi: {e}")
+
+    # 2) PIXABAY (zaxira)
+    if PIXABAY_API_KEY:
+        try:
+            url = (f"https://pixabay.com/api/?key={PIXABAY_API_KEY}"
+                   f"&q={urllib.parse.quote(query)}&image_type=photo&orientation=horizontal&per_page=8&safesearch=true")
+            with urllib.request.urlopen(url, timeout=12) as resp:
+                data = json.loads(resp.read().decode())
+            hits = data.get("hits", [])
+            if hits:
+                img_url = _r.choice(hits).get("largeImageURL") or _r.choice(hits).get("webformatURL")
+                with urllib.request.urlopen(img_url, timeout=12) as img_resp:
+                    return io.BytesIO(img_resp.read())
+        except Exception as e:
+            logger.warning(f"Pixabay ishlamadi: {e}")
+
+    return None
 
 
 async def _get_image_keyword(topic: str, slide_title: str, purpose: str = "") -> str:
@@ -590,7 +609,7 @@ async def create_ppt_file(topic: str, slides_count: int, design: str, purpose: s
         
         # Rasm — faqat ba'zi slaydlarga (titul va asosiy qism)
         # Adabiyotlar va xulosa slaydlariga rasm qo'ymaymiz
-        if PEXELS_API_KEY and idx < total - 1:
+        if _has_image_source() and idx < total - 1:
             try:
                 keyword = await _get_image_keyword(topic, slide_data.get("title", topic), purpose)
                 img_stream = _fetch_image(keyword)

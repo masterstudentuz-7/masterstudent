@@ -14,7 +14,7 @@ import database as db
 from locales import get_text
 from keyboards.main_kb import get_main_menu_kb
 from keyboards.inline_kb import get_rating_kb, get_buy_now_kb
-from services.ai_service import create_document_file, create_ppt_file
+from services.ai_service import create_document_file, create_ppt_file, create_essay_file
 from utils.progress import start_progress_task, stop_progress_task
 
 router = Router()
@@ -115,6 +115,19 @@ async def resume_order(callback: CallbackQuery, state: FSMContext):
             )
             stop_progress_task(progress_task)
             fn = f"{p['doc_type']}_{order_id}.docx"
+            doc = BufferedInputFile(f.read(), filename=fn)
+            sent = await callback.message.answer_document(doc, caption=get_text("ai_complete", lang))
+            if sent.document:
+                await db.save_file(user_id, order_id, fn, sent.document.file_id, "docx")
+        elif p["kind"] == "esse":
+            order_id = await db.create_order(
+                user_id, "esse", "Esse", f"Topic: {p['topic']}", price, is_ai=1
+            )
+            f = await create_essay_file(
+                p["topic"], p["essay_lang"], p["word_count"], p["essay_type"]
+            )
+            stop_progress_task(progress_task)
+            fn = f"esse_{order_id}.docx"
             doc = BufferedInputFile(f.read(), filename=fn)
             sent = await callback.message.answer_document(doc, caption=get_text("ai_complete", lang))
             if sent.document:
