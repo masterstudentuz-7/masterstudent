@@ -85,9 +85,9 @@ Choose the section you need from the menu below 👇""",
     },
 
     "welcome_back": {
-        "uz": "👋 Qaytganingizdan xursandmiz, hurmatli mijoz! Menyudan tanlang 👇",
-        "ru": "👋 Рады видеть вас снова! Выберите из меню 👇",
-        "en": "👋 Welcome back! Choose from the menu 👇",
+        "uz": "Assalomu alaykum! 😊 Xush kelibsiz!\n\nMen NOVA AI 🤖 — sizning shaxsiy yordamchingizman. Bugun sizga qanday yordam bera olaman? Quyidagi menyudan kerakli xizmatni tanlang 👇",
+        "ru": "Здравствуйте! 😊 Добро пожаловать!\n\nЯ NOVA AI 🤖 — ваш личный помощник. Чем могу помочь сегодня? Выберите услугу из меню 👇",
+        "en": "Hello! 😊 Welcome!\n\nI'm NOVA AI 🤖 — your personal assistant. How can I help you today? Choose a service from the menu 👇",
     },
 
     # ===== MAIN MENU =====

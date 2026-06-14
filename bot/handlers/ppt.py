@@ -23,6 +23,8 @@ class PPTStates(StatesGroup):
     choosing_lang = State()
     entering_topic = State()
     choosing_slides = State()
+    choosing_image_mode = State()
+    uploading_images = State()
     entering_extra = State()
     confirming = State()
 
@@ -212,15 +214,100 @@ async def ppt_topic_entered(message: Message, state: FSMContext):
 
 @router.callback_query(PPTStates.choosing_slides, F.data.startswith("ppt_slides_"))
 async def ppt_slides_selected(callback: CallbackQuery, state: FSMContext):
-    """Handle slides count selection."""
+    """Handle slides count selection — keyin rasm usulini so'raymiz."""
     slides = int(callback.data.replace("ppt_slides_", ""))
     lang = await db.get_user_language(callback.from_user.id)
-    
+
     await state.update_data(slides=slides)
+    await state.set_state(PPTStates.choosing_image_mode)
+
+    from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+    kb = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="🤖 Avtomatik rasmlar", callback_data="imgmode_auto")],
+        [InlineKeyboardButton(text="📤 O'zim rasm yuklayman", callback_data="imgmode_upload")],
+        [InlineKeyboardButton(text="🚫 Rasmsiz", callback_data="imgmode_none")],
+        [InlineKeyboardButton(text=get_text("btn_back", lang), callback_data="cancel_order")],
+    ])
+    await callback.message.edit_text(
+        "🖼 <b>Slaydlarga rasm qo'shamizmi?</b>\n\n"
+        "🤖 <b>Avtomatik</b> — NOVA AI mavzuga mos rasmlarni o'zi topadi\n"
+        "📤 <b>O'zim yuklayman</b> — siz rasmlaringizni yuborasiz, ular slaydlarga joylanadi\n"
+        "🚫 <b>Rasmsiz</b> — faqat matn va dizayn\n\n"
+        "Birini tanlang 👇",
+        reply_markup=kb,
+        parse_mode="HTML"
+    )
+    await callback.answer()
+
+
+@router.callback_query(PPTStates.choosing_image_mode, F.data.startswith("imgmode_"))
+async def ppt_image_mode_selected(callback: CallbackQuery, state: FSMContext):
+    """Rasm usuli tanlandi."""
+    mode = callback.data.replace("imgmode_", "")
+    lang = await db.get_user_language(callback.from_user.id)
+    await state.update_data(image_mode=mode, user_images=[])
+
+    if mode == "upload":
+        await state.set_state(PPTStates.uploading_images)
+        from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+        kb = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text="✅ Tayyor (rasmlar yuborildi)", callback_data="upload_done")],
+            [InlineKeyboardButton(text=get_text("btn_back", lang), callback_data="cancel_order")],
+        ])
+        await callback.message.edit_text(
+            "📤 <b>Rasmlaringizni yuboring</b>\n\n"
+            "Slaydlarga qo'ymoqchi bo'lgan rasmlaringizni birma-bir yuboring 📷\n"
+            "(Bir nechta rasm yuborishingiz mumkin)\n\n"
+            "Tugatganingizdan so'ng «✅ Tayyor» tugmasini bosing 👇",
+            reply_markup=kb,
+            parse_mode="HTML"
+        )
+        await callback.answer()
+        return
+
+    # auto yoki none — to'g'ridan-to'g'ri qo'shimcha talablarga
     await state.set_state(PPTStates.entering_extra)
-    
     await callback.message.edit_text(
         get_text("ppt_extra_requirements", lang),
+        parse_mode="HTML"
+    )
+    await callback.answer()
+
+
+@router.message(PPTStates.uploading_images, F.photo)
+async def ppt_photo_received(message: Message, state: FSMContext):
+    """Foydalanuvchi rasm yubordi — yuklab olib saqlaymiz."""
+    data = await state.get_data()
+    images = data.get("user_images", [])
+    if len(images) >= 15:
+        await message.answer("⚠️ Maksimal 15 ta rasm. «✅ Tayyor» tugmasini bosing.")
+        return
+    try:
+        file = await message.bot.get_file(message.photo[-1].file_id)
+        buf = await message.bot.download_file(file.file_path)
+        images.append(buf.read())
+        await state.update_data(user_images=images)
+        from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+        kb = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text="✅ Tayyor", callback_data="upload_done")],
+        ])
+        await message.answer(f"✅ Qabul qilindi! Jami: {len(images)} ta rasm 📷\n\nYana yuborishingiz yoki «✅ Tayyor» bosishingiz mumkin.", reply_markup=kb)
+    except Exception:
+        await message.answer("❌ Rasmni yuklab olishda xatolik. Qayta urinib ko'ring.")
+
+
+@router.callback_query(PPTStates.uploading_images, F.data == "upload_done")
+async def ppt_upload_done(callback: CallbackQuery, state: FSMContext):
+    """Rasm yuklash tugadi — qo'shimcha talablarga o'tamiz."""
+    lang = await db.get_user_language(callback.from_user.id)
+    data = await state.get_data()
+    count = len(data.get("user_images", []))
+    if count == 0:
+        await callback.answer("Hali rasm yubormadingiz", show_alert=True)
+        return
+    await state.set_state(PPTStates.entering_extra)
+    await callback.message.edit_text(
+        f"✅ {count} ta rasm qabul qilindi!\n\n" + get_text("ppt_extra_requirements", lang),
         parse_mode="HTML"
     )
     await callback.answer()
@@ -349,7 +436,9 @@ async def ppt_confirmed(callback: CallbackQuery, state: FSMContext):
             purpose=data["purpose"],
             lang=data["ppt_lang"],
             extra=data.get("extra", ""),
-            is_pro=data.get("is_pro", False)
+            is_pro=data.get("is_pro", False),
+            image_mode=data.get("image_mode", "auto"),
+            user_images=data.get("user_images", [])
         )
         
         # Progress to'xtatish

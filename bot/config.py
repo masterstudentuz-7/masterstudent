@@ -85,34 +85,34 @@ PPT_PURPOSES = [
 # PPT Slide counts
 PPT_SLIDES = [5, 10, 15, 20, 25, 30]
 
-# Hujjat (referat/mustaqil ish) varoq oralig'i va narxlari — ARZON narxlar
-# Har bir element: (kalit, ko'rinadigan nom, sahifa soni, narx)
+# Hujjat (referat/mustaqil ish) varoq oralig'i va narxlari
+# 10-15 dan boshlanadi, 25-30 gacha (skrinshotdagidek)
 DOC_PAGE_OPTIONS = [
-    ("p_5_10",  "5-10 sahifa",   10,  3000),
-    ("p_10_15", "10-15 sahifa", 15,  4000),
-    ("p_15_20", "15-20 sahifa", 20,  5000),
-    ("p_20_25", "20-25 sahifa", 25,  6000),
-    ("p_25_30", "25-30 sahifa", 30,  7000),
+    ("p_10_15", "10-15 sahifa", 15,  3000),
+    ("p_15_20", "15-20 sahifa", 20,  4000),
+    ("p_20_25", "20-25 sahifa", 25,  5000),
+    ("p_25_30", "25-30 sahifa", 30,  6000),
 ]
 
-# Service prices (in so'm) — RAQOBATBARDOSH ARZON narxlar
+# Service prices (in so'm)
+# Taqdimot Standart: 6-19 slayd=3000, 20-30 slayd=5000
+# Taqdimot Premium (PRO, rasmli): 6-19 slayd=6000, 20-30 slayd=8000
 PRICES = {
-    "ppt_5": 2000,
+    "ppt_5": 3000,
     "ppt_10": 3000,
-    "ppt_15": 4000,
+    "ppt_15": 3000,
     "ppt_20": 5000,
-    "ppt_25": 6000,
-    "ppt_30": 7000,
-    # Taqdimot PRO — rasmlar bilan, ko'proq ma'lumot
-    "ppt_pro_5": 4000,
-    "ppt_pro_10": 5000,
+    "ppt_25": 5000,
+    "ppt_30": 5000,
+    # Taqdimot PRO (Premium — rasmli, boy ma'lumot)
+    "ppt_pro_5": 6000,
+    "ppt_pro_10": 6000,
     "ppt_pro_15": 6000,
-    "ppt_pro_20": 7000,
+    "ppt_pro_20": 8000,
     "ppt_pro_25": 8000,
-    "ppt_pro_30": 9000,
+    "ppt_pro_30": 8000,
     "referat": 3000,
     "mustaqil_ish": 3000,
-    # Ilmiy & Ideal sifat (Premium tarif)
     "referat_premium": 5000,
     "mustaqil_ish_premium": 5000,
     "esse": 2000,

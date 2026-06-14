@@ -581,10 +581,12 @@ def _add_decorative_elements(slide, colors, idx, total_slides):
         logger.warning(f"Dekorativ element qo'shilmadi: {e}")
 
 
-async def create_ppt_file(topic: str, slides_count: int, design: str, purpose: str, lang: str, extra: str = "", is_pro: bool = False) -> io.BytesIO:
+async def create_ppt_file(topic: str, slides_count: int, design: str, purpose: str, lang: str, extra: str = "", is_pro: bool = False, image_mode: str = "auto", user_images: list = None) -> io.BytesIO:
     """Create GOST-standard PPTX file with images and decorative design.
-    is_pro=True: rasmlar har slaydda, boyroq kontent."""
+    image_mode: 'auto' (internetdan), 'upload' (foydalanuvchi rasmlari), 'none' (rasmsiz).
+    user_images: foydalanuvchi yuborgan rasmlar (bytes ro'yxati)."""
     slides_data = await generate_ppt_content(topic, slides_count, purpose, lang, extra, is_pro=is_pro)
+    user_images = user_images or []
     
     prs = Presentation()
     prs.slide_width = Inches(13.333)
@@ -609,7 +611,16 @@ async def create_ppt_file(topic: str, slides_count: int, design: str, purpose: s
         
         # Rasm — faqat ba'zi slaydlarga (titul va asosiy qism)
         # Adabiyotlar va xulosa slaydlariga rasm qo'ymaymiz
-        if _has_image_source() and idx < total - 1:
+        # Rasm — usulga qarab
+        if image_mode == "none":
+            img_stream = None
+        elif image_mode == "upload" and user_images and idx < total - 1:
+            # Foydalanuvchi rasmlarini slaydlarga navbat bilan joylaymiz
+            try:
+                img_stream = io.BytesIO(user_images[(idx - 1) % len(user_images)])
+            except Exception:
+                img_stream = None
+        elif _has_image_source() and idx < total - 1:
             try:
                 keyword = await _get_image_keyword(topic, slide_data.get("title", topic), purpose)
                 img_stream = _fetch_image(keyword)
