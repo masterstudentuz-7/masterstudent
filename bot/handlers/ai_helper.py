@@ -15,9 +15,9 @@ class AIHelperStates(StatesGroup):
     chatting = State()
 
 
-@router.message(F.text.in_(["🤖 EVA Yordamchi", "🤖 AI Yordamchi", "🤖 EVA Помощник", "🤖 AI Помощник", "🤖 EVA Helper", "🤖 AI Helper"]))
+@router.message(F.text.in_(["🤖 NOVA AI Yordamchi", "🤖 AI Yordamchi", "🤖 NOVA AI Помощник", "🤖 AI Помощник", "🤖 NOVA AI Helper", "🤖 AI Helper"]))
 async def ai_helper_start(message: Message, state: FSMContext):
-    """Start EVA helper conversation."""
+    """Start NOVA AI helper conversation."""
     lang = await db.get_user_language(message.from_user.id)
     await state.set_state(AIHelperStates.chatting)
     await message.answer(
@@ -29,7 +29,7 @@ async def ai_helper_start(message: Message, state: FSMContext):
 
 @router.message(AIHelperStates.chatting)
 async def ai_helper_message(message: Message, state: FSMContext):
-    """Handle EVA helper messages."""
+    """Handle NOVA AI helper messages."""
     lang = await db.get_user_language(message.from_user.id)
     
     # Check for cancel/back
@@ -42,9 +42,9 @@ async def ai_helper_message(message: Message, state: FSMContext):
         )
         return
     
-    # Process with EVA
+    # Process with NOVA AI
     try:
         response = await ai_chat(message.text, lang)
-        await message.answer(f"🤖 <b>EVA:</b> {response}", parse_mode="HTML")
+        await message.answer(f"🤖 <b>NOVA AI:</b> {response}", parse_mode="HTML")
     except Exception:
         await message.answer(get_text("error_generic", lang))

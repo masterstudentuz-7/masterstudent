@@ -81,54 +81,54 @@ PPT_PURPOSES = [
 # PPT Slide counts
 PPT_SLIDES = [5, 10, 15, 20, 25, 30]
 
-# Hujjat (referat/mustaqil ish) varoq oralig'i va narxlari
+# Hujjat (referat/mustaqil ish) varoq oralig'i va narxlari — ARZON narxlar
 # Har bir element: (kalit, ko'rinadigan nom, sahifa soni, narx)
 DOC_PAGE_OPTIONS = [
-    ("p_5_10",  "5-10 sahifa",   8,  8000),
-    ("p_10_15", "10-15 sahifa", 13, 12000),
-    ("p_15_20", "15-20 sahifa", 18, 16000),
-    ("p_20_25", "20-25 sahifa", 23, 20000),
-    ("p_25_30", "25-30 sahifa", 28, 25000),
+    ("p_5_10",  "5-10 sahifa",   10,  3000),
+    ("p_10_15", "10-15 sahifa", 15,  4000),
+    ("p_15_20", "15-20 sahifa", 20,  5000),
+    ("p_20_25", "20-25 sahifa", 25,  6000),
+    ("p_25_30", "25-30 sahifa", 30,  7000),
 ]
 
-# Service prices (in so'm)
+# Service prices (in so'm) — RAQOBATBARDOSH ARZON narxlar
 PRICES = {
-    "ppt_5": 5000,
-    "ppt_10": 8000,
-    "ppt_15": 12000,
-    "ppt_20": 15000,
-    "ppt_25": 18000,
-    "ppt_30": 22000,
-    # Taqdimot PRO — rasmlar bilan, ko'proq ma'lumot (oddiydan qimmatroq)
-    "ppt_pro_5": 9000,
-    "ppt_pro_10": 14000,
-    "ppt_pro_15": 20000,
-    "ppt_pro_20": 26000,
-    "ppt_pro_25": 32000,
-    "ppt_pro_30": 38000,
-    "referat": 10000,
-    "mustaqil_ish": 10000,
-    # Ilmiy & Ideal sifat (Premium tarif) — chuqurroq, ilmiy manbalar bilan
-    "referat_premium": 7000,
-    "mustaqil_ish_premium": 7000,
-    "esse": 5000,
-    "tarjima_page": 3000,
-    "qr_code": 2000,
-    "ai_text": 5000,
-    "ai_content": 7000,
-    "speech": 8000,
-    "banner_post": 10000,
-    # Admin services
-    "cv": 25000,
-    "resume": 25000,
-    "internet": 15000,
-    "mygov": 20000,
-    "hisobot": 30000,
-    "diplom_design": 35000,
-    "sertifikat": 25000,
-    "vizitka": 20000,
-    "telegram_post": 15000,
-    "reklama_banner": 20000,
-    "menu_design": 25000,
-    "logo": 40000,
+    "ppt_5": 2000,
+    "ppt_10": 3000,
+    "ppt_15": 4000,
+    "ppt_20": 5000,
+    "ppt_25": 6000,
+    "ppt_30": 7000,
+    # Taqdimot PRO — rasmlar bilan, ko'proq ma'lumot
+    "ppt_pro_5": 4000,
+    "ppt_pro_10": 5000,
+    "ppt_pro_15": 6000,
+    "ppt_pro_20": 7000,
+    "ppt_pro_25": 8000,
+    "ppt_pro_30": 9000,
+    "referat": 3000,
+    "mustaqil_ish": 3000,
+    # Ilmiy & Ideal sifat (Premium tarif)
+    "referat_premium": 5000,
+    "mustaqil_ish_premium": 5000,
+    "esse": 2000,
+    "tarjima_page": 1500,
+    "qr_code": 1000,
+    "ai_text": 2000,
+    "ai_content": 3000,
+    "speech": 3000,
+    "banner_post": 4000,
+    # Admin services (narx admin bilan kelishiladi — bu faqat ko'rsatkich)
+    "cv": 20000,
+    "resume": 20000,
+    "internet": 10000,
+    "mygov": 15000,
+    "hisobot": 25000,
+    "diplom_design": 30000,
+    "sertifikat": 20000,
+    "vizitka": 15000,
+    "telegram_post": 12000,
+    "reklama_banner": 15000,
+    "menu_design": 20000,
+    "logo": 30000,
 }

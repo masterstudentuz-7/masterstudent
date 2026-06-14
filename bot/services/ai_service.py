@@ -456,7 +456,7 @@ Faqat to'g'ri to'liq JSON massiv. Markdown yo'q."""
 
     for attempt in range(2):
         try:
-            content = await ai_generate(content_prompt, max_tokens=8000, temperature=0.7)
+            content = await ai_generate(content_prompt, max_tokens=min(16000, 2000 + len(full_titles) * 700), temperature=0.7)
             content = content.strip()
             if content.startswith("```"):
                 content = content.split("\n", 1)[1]
@@ -627,7 +627,7 @@ async def create_ppt_file(topic: str, slides_count: int, design: str, purpose: s
             sub = slide.shapes.add_textbox(Inches(1), Inches(5.0), Inches(11.3), Inches(0.8))
             stf = sub.text_frame
             sp = stf.paragraphs[0]
-            sp.text = "MasterStudent — EVA AI tomonidan tayyorlandi"
+            sp.text = "MasterStudent — NOVA AI AI tomonidan tayyorlandi"
             sp.font.size = Pt(16)
             sp.font.name = "Times New Roman"
             sp.font.italic = True
@@ -702,19 +702,22 @@ async def generate_document_content(topic: str, doc_type: str, pages: int, lang:
     lang_name = {"uz": "O'zbek", "ru": "Русский", "en": "English"}.get(lang, "O'zbek")
     words_per_page = 250
     total_words = pages * words_per_page
-    
+
+    # Sahifalar soniga qarab bo'limlar soni (ko'p sahifa = ko'p bo'lim)
+    num_sections = max(4, min(10, pages // 4))
+
     # 1-QADAM: Reja tuzish — HAQIQIY, mazmunli bo'lim nomlari
     plan_prompt = f"""Sen "{lang_name}" tilida GOST standartidagi akademik "{doc_type}" yozayotgan professional mutaxassissan.
 Mavzu: "{topic}"
-Sahifalar soni: {pages}
+Sahifalar soni: {pages} (bu MUHIM — {pages} sahifani to'ldirish kerak!)
 
-VAZIFA: Shu mavzu bo'yicha REJA tuz. Asosiy qism uchun 4-6 ta BO'LIM sarlavhasini yoz.
+VAZIFA: Shu mavzu bo'yicha REJA tuz. Asosiy qism uchun aniq {num_sections} ta BO'LIM sarlavhasini yoz.
 
 MUHIM QOIDALAR:
+- Aniq {num_sections} ta bo'lim bo'lsin (sahifalar ko'p bo'lgani uchun)
 - Har bir bo'lim sarlavhasi MAZMUNLI va MAVZUGA OID bo'lishi shart
 - "1-bo'lim", "2-bo'lim", "Bob 1", "Birinchi qism" kabi UMUMIY nomlar TAQIQLANADI
 - Har bir sarlavha mavzuning aniq bir jihatini ifodalashi kerak
-- Sarlavhalar akademik uslubda, to'liq va aniq bo'lsin
 
 YAXSHI MISOL (mavzu "O'zbekiston iqtisodiyoti" bo'lsa):
 - "O'zbekiston iqtisodiyotining zamonaviy holati va asosiy ko'rsatkichlari"
@@ -727,7 +730,7 @@ YOMON MISOL (ishlatma!): "1-bo'lim", "Kirish qismi", "Asosiy qism"
 Faqat JSON qaytar:
 {{
     "title": "ishning to'liq akademik nomi",
-    "sections": ["birinchi mazmunli sarlavha", "ikkinchi mazmunli sarlavha", "uchinchi mazmunli sarlavha", "to'rtinchi mazmunli sarlavha"]
+    "sections": ["sarlavha 1", "sarlavha 2", "... aniq {num_sections} ta"]
 }}
 Faqat to'g'ri JSON qaytar. Markdown ishlatma."""
 
@@ -1056,11 +1059,11 @@ def create_qr_code(data: str, design: str = "simple") -> io.BytesIO:
 # ============================================================
 
 async def ai_chat(question: str, lang: str = "uz") -> str:
-    """EVA — aqlli, hushmuomala AI yordamchi (o'zbek stilda)."""
+    """NOVA AI — aqlli, hushmuomala AI yordamchi (o'zbek stilda)."""
     lang_name = {"uz": "O'zbek", "ru": "Русский", "en": "English"}.get(lang, "O'zbek")
     
     persona = {
-        "uz": """Sening isming EVA — sen O'zbekistondagi "MasterStudent" platformasining shaxsiy AI yordamchisisan. 
+        "uz": """Sening isming NOVA AI — sen O'zbekistondagi "MasterStudent" platformasining shaxsiy AI yordamchisisan. 
 
 SENING SHAXSIYATING:
 - Sen mehribon, samimiy va g'amxo'r qizsan
@@ -1080,12 +1083,12 @@ SENING VAZIFANG:
 PLATFORMA XIZMATLARI: Professional PPT, Referat, Mustaqil ish, Esse, Tarjima, QR Code, AI matn, Nutq tayyorlash, va dizayn xizmatlari (CV, Logo, Vizitka).
 
 Har doim {lang_name} tilida javob ber. Iliq, do'stona va foydali bo'l!""",
-        "ru": "Тебя зовут EVA — персональный AI-помощник платформы MasterStudent. Ты добрая, вежливая и умная. Помогай клиентам тепло и профессионально. Отвечай на русском языке.",
-        "en": "Your name is EVA — personal AI assistant of MasterStudent platform. You are kind, polite and smart. Help customers warmly and professionally. Answer in English.",
+        "ru": "Тебя зовут NOVA AI — персональный AI-помощник платформы MasterStudent. Ты добрая, вежливая и умная. Помогай клиентам тепло и профессионально. Отвечай на русском языке.",
+        "en": "Your name is NOVA AI — personal AI assistant of MasterStudent platform. You are kind, polite and smart. Help customers warmly and professionally. Answer in English.",
     }
     
     system = persona.get(lang, persona["uz"]).replace("{lang_name}", lang_name)
-    prompt = f"{system}\n\nMijoz savoli: {question}\n\nEVA javobi:"
+    prompt = f"{system}\n\nMijoz savoli: {question}\n\nNOVA AI javobi:"
     return await ai_generate(prompt, max_tokens=1200, temperature=0.8)
 
 

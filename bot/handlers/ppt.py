@@ -94,10 +94,10 @@ async def ppt_pro_start(callback: CallbackQuery, state: FSMContext):
 
     if WEBAPP_URL:
         kb = ReplyKeyboardMarkup(
-            keyboard=[[KeyboardButton(
-                text="🌟 Taqdimot PRO — ochish",
-                web_app=WebAppInfo(url=WEBAPP_URL)
-            )]],
+            keyboard=[
+                [KeyboardButton(text="🌟 Taqdimot PRO — ochish", web_app=WebAppInfo(url=WEBAPP_URL))],
+                [KeyboardButton(text=get_text("btn_back", lang))],
+            ],
             resize_keyboard=True
         )
         await callback.message.answer(
@@ -108,7 +108,8 @@ async def ppt_pro_start(callback: CallbackQuery, state: FSMContext):
             "• 🖼 Avtomatik rasmlar\n"
             "• ⭐ 3 xil sifat tarifi\n"
             "• 📄 PPTX yoki PDF format\n\n"
-            "Quyidagi tugmani bosing 👇",
+            "Quyidagi tugmani bosing 👇\n"
+            "⬅️ Chiqish uchun «Ortga» tugmasini bosing",
             reply_markup=kb,
             parse_mode="HTML"
         )

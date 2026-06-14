@@ -68,14 +68,17 @@ async def cmd_bekor(message: Message, state: FSMContext):
     await message.answer("✅ Bekor qilindi")
 
 
-async def _do_broadcast(message: Message, text: str):
-    """Barcha foydalanuvchilarga xabar yuboradi."""
+async def _do_broadcast(message: Message, text: str, photo_id: str = None):
+    """Barcha foydalanuvchilarga xabar yuboradi (matn yoki rasm bilan)."""
     users = await db.get_all_users()
     sent = 0
     failed = 0
     for user in users:
         try:
-            await message.bot.send_message(user["user_id"], text, parse_mode="HTML")
+            if photo_id:
+                await message.bot.send_photo(user["user_id"], photo_id, caption=text or "", parse_mode="HTML")
+            else:
+                await message.bot.send_message(user["user_id"], text, parse_mode="HTML")
             sent += 1
         except Exception:
             failed += 1
@@ -403,20 +406,34 @@ async def admin_broadcast_start(callback: CallbackQuery, state: FSMContext):
         return
     
     await state.set_state(AdminStates.broadcasting)
-    await callback.message.answer("📢 Xabar matnini yuboring (barcha foydalanuvchilarga yuboriladi):")
+    await callback.message.answer(
+        "📢 <b>E'lon yuborish</b>\n\n"
+        "Xabaringizni yuboring — barcha foydalanuvchilarga jo'natiladi.\n\n"
+        "✍️ Oddiy <b>matn</b> yuborishingiz mumkin\n"
+        "🖼 Yoki <b>rasm + izoh</b> (caption) yuborishingiz mumkin\n\n"
+        "❌ Bekor qilish: /bekor",
+        parse_mode="HTML"
+    )
     await callback.answer()
 
 
 @router.message(AdminStates.broadcasting)
 async def admin_broadcast_send(message: Message, state: FSMContext):
-    """Send broadcast message."""
+    """Send broadcast message — matn yoki rasm bilan."""
     if not is_admin(message.from_user.id):
         return
     if message.text and message.text.strip() in ["/bekor", "bekor", "❌"]:
         await state.clear()
         await message.answer("✅ Bekor qilindi")
         return
-    await _do_broadcast(message, message.text)
+    # Rasm yuborilgan bo'lsa — rasm + caption
+    if message.photo:
+        photo_id = message.photo[-1].file_id
+        caption = message.caption or ""
+        await _do_broadcast(message, caption, photo_id=photo_id)
+    else:
+        await _do_broadcast(message, message.text or "")
+    await state.clear()
     await state.clear()
 
 

@@ -1,5 +1,5 @@
 """
-EVA Progress Bar — kutish paytida animatsiyali progress va maslahatlar.
+NOVA AI Progress Bar — kutish paytida animatsiyali progress va maslahatlar.
 """
 import asyncio
 import random
@@ -19,7 +19,7 @@ TIPS_UZ = [
     "📖 Kitob o'qib turing — bilim hech qachon ko'p bo'lmaydi",
     "🏃 Bir oz harakatlanib turing — tanaga foydali!",
     "🌅 Derazadan tashqariga qarang — tabiat go'zal!",
-    "💪 Siz zo'rsiz! EVA sizga eng yaxshi natijani tayyorlamoqda",
+    "💪 Siz zo'rsiz! NOVA AI sizga eng yaxshi natijani tayyorlamoqda",
     "🤝 Do'stlaringizga ham botimizni tavsiya qiling!",
     "🎯 Maqsadingizga yana bir qadam yaqinlashdingiz!",
     "🌟 Sabr — muvaffaqiyat kaliti!",
@@ -87,7 +87,7 @@ async def show_progress(message: Message, lang: str = "uz", is_ppt: bool = False
     for i, (bar, percent, status) in enumerate(stages[:-1]):  # Oxirgi 100% ni ko'rsatmaymiz (fayl kelganda ko'rinadi)
         tip = get_random_tip(lang)
         text = (
-            f"🤖 <b>EVA ishlamoqda...</b>\n\n"
+            f"🤖 <b>NOVA AI ishlamoqda...</b>\n\n"
             f"{bar} <b>{percent}</b>\n"
             f"📋 {status}\n\n"
             f"💬 <i>{tip}</i>"
