@@ -331,7 +331,8 @@ def generate_designs_preview() -> io.BytesIO:
     d = ImageDraw.Draw(img)
 
     def load_font(size, bold=False):
-        names = (["DejaVuSans-Bold.ttf", "Arial Bold.ttf"] if bold else ["DejaVuSans.ttf", "Arial.ttf"])
+        names = (["DejaVuSans-Bold.ttf", "arialbd.ttf", "Arial Bold.ttf", "arial.ttf"]
+                 if bold else ["DejaVuSans.ttf", "arial.ttf", "Arial.ttf"])
         for n in names:
             try:
                 return ImageFont.truetype(n, size)
@@ -480,46 +481,63 @@ Faqat to'g'ri to'liq JSON massiv. Markdown yo'q."""
 
 
 def _has_image_source() -> bool:
-    """Hech bo'lmaganda bitta rasm manbasi sozlanganmi?"""
-    return bool(PEXELS_API_KEY or PIXABAY_API_KEY)
+    """Rasm manbasi doimo mavjud — Openverse kalitsiz ishlaydi."""
+    return True
+
+
+_UA = "Mozilla/5.0 (MasterStudentBot)"
+
+
+def _download_bytes(url: str, headers: dict = None, timeout: int = 12) -> io.BytesIO:
+    req = urllib.request.Request(url, headers=headers or {"User-Agent": _UA})
+    with urllib.request.urlopen(req, timeout=timeout) as resp:
+        return io.BytesIO(resp.read())
 
 
 def _fetch_image(query: str) -> io.BytesIO:
     """
-    Mavzuga oid rasm yuklab oladi. Avval Pexels, keyin Pixabay sinaladi.
-    Hech qaysi ishlamasa None qaytaradi.
+    Mavzuga oid rasm yuklab oladi.
+    Tartib: Pexels (kalit) -> Pixabay (kalit) -> Openverse (KALITSIZ, doim ishlaydi).
     """
     import random as _r
 
-    # 1) PEXELS
+    # 1) PEXELS (eng sifatli, kalit kerak)
     if PEXELS_API_KEY:
         try:
             url = f"https://api.pexels.com/v1/search?query={urllib.parse.quote(query)}&per_page=8&orientation=landscape"
-            req = urllib.request.Request(url, headers={"Authorization": PEXELS_API_KEY})
-            with urllib.request.urlopen(req, timeout=12) as resp:
-                data = json.loads(resp.read().decode())
+            data = json.loads(_download_bytes(url, {"Authorization": PEXELS_API_KEY}).read().decode())
             photos = data.get("photos", [])
             if photos:
-                img_url = _r.choice(photos)["src"]["large"]
-                with urllib.request.urlopen(img_url, timeout=12) as img_resp:
-                    return io.BytesIO(img_resp.read())
+                return _download_bytes(_r.choice(photos)["src"]["large"])
         except Exception as e:
             logger.warning(f"Pexels ishlamadi: {e}")
 
-    # 2) PIXABAY (zaxira)
+    # 2) PIXABAY (kalit kerak)
     if PIXABAY_API_KEY:
         try:
             url = (f"https://pixabay.com/api/?key={PIXABAY_API_KEY}"
                    f"&q={urllib.parse.quote(query)}&image_type=photo&orientation=horizontal&per_page=8&safesearch=true")
-            with urllib.request.urlopen(url, timeout=12) as resp:
-                data = json.loads(resp.read().decode())
+            data = json.loads(_download_bytes(url).read().decode())
             hits = data.get("hits", [])
             if hits:
-                img_url = _r.choice(hits).get("largeImageURL") or _r.choice(hits).get("webformatURL")
-                with urllib.request.urlopen(img_url, timeout=12) as img_resp:
-                    return io.BytesIO(img_resp.read())
+                h = _r.choice(hits)
+                return _download_bytes(h.get("largeImageURL") or h.get("webformatURL"))
         except Exception as e:
             logger.warning(f"Pixabay ishlamadi: {e}")
+
+    # 3) OPENVERSE — KALITSIZ, hamma uchun ishlaydi (asosiy zaxira)
+    try:
+        url = f"https://api.openverse.org/v1/images/?q={urllib.parse.quote(query)}&page_size=10&mature=false"
+        data = json.loads(_download_bytes(url, {"User-Agent": _UA}, timeout=15).read().decode())
+        results = [r for r in data.get("results", []) if r.get("url")]
+        if results:
+            for r in _r.sample(results, min(3, len(results))):
+                try:
+                    return _download_bytes(r["url"], {"User-Agent": _UA})
+                except Exception:
+                    continue
+    except Exception as e:
+        logger.warning(f"Openverse ishlamadi: {e}")
 
     return None
 
