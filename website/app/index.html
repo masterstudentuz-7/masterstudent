@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Taqdimot yaratish — MasterStudent</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app">
+        <div class="app-header">
+            <h1>🎨 Taqdimot yaratish</h1>
+            <p>Sozlamalarni to'ldiring va dizayn tanlang</p>
+        </div>
+
+        <!-- MAVZU -->
+        <div class="field">
+            <label>📝 Mavzu</label>
+            <textarea id="topic" rows="2" placeholder="Taqdimot mavzusini yozing. Masalan: O'zbekiston iqtisodiyoti"></textarea>
+            <span class="hint">Mavzuni to'liq va tushunarli yozing</span>
+        </div>
+
+        <!-- ISM -->
+        <div class="field">
+            <label>👤 Ism (ixtiyoriy)</label>
+            <input type="text" id="author" placeholder="Ism familiyangiz (titul slaydda chiqadi)">
+        </div>
+
+        <!-- TIL -->
+        <div class="field">
+            <label>🌐 Til</label>
+            <select id="lang">
+                <option value="uz">🇺🇿 O'zbek</option>
+                <option value="ru">🇷🇺 Rus</option>
+                <option value="en">🇬🇧 Ingliz</option>
+            </select>
+        </div>
+
+        <!-- SLAYDLAR -->
+        <div class="field">
+            <label>📑 Slaydlar soni</label>
+            <select id="slides">
+                <option value="5">5 ta slayd</option>
+                <option value="10" selected>10 ta slayd</option>
+                <option value="15">15 ta slayd</option>
+                <option value="20">20 ta slayd</option>
+                <option value="25">25 ta slayd</option>
+                <option value="30">30 ta slayd</option>
+            </select>
+        </div>
+
+        <!-- DIZAYN -->
+        <div class="field">
+            <label>🎨 Dizaynni tanlang</label>
+            <span class="hint">Quyidagi dizaynlardan birini tanlang 👇</span>
+            <div class="designs" id="designs"></div>
+        </div>
+
+        <!-- RASM USULI -->
+        <div class="field">
+            <label>🖼 Rasmlar</label>
+            <div class="radio-group" id="imageMode">
+                <label class="radio-card selected" data-val="auto">
+                    <input type="radio" name="img" value="auto" checked>
+                    <div><b>Avtomatik rasmli</b><span>AI mavzuga mos rasmlarni o'zi qo'shadi</span></div>
+                </label>
+                <label class="radio-card" data-val="none">
+                    <input type="radio" name="img" value="none">
+                    <div><b>Rasmsiz</b><span>Faqat matn va dizayn elementlari</span></div>
+                </label>
+            </div>
+        </div>
+
+        <!-- TARIF -->
+        <div class="field">
+            <label>⭐ Tarifni tanlang</label>
+            <div class="radio-group" id="tariff">
+                <label class="radio-card selected" data-val="standart">
+                    <input type="radio" name="tariff" value="standart" checked>
+                    <div><b>⭐ Standart</b><span>Tezkor va sifatli taqdimot</span></div>
+                </label>
+                <label class="radio-card" data-val="premium">
+                    <input type="radio" name="tariff" value="premium">
+                    <div><b>⭐⭐ Premium</b><span>Yaxshilangan matn, boy ma'lumot</span></div>
+                </label>
+                <label class="radio-card" data-val="ilmiy">
+                    <input type="radio" name="tariff" value="ilmiy">
+                    <div><b>⭐⭐⭐ Yuqori Sifatli Premium</b><span>Ilmiy yondashuv, manbalar bilan</span></div>
+                </label>
+            </div>
+        </div>
+
+        <!-- FORMAT -->
+        <div class="field">
+            <label>📄 Fayl formati</label>
+            <div class="radio-group" id="format">
+                <label class="radio-card selected" data-val="pptx">
+                    <input type="radio" name="format" value="pptx" checked>
+                    <div><b>PPTX — PowerPoint</b></div>
+                </label>
+                <label class="radio-card" data-val="pdf">
+                    <input type="radio" name="format" value="pdf">
+                    <div><b>PDF</b></div>
+                </label>
+            </div>
+        </div>
+
+        <button class="submit-btn" id="submitBtn">✅ Taqdimot yaratish</button>
+        <div class="error" id="error"></div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

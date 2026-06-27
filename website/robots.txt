@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://masterstudentuz-7.github.io/masterstudent/sitemap.xml

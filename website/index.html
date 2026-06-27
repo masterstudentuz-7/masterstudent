@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- ===== ASOSIY SEO ===== -->
+    <title>MasterStudent — AI yordamida PPT, Referat, Mustaqil ish | GOST standartida</title>
+    <meta name="description" content="MasterStudent — sun'iy intellekt yordamida professional taqdimot (PPT), referat, mustaqil ish va esse yaratish. GOST standartida, 1-5 daqiqada tayyor. Talabalar uchun eng yaxshi yordamchi.">
+    <meta name="keywords" content="referat, mustaqil ish, ppt, taqdimot, prezentatsiya, esse, GOST, talaba, universitet, AI, sun'iy intellekt, MasterStudent, referat tayyorlash, slayd, kompyuter xizmatlari, online xizmat, Uzbekistan, O'zbekiston">
+    <meta name="author" content="MasterStudent">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="Uzbek">
+    <link rel="canonical" href="https://masterstudentuz-7.github.io/masterstudent/">
+
+    <!-- ===== OPEN GRAPH (Telegram, Facebook) ===== -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="MasterStudent — AI yordamida PPT, Referat, Mustaqil ish">
+    <meta property="og:description" content="Sun'iy intellekt yordamida GOST standartida taqdimot, referat va mustaqil ish. 1-5 daqiqada tayyor!">
+    <meta property="og:url" content="https://masterstudentuz-7.github.io/masterstudent/">
+    <meta property="og:image" content="https://masterstudentuz-7.github.io/masterstudent/logo.svg">
+    <meta property="og:site_name" content="MasterStudent">
+    <meta property="og:locale" content="uz_UZ">
+
+    <!-- ===== TWITTER CARD ===== -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="MasterStudent — AI yordamida PPT, Referat, Mustaqil ish">
+    <meta name="twitter:description" content="GOST standartida taqdimot, referat va mustaqil ish. 1-5 daqiqada tayyor!">
+    <meta name="twitter:image" content="https://masterstudentuz-7.github.io/masterstudent/logo.svg">
+
+    <!-- ===== FAVICON ===== -->
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+
+    <!-- ===== STRUCTURED DATA (Google uchun) ===== -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "MasterStudent",
+      "description": "AI yordamida professional taqdimot, referat, mustaqil ish yaratish xizmati",
+      "url": "https://masterstudentuz-7.github.io/masterstudent/",
+      "logo": "https://masterstudentuz-7.github.io/masterstudent/logo.svg",
+      "sameAs": ["https://t.me/MasterStudentUz_bot"]
+    }
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- CURSOR -->
+    <div class="cursor" id="cursor"></div>
+    <div class="cursor-follower" id="cursorFollower"></div>
+
+    <!-- NAVBAR -->
+    <header class="header" id="header">
+        <div class="header-container">
+            <a href="#" class="brand">
+                <div class="brand-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <span class="brand-name">MasterStudent</span>
+                <span class="brand-badge">PRO</span>
+            </a>
+            <nav class="nav" id="nav">
+                <a href="#features" class="nav-link">Imkoniyatlar</a>
+                <a href="#services" class="nav-link">Xizmatlar</a>
+                <a href="#pricing" class="nav-link">Narxlar</a>
+                <a href="#reviews" class="nav-link">Izohlar</a>
+            </nav>
+            <div class="header-actions">
+                <a href="https://t.me/MasterStudentUz_bot" class="btn-premium" target="_blank">
+                    <span class="btn-premium-glow"></span>
+                    <span class="btn-premium-text">Kirish</span>
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 7h12m-4-4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </a>
+            </div>
+            <button class="mobile-toggle" id="mobileToggle"><span></span><span></span></button>
+        </div>
+    </header>
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="hero-bg">
+            <div class="hero-gradient"></div>
+            <div class="hero-grid-pattern"></div>
+            <div class="hero-glow hero-glow-1"></div>
+            <div class="hero-glow hero-glow-2"></div>
+        </div>
+        <div class="hero-container">
+            <div class="hero-badge">
+                <div class="hero-badge-dot"></div>
+                <span>Yangi: GOST 2024 standartida ishlaymiz</span>
+            </div>
+            <h1 class="hero-title">
+                <span class="hero-line">Akademik hujjatlar</span>
+                <span class="hero-line hero-line-accent">AI kuchi bilan</span>
+                <span class="hero-line">premium sifatda</span>
+            </h1>
+            <p class="hero-desc">
+                Professional taqdimot, referat va mustaqil ishlarni sun'iy intellekt yordamida bir necha daqiqada yarating. 
+                To'liq GOST formatlash, boy kontent, o'qituvchi mamnun bo'ladigan natija.
+            </p>
+            <div class="hero-actions">
+                <a href="https://t.me/MasterStudentUz_bot" class="btn-hero" target="_blank">
+                    <div class="btn-hero-bg"></div>
+                    <span class="btn-hero-content">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.12.12 0 00-.07-.2c-.08-.06-.19-.04-.27-.02-.12.02-1.96 1.25-5.54 3.69-.52.36-1 .53-1.42.52-.47-.01-1.37-.26-2.03-.48-.82-.27-1.47-.42-1.42-.88.03-.24.37-.49 1.02-.75 3.99-1.74 6.65-2.89 7.99-3.44 3.8-1.58 4.59-1.86 5.1-1.87.11 0 .37.03.54.17.14.12.18.28.2.45 0 .06.01.24 0 .38z"/></svg>
+                        Hoziroq boshlash
+                    </span>
+                </a>
+                <a href="#features" class="btn-secondary">
+                    Ko'proq bilish
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v12m-4-4l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </a>
+            </div>
+
+
+        </div>
+    </section>
+
+    <!-- STATS -->
+    <section class="stats">
+        <div class="stats-container">
+            <div class="stat-block">
+                <div class="stat-num" data-count="2847">0</div>
+                <div class="stat-label">Yaratilgan hujjatlar</div>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-block">
+                <div class="stat-num" data-count="99">0</div>
+                <div class="stat-suffix">%</div>
+                <div class="stat-label">Mamnun mijozlar</div>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-block">
+                <div class="stat-num" data-count="25">0</div>
+                <div class="stat-suffix">+</div>
+                <div class="stat-label">Premium xizmatlar</div>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-block">
+                <div class="stat-num" data-count="3">0</div>
+                <div class="stat-suffix">min</div>
+                <div class="stat-label">O'rtacha tayyor</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-head">
+                <div class="section-tag">Imkoniyatlar</div>
+                <h2 class="section-title">Nima uchun bizni<br><span class="accent-gradient">tanlashadi?</span></h2>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon-wrap"><div class="feature-icon">⚡</div></div>
+                    <h3>Tezkor natija</h3>
+                    <p>AI texnologiyasi har bir bo'limni alohida yaratadi. 3-5 daqiqada to'liq hujjat tayyor.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon-wrap"><div class="feature-icon">📐</div></div>
+                    <h3>GOST Standart</h3>
+                    <p>Times New Roman 14pt, 1.5 interval, A4, maydonlar — hammasi o'qituvchi talab qilganday.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon-wrap"><div class="feature-icon">📄</div></div>
+                    <h3>To'la sahifalar</h3>
+                    <p>10 sahifa so'rasangiz — haqiqatan 10 sahifa to'la yoziladi. "Kam" degan gap yo'q.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon-wrap"><div class="feature-icon">🎯</div></div>
+                    <h3>Aniq tuzilish</h3>
+                    <p>Titul, mundarija, kirish, asosiy qism, xulosa, adabiyotlar — hech narsa qolmaydi.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon-wrap"><div class="feature-icon">🔒</div></div>
+                    <h3>Xavfsiz to'lov</h3>
+                    <p>Payme, Click, bank karta. Pul faqat admin tasdiqlagandan keyin yechiladi.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon-wrap"><div class="feature-icon">🌍</div></div>
+                    <h3>3 tilda</h3>
+                    <p>O'zbek, rus, ingliz tillarida hujjat yaratish va interfeys.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SERVICES -->
+    <section class="services-section" id="services">
+        <div class="container">
+            <div class="section-head">
+                <div class="section-tag">Xizmatlar</div>
+                <h2 class="section-title">Premium <span class="accent-gradient">xizmatlar</span></h2>
+            </div>
+            <div class="services-list">
+                <div class="svc-row">
+                    <div class="svc-number">01</div>
+                    <div class="svc-content">
+                        <h3>Professional PPT</h3>
+                        <p>10 dizayn, GOST tuzilishi, 5-30 slayd, speaker notes</p>
+                    </div>
+                    <div class="svc-price">5,000 — 22,000</div>
+                    <div class="svc-time">3-5 daq</div>
+                </div>
+                <div class="svc-row">
+                    <div class="svc-number">02</div>
+                    <div class="svc-content">
+                        <h3>Referat</h3>
+                        <p>GOST formati, 5-50 sahifa, to'la kontent, adabiyotlar</p>
+                    </div>
+                    <div class="svc-price">10,000</div>
+                    <div class="svc-time">3-5 daq</div>
+                </div>
+                <div class="svc-row">
+                    <div class="svc-number">03</div>
+                    <div class="svc-content">
+                        <h3>Mustaqil ish</h3>
+                        <p>Titul varaq, mundarija, kirish, xulosa — sahifalar to'la</p>
+                    </div>
+                    <div class="svc-price">10,000</div>
+                    <div class="svc-time">3-5 daq</div>
+                </div>
+                <div class="svc-row">
+                    <div class="svc-number">04</div>
+                    <div class="svc-content">
+                        <h3>Esse</h3>
+                        <p>Argumentativ, tahliliy, hikoyaviy — akademik uslubda</p>
+                    </div>
+                    <div class="svc-price">5,000</div>
+                    <div class="svc-time">2-3 daq</div>
+                </div>
+                <div class="svc-row">
+                    <div class="svc-number">05</div>
+                    <div class="svc-content">
+                        <h3>Tarjima + QR + AI matn</h3>
+                        <p>Professional tarjima, QR kod, kontent yaratish, nutq</p>
+                    </div>
+                    <div class="svc-price">2,000 — 8,000</div>
+                    <div class="svc-time">1-3 daq</div>
+                </div>
+                <div class="svc-row">
+                    <div class="svc-number">06</div>
+                    <div class="svc-content">
+                        <h3>Dizayn xizmatlari</h3>
+                        <p>Logo, CV, vizitka, banner, sertifikat — admin bajaradi</p>
+                    </div>
+                    <div class="svc-price">15,000 — 40,000</div>
+                    <div class="svc-time">1-24 soat</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PRICING -->
+    <section class="pricing-section" id="pricing">
+        <div class="container">
+            <div class="section-head center">
+                <div class="section-tag">Narxlar</div>
+                <h2 class="section-title">Shaffof va <span class="accent-gradient">adolatli</span></h2>
+                <p class="section-desc">Ro'yxatdan o'tganingizda <strong>6,000 so'm</strong> bonus beriladi</p>
+            </div>
+            <div class="pricing-duo">
+                <div class="pricing-card">
+                    <div class="pc-header">
+                        <span class="pc-label">AI Xizmatlar</span>
+                        <div class="pc-price"><span class="pc-from">dan</span> <span class="pc-amount">2,000</span> <span class="pc-curr">so'm</span></div>
+                        <p class="pc-desc">Avtomatik • 1-5 daqiqa</p>
+                    </div>
+                    <ul class="pc-features">
+                        <li>Professional PPT (GOST, 10 dizayn)</li>
+                        <li>Referat — sahifalar TO'LA yoziladi</li>
+                        <li>Mustaqil ish — GOST tuzilishi</li>
+                        <li>Esse (argumentativ, tahliliy...)</li>
+                        <li>Tarjima (UZ / RU / EN)</li>
+                        <li>QR Code, AI matn, nutq tayyorlash</li>
+                        <li>Fayllar saqlanadi — qayta yuklab olish</li>
+                    </ul>
+                    <a href="https://t.me/MasterStudentUz_bot" class="btn-card" target="_blank">Boshlash →</a>
+                </div>
+                <div class="pricing-card premium-card">
+                    <div class="premium-glow"></div>
+                    <div class="pc-badge">VIP</div>
+                    <div class="pc-header">
+                        <span class="pc-label">Admin Xizmatlar</span>
+                        <div class="pc-price"><span class="pc-from">dan</span> <span class="pc-amount">15,000</span> <span class="pc-curr">so'm</span></div>
+                        <p class="pc-desc">Professional bajaradi • 1-24 soat</p>
+                    </div>
+                    <ul class="pc-features">
+                        <li>CV / Resume — zamonaviy dizayn</li>
+                        <li>Logo yaratish — brend identikasi</li>
+                        <li>Diplom / Sertifikat dizayni</li>
+                        <li>Vizitka / Menyu / Banner</li>
+                        <li>Telegram post dizayni</li>
+                        <li>My.gov.uz / Internet xizmatlari</li>
+                        <li>Individual yondashuv</li>
+                    </ul>
+                    <a href="https://t.me/MasterStudentUz_bot" class="btn-card btn-card-premium" target="_blank">Boshlash →</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- REVIEWS -->
+    <section class="reviews-section" id="reviews">
+        <div class="container">
+            <div class="section-head center">
+                <div class="section-tag">Izohlar</div>
+                <h2 class="section-title">Mijozlar <span class="accent-gradient">ishonadi</span></h2>
+            </div>
+            <div class="reviews-masonry">
+                <div class="review-item">
+                    <div class="review-stars">★★★★★</div>
+                    <p>"Referat 12 sahifa bo'lishi kerak edi. Aniq 12 sahifa to'la chiqdi — kirish, 4 bo'lim, xulosa, adabiyotlar. O'qituvchim hech narsa demadi, 5 baho qo'ydi!"</p>
+                    <div class="review-user"><div class="review-ava">A</div><div><strong>Aziz M.</strong><span>TATU, 3-kurs</span></div></div>
+                </div>
+                <div class="review-item">
+                    <div class="review-stars">★★★★★</div>
+                    <p>"PPT 20 slaydda tayyor bo'ldi. Dizayni zo'r, har bir slaydda 5-6 ta to'liq gap bor. Dotsent taqdimotni ko'rib hayratda qoldi."</p>
+                    <div class="review-user"><div class="review-ava">N</div><div><strong>Nodira K.</strong><span>TDIU, magistrant</span></div></div>
+                </div>
+                <div class="review-item">
+                    <div class="review-stars">★★★★★</div>
+                    <p>"Logo va vizitka dizayni buyurtma qildim. 3 soatda tayyor bo'ldi. Professional sifat, narxi ham juda qulay. 100% tavsiya qilaman."</p>
+                    <div class="review-user"><div class="review-ava">S</div><div><strong>Sardor T.</strong><span>Tadbirkor</span></div></div>
+                </div>
+                <div class="review-item">
+                    <div class="review-stars">★★★★★</div>
+                    <p>"Mustaqil ishni topshirganimda o'qituvchi ajablandi — sahifalar to'la, format ideal, adabiyotlar to'g'ri. Shu botga katta rahmat!"</p>
+                    <div class="review-user"><div class="review-ava">D</div><div><strong>Dilnoza R.</strong><span>SamDU, 2-kurs</span></div></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA FINAL -->
+    <section class="final-cta">
+        <div class="container">
+            <div class="cta-card">
+                <div class="cta-glow"></div>
+                <div class="cta-content">
+                    <h2>Premium xizmatni sinab ko'ring</h2>
+                    <p>Ro'yxatdan o'ting — 6,000 so'm bonus oling — birinchi hujjatingizni yarating</p>
+                    <a href="https://t.me/MasterStudentUz_bot" class="btn-hero" target="_blank">
+                        <div class="btn-hero-bg"></div>
+                        <span class="btn-hero-content">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.12.12 0 00-.07-.2c-.08-.06-.19-.04-.27-.02-.12.02-1.96 1.25-5.54 3.69-.52.36-1 .53-1.42.52-.47-.01-1.37-.26-2.03-.48-.82-.27-1.47-.42-1.42-.88.03-.24.37-.49 1.02-.75 3.99-1.74 6.65-2.89 7.99-3.44 3.8-1.58 4.59-1.86 5.1-1.87.11 0 .37.03.54.17.14.12.18.28.2.45 0 .06.01.24 0 .38z"/></svg>
+                            Telegram Botga o'tish
+                        </span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- COMMENTS -->
+    <section class="comments-section" id="comments">
+        <div class="container">
+            <div class="section-head center">
+                <div class="section-tag">Izohlar</div>
+                <h2 class="section-title">Fikringizni <span class="accent-gradient">qoldiring</span></h2>
+                <p class="section-desc">Xizmatimiz haqida o'z fikringizni yozing — bu boshqalarga yordam beradi</p>
+            </div>
+            <div class="comments-container">
+                <form class="comment-form" id="commentForm">
+                    <div class="form-row">
+                        <input type="text" id="commentName" placeholder="Ismingiz" required class="form-input">
+                        <select id="commentRating" class="form-input form-select">
+                            <option value="5">★★★★★ A'lo</option>
+                            <option value="4">★★★★ Yaxshi</option>
+                            <option value="3">★★★ O'rtacha</option>
+                            <option value="2">★★ Yomon</option>
+                            <option value="1">★ Juda yomon</option>
+                        </select>
+                    </div>
+                    <textarea id="commentText" placeholder="Xizmatimiz haqida fikringizni yozing..." required class="form-input form-textarea"></textarea>
+                    <button type="submit" class="btn-submit">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+                        Yuborish
+                    </button>
+                </form>
+                <div class="comments-list" id="commentsList">
+                    <!-- Saqlangan izohlar shu yerda ko'rinadi -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- DONATE -->
+    <section class="donate-section" id="donate">
+        <div class="container">
+            <div class="donate-card">
+                <div class="donate-glow"></div>
+                <div class="donate-content">
+                    <div class="donate-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+                    </div>
+                    <h2>Loyihani qo'llab-quvvatlang</h2>
+                    <p>Agar xizmatlarimiz sizga yoqsa va foydali bo'lsa — loyihamizni rivojlantirishga yordam bering. 
+                    Har bir donat yangi xizmatlar yaratish, serverlarni kuchaytirish va sifatni oshirishga sarflanadi.</p>
+                    <div class="donate-amounts">
+                        <button class="donate-btn" data-amount="5000">5,000 so'm</button>
+                        <button class="donate-btn" data-amount="10000">10,000 so'm</button>
+                        <button class="donate-btn" data-amount="25000">25,000 so'm</button>
+                        <button class="donate-btn" data-amount="50000">50,000 so'm</button>
+                        <button class="donate-btn active" data-amount="100000">100,000 so'm</button>
+                        <button class="donate-btn" data-amount="0">Boshqa summa</button>
+                    </div>
+                    <div class="donate-methods">
+                        <div class="donate-method">
+                            <div class="dm-icon">💳</div>
+                            <div class="dm-info">
+                                <span class="dm-title">Bank karta — Abduvaitov Sobir</span>
+                                <code class="dm-card">9860 0101 2829 3650</code>
+                            </div>
+                            <button class="dm-copy" onclick="copyCard()">Nusxalash</button>
+                        </div>
+                        <div class="donate-method">
+                            <div class="dm-icon">💙</div>
+                            <div class="dm-info">
+                                <span class="dm-title">Telegram Bot orqali</span>
+                                <span class="dm-sub">Balansni to'ldirish = Donat</span>
+                            </div>
+                            <a href="https://t.me/MasterStudentUz_bot" class="dm-copy" target="_blank">Ochish</a>
+                        </div>
+                    </div>
+                    <p class="donate-thanks">Har bir qo'llab-quvvatlash uchun katta rahmat! 🙏</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-info">
+                    <a href="#" class="brand"><div class="brand-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="brand-name">MasterStudent</span></a>
+                    <p>Premium AI kompyuter xizmatlari platformasi. GOST standartida akademik hujjatlar.</p>
+                </div>
+                <div class="footer-nav">
+                    <div><h4>Platforma</h4><a href="#features">Imkoniyatlar</a><a href="#services">Xizmatlar</a><a href="#pricing">Narxlar</a></div>
+                    <div><h4>Yordam</h4><a href="#reviews">Izohlar</a><a href="#">FAQ</a><a href="#">Qo'llab-quvvatlash</a></div>
+                    <div><h4>Aloqa</h4><a href="https://t.me/MasterStudentUz_bot" target="_blank">Telegram Bot</a><a href="#">Kanal</a><a href="#">Admin</a></div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024–2026 MasterStudent. Premium AI Platform.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Firebase (izohlar hammaga ko'rinishi uchun) -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
