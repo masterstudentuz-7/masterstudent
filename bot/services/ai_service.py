@@ -404,13 +404,15 @@ Faqat to'g'ri JSON. Markdown yo'q."""
 
     main_titles = []
     try:
-        pt = await ai_generate(plan_prompt, max_tokens=800, temperature=0.7)
+        pt = await ai_generate(plan_prompt, max_tokens=min(3000, 600 + main_count * 60), temperature=0.7)
         pt = pt.strip()
         if pt.startswith("```"):
             pt = pt.split("\n", 1)[1]
             if pt.endswith("```"):
                 pt = pt[:-3]
-        main_titles = json.loads(pt.strip())
+        parsed = json.loads(pt.strip())
+        if isinstance(parsed, list):
+            main_titles = [str(t).strip() for t in parsed if str(t).strip()]
     except Exception:
         main_titles = []
 
@@ -419,9 +421,22 @@ Faqat to'g'ri JSON. Markdown yo'q."""
         tl = (t or "").lower().strip()
         return (not tl) or len(tl) < 6 or tl.startswith(("1-", "2-", "3-", "slayd", "bob", "bo'lim"))
 
-    if not main_titles or any(_bad(t) for t in main_titles):
-        main_titles = [f"{topic}: {asp}" for asp in
-                       ["mohiyati", "ahamiyati", "tahlili", "muammolari", "istiqbollari"]][:main_count]
+    # Yomon sarlavhalarni olib tashlaymiz (hammasini emas — faqat yomonlarini)
+    main_titles = [t for t in main_titles if not _bad(t)]
+
+    # Agar yetarli bo'lmasa, mavzuga oid jihatlar bilan to'ldiramiz (takrorsiz)
+    if len(main_titles) < main_count:
+        aspects = [
+            "mohiyati va asosiy tushunchalari", "tarixiy rivojlanishi", "zamonaviy holati",
+            "asosiy tamoyillari", "turlari va tasnifi", "ahamiyati va roli",
+            "amaliy qo'llanilishi", "qiyosiy tahlili", "muammolari va yechimlari",
+            "xalqaro tajriba", "statistik ko'rsatkichlari", "rivojlanish istiqbollari",
+            "samaradorligini oshirish yo'llari", "ta'siri va natijalari", "kelajak tendensiyalari",
+        ]
+        i = 0
+        while len(main_titles) < main_count:
+            main_titles.append(f"{topic}: {aspects[i % len(aspects)]}")
+            i += 1
     main_titles = main_titles[:main_count]
 
     # GOST slayd tuzilishi: titul + reja + kirish + [asosiy] + xulosa + adabiyotlar
@@ -433,51 +448,74 @@ Faqat to'g'ri JSON. Markdown yo'q."""
     # To'liq slayd sarlavhalari ro'yxati
     full_titles = [topic, plan_t, intro_t] + main_titles + [concl_t, refs_t]
 
-    # 2-QADAM: Har slayd uchun kontent generatsiya (bitta so'rovda)
-    bullets_per_slide = "6-8" if is_pro else "4-6"
+    # 2-QADAM: Kontentni KICHIK GURUHLARGA bo'lib generatsiya qilamiz.
+    # MUHIM: bitta katta so'rovda barcha slaydlarni so'rasak, AI JSON ni
+    # yarmida kesib qo'yadi -> slaydlar yetishmaydi (masalan 30 o'rniga 15).
+    # Shuning uchun har safar 5 tadan slayd so'raymiz va natijalarni birlashtiramiz.
+    bullets_per_slide = "6-8" if is_pro else "5-6"
     pro_note = "\n- PRO sifat: chuqurroq tahlil, aniq raqamlar, statistika va misollar bilan boyit" if is_pro else ""
-    titles_for_prompt = "\n".join([f"{i+1}. {t}" for i, t in enumerate(full_titles)])
-    content_prompt = f"""Sen "{lang_name}" tilida GOST standartidagi akademik taqdimot kontentini yozayotgan mutaxassissan.
+
+    async def _gen_batch(batch_titles: list) -> list:
+        titles_block = "\n".join([f'{j+1}. "{t}"' for j, t in enumerate(batch_titles)])
+        prompt = f"""Sen "{lang_name}" tilida GOST standartidagi akademik taqdimot kontentini yozayotgan mutaxassissan.
 Mavzu: "{topic}"
 {f'Qo`shimcha talab: {extra}' if extra else ''}
 
-Quyidagi slaydlar uchun kontent yoz (sarlavhalar ALREADY berilgan, ularni O'ZGARTIRMA):
-{titles_for_prompt}
+Quyidagi {len(batch_titles)} ta slayd uchun kontent yoz. Sarlavhalarni AYNAN shu holida ishlat, O'ZGARTIRMA:
+{titles_block}
 
 QOIDALAR:
-- 2-slayd "Reja" — unda barcha bo'limlar ro'yxati bullet sifatida
-- Har slaydda {bullets_per_slide} ta to'liq, ma'lumotli bullet (har biri 12-20 so'z, faktlar bilan)
-- "Foydalanilgan adabiyotlar" slaydida 5-6 ta manba
-- Akademik, aniq, mazmunli yoz{pro_note}
+- Agar sarlavha "Reja"/"План"/"Plan" bo'lsa — taqdimotning asosiy bo'limlari ro'yxatini bullet qil
+- Agar sarlavha "Foydalanilgan adabiyotlar"/"References" bo'lsa — 6-7 ta real manba (GOST formatda)
+- Boshqa slaydlarda {bullets_per_slide} ta to'liq, ma'lumotli bullet (har biri 12-22 so'z, aniq faktlar bilan)
+- Bulletlar bir-birini takrorlamasin, akademik va mazmunli bo'lsin{pro_note}
 
-Aniq {len(full_titles)} ta obyektli JSON massiv qaytar. Har obyekt:
+Aniq {len(batch_titles)} ta obyektli JSON massiv qaytar. Har obyekt:
 {{"title": "<yuqoridagi aynan o'sha sarlavha>", "content": ["bullet1", "bullet2", ...], "notes": "ma'ruzachi uchun 2 jumla"}}
 
-Faqat to'g'ri to'liq JSON massiv. Markdown yo'q."""
+Faqat to'g'ri, to'liq JSON massiv. Markdown yo'q."""
+        for attempt in range(3):
+            try:
+                raw = await ai_generate(prompt, max_tokens=min(8000, 1500 + len(batch_titles) * 900), temperature=0.7)
+                raw = raw.strip()
+                if raw.startswith("```"):
+                    raw = raw.split("\n", 1)[1]
+                    if raw.endswith("```"):
+                        raw = raw[:-3]
+                arr = json.loads(raw.strip())
+                if isinstance(arr, list) and arr:
+                    return arr
+            except Exception as e:
+                logger.warning(f"PPT batch attempt {attempt + 1} failed: {e}")
+        return []
 
-    for attempt in range(2):
-        try:
-            content = await ai_generate(content_prompt, max_tokens=min(16000, 2000 + len(full_titles) * 700), temperature=0.7)
-            content = content.strip()
-            if content.startswith("```"):
-                content = content.split("\n", 1)[1]
-                if content.endswith("```"):
-                    content = content[:-3]
-            content = content.strip()
-            result = json.loads(content)
-            # Sarlavhalarni majburan to'g'rilash (AI o'zgartirgan bo'lsa)
-            for i, item in enumerate(result):
-                if i < len(full_titles):
-                    item["title"] = full_titles[i]
-            return result
-        except json.JSONDecodeError as e:
-            logger.warning(f"PPT JSON parse attempt {attempt + 1} failed: {e}")
-            if attempt == 0:
-                content_prompt += "\n\nMUHIM: Avvalgi javob buzuq JSON edi. Bulletlarni QISQA qil (max 15 so'z). To'liq, to'g'ri JSON massiv qaytar."
-                continue
+    results = []
+    BATCH = 5
+    for bi in range(0, len(full_titles), BATCH):
+        batch_titles = full_titles[bi:bi + BATCH]
+        arr = await _gen_batch(batch_titles)
+        # Har slaydni sarlavhasiga majburan bog'laymiz va yetishmaganini to'ldiramiz
+        for k, t in enumerate(batch_titles):
+            if k < len(arr) and isinstance(arr[k], dict) and arr[k].get("content"):
+                item = arr[k]
+                item["title"] = t
+                results.append(item)
             else:
-                logger.error(f"PPT JSON parse error (final): {e}")
-                raise Exception("AI noto'g'ri format qaytardi (JSONDecodeError)")
+                # Zaxira — slayd hech qachon bo'sh qolmasin
+                results.append({
+                    "title": t,
+                    "content": [f"{t} bo'yicha asosiy ma'lumotlar va tahlil",
+                                "Mavzuning muhim jihatlari va xulosalari"],
+                    "notes": ""
+                })
+
+    # "Reja" slaydini kafolatlangan tarzda bo'limlar ro'yxati bilan to'ldiramiz
+    for item in results:
+        if item.get("title") == plan_t:
+            item["content"] = main_titles[:]
+            break
+
+    return results[:len(full_titles)]
 
 
 def _has_image_source() -> bool:
@@ -751,8 +789,10 @@ async def generate_document_content(topic: str, doc_type: str, pages: int, lang:
     words_per_page = 250
     total_words = pages * words_per_page
 
-    # Sahifalar soniga qarab bo'limlar soni (ko'p sahifa = ko'p bo'lim)
-    num_sections = max(4, min(10, pages // 4))
+    # Sahifalar soniga qarab bo'limlar soni — ko'p sahifa = ko'p bo'lim.
+    # Har bo'lim ~1.5-2 sahifa bo'lishi uchun bo'lim sonini sahifaga moslaymiz.
+    # 10 sahifa -> 4 bo'lim, 15 -> 6, 20 -> 9, 25 -> 11, 30 -> 14
+    num_sections = max(4, min(16, (pages - 2) // 2))
 
     # 1-QADAM: Reja tuzish — HAQIQIY, mazmunli bo'lim nomlari
     plan_prompt = f"""Sen "{lang_name}" tilida GOST standartidagi akademik "{doc_type}" yozayotgan professional mutaxassissan.
@@ -782,7 +822,7 @@ Faqat JSON qaytar:
 }}
 Faqat to'g'ri JSON qaytar. Markdown ishlatma."""
 
-    plan_text = await ai_generate(plan_prompt, max_tokens=1000, temperature=0.7)
+    plan_text = await ai_generate(plan_prompt, max_tokens=min(2500, 800 + num_sections * 50), temperature=0.7)
     plan_text = plan_text.strip()
     if plan_text.startswith("```"):
         plan_text = plan_text.split("\n", 1)[1]
@@ -833,53 +873,78 @@ Faqat to'g'ri JSON qaytar. Markdown ishlatma."""
             }
 
     title = plan.get("title", topic) or topic
-    section_headings = plan.get("sections", [])
-    if _is_bad_sections(section_headings):
-        section_headings = [
-            f"{topic}: mohiyati va asosiy tushunchalari",
-            f"{topic}ning zamonaviy holati va tahlili",
-            f"{topic} sohasidagi muammolar va ularning yechimlari",
-            f"{topic}ning rivojlanish istiqbollari",
+    section_headings = [str(s).strip() for s in plan.get("sections", []) if str(s).strip()]
+
+    # Yomon (umumiy) sarlavhalarni alohida filtrlaymiz
+    def _bad_one(s):
+        sl = (s or "").lower().strip()
+        if not sl or len(sl) < 12:
+            return True
+        if sl.startswith(("bob", "1-", "2-", "3-", "4-", "5-", "bo'lim", "bolim")):
+            return True
+        if "bo'lim" in sl and len(sl) < 18:
+            return True
+        return False
+
+    section_headings = [s for s in section_headings if not _bad_one(s)]
+
+    # Yetarli bo'lim bo'lmasa — mavzuga oid jihatlar bilan to'ldiramiz (takrorsiz)
+    if len(section_headings) < num_sections:
+        _aspects = [
+            "mohiyati va asosiy tushunchalari", "tarixiy shakllanishi va rivojlanishi",
+            "zamonaviy holati va tahlili", "asosiy tamoyillari va xususiyatlari",
+            "turlari, tasnifi va tuzilishi", "ahamiyati va amaliy roli",
+            "amaliy qo'llanilishi va misollari", "qiyosiy tahlili va baholanishi",
+            "sohadagi muammolar va ularning yechimlari", "xalqaro tajriba va qiyoslash",
+            "statistik ko'rsatkichlari va dinamikasi", "samaradorligini oshirish yo'llari",
+            "ta'siri, natijalari va oqibatlari", "rivojlanish istiqbollari va kelajagi",
+            "innovatsion yondashuvlar va tendensiyalar", "umumiy xulosalar va tavsiyalar",
         ]
+        i = 0
+        while len(section_headings) < num_sections:
+            section_headings.append(f"{topic}: {_aspects[i % len(_aspects)]}")
+            i += 1
+    section_headings = section_headings[:num_sections]
     
     # 2-QADAM: Kirish — batafsil
-    words_per_section = total_words // (len(section_headings) + 2)
-    
+    words_per_section = max(420, total_words // (len(section_headings) + 2))
+    intro_words = max(420, words_per_section)
+
     intro_prompt = f"""Write a detailed INTRODUCTION (Kirish) for a GOST-standard {doc_type} in {lang_name} language.
 Topic: {title}
-Length: {max(words_per_section, 300)} words minimum.
+Length: STRICTLY {intro_words} words minimum (this is about 1.5 pages — do NOT write less).
 
-The introduction MUST include:
+The introduction MUST include these parts, each as a separate full paragraph:
 1. Mavzuning dolzarbligi (relevance) — why this topic matters today (2-3 paragraphs)
 2. Ishning maqsadi (goal) — clearly state the main goal
 3. Vazifalar (tasks) — list 4-5 specific tasks
 4. Tadqiqot usullari (methods) — what methods were used
 5. Ishning tuzilishi — brief overview of the structure
 
-Write in academic style. Use LONG, detailed paragraphs. Fill the page completely.
-Return ONLY the text, no JSON, no markdown formatting."""
+Write 6-8 LONG paragraphs, each 5-7 sentences. Academic style. Fill the page completely.
+Do NOT repeat sentences. Return ONLY the text, no JSON, no markdown formatting."""
 
     introduction = await ai_generate(intro_prompt, max_tokens=4000, temperature=0.7)
     
     # 3-QADAM: Har bir bo'limni alohida generatsiya — TO'LIQ va BOY kontent
     sections = []
     for i, heading in enumerate(section_headings):
+        prev_headings = ", ".join(h for j, h in enumerate(section_headings) if j != i) or "—"
         section_prompt = f"""Write section "{heading}" for a GOST-standard academic {doc_type} in {lang_name} language.
 Topic: {title}
 This is section {i+1} of {len(section_headings)}.
 
 REQUIREMENTS:
-- Length: minimum {max(words_per_section, 400)} words
-- Write 4-6 LONG detailed paragraphs
-- Use academic writing style
-- Include facts, statistics, analysis
-- Each paragraph should be at least 4-5 sentences long
-- Fill the page completely — o'qituvchi "kam" demasligi kerak!
-- Write substantive academic content, not filler
+- Length: STRICTLY at least {words_per_section} words (about 1.5-2 pages). Do NOT write less.
+- Write exactly 6-8 LONG detailed paragraphs, each paragraph 5-7 full sentences
+- Academic writing style with facts, statistics, examples and analysis
+- Cover ONLY this section's specific aspect. Other sections are: {prev_headings}
+- Do NOT repeat content from other sections. Do NOT repeat sentences.
+- Fill the pages completely — o'qituvchi "kam" demasligi kerak!
 
 Return ONLY the section text, no heading, no JSON, no markdown."""
 
-        section_content = await ai_generate(section_prompt, max_tokens=4000, temperature=0.7)
+        section_content = await ai_generate(section_prompt, max_tokens=4000, temperature=0.75)
         sections.append({"heading": heading, "content": section_content.strip()})
     
     # 4-QADAM: Xulosa — batafsil
@@ -887,28 +952,29 @@ Return ONLY the section text, no heading, no JSON, no markdown."""
 Topic: {title}
 Sections covered: {', '.join(section_headings)}
 
-Length: minimum {max(words_per_section, 300)} words.
+Length: STRICTLY {max(420, words_per_section)} words minimum (about 1.5 pages). Do NOT write less.
 
-The conclusion MUST include:
+The conclusion MUST include, each as a full paragraph:
 1. Summary of key findings from each section
 2. Main results achieved
 3. Practical significance
 4. Recommendations for further research
 
-Write in academic style. Use detailed paragraphs. Fill the page.
+Write 5-7 LONG paragraphs, each 5-7 sentences. Academic style. Do NOT repeat sentences.
 Return ONLY the text, no JSON, no markdown."""
 
-    conclusion = await ai_generate(conclusion_prompt, max_tokens=3000, temperature=0.7)
+    conclusion = await ai_generate(conclusion_prompt, max_tokens=3500, temperature=0.7)
     
     # 5-QADAM: Adabiyotlar
     refs = []
     if references:
-        refs_prompt = f"""Generate a list of 8-10 academic references/bibliography for a {doc_type} about "{title}" in {lang_name} language.
+        n_refs = max(10, min(20, num_sections + 6))
+        refs_prompt = f"""Generate a list of {n_refs} academic references/bibliography for a {doc_type} about "{title}" in {lang_name} language.
 Format each reference in GOST standard (Author. Title. — City: Publisher, Year. — Pages.)
-Include: books, journal articles, laws/regulations, internet sources.
-Return each reference on a new line, numbered 1-10. Return ONLY the list."""
+Include a mix: books, journal articles, laws/regulations, dissertations, internet sources (with URL).
+Use realistic recent years (2015-2024). Return each reference on a new line, numbered 1-{n_refs}. Return ONLY the list."""
         
-        refs_text = await ai_generate(refs_prompt, max_tokens=2000, temperature=0.7)
+        refs_text = await ai_generate(refs_prompt, max_tokens=2500, temperature=0.7)
         for line in refs_text.strip().split("\n"):
             line = line.strip()
             if line and len(line) > 10:
@@ -922,7 +988,7 @@ Return each reference on a new line, numbered 1-10. Return ONLY the list."""
         "introduction": introduction.strip(),
         "sections": sections,
         "conclusion": conclusion.strip(),
-        "references": refs[:10]
+        "references": refs[:20]
     }
 
 
