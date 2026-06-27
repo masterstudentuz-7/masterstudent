@@ -233,7 +233,7 @@ def _add_gost_heading(doc: Document, text: str, level: int = 1):
     # Oxirida nuqtani olib tashlash
     clean_text = text.rstrip(".")
     
-    run = p.add_run(clean_text.upper() if level == 1 else clean_text)
+    run = p.add_run(clean_text)
     run.font.name = "Times New Roman"
     run.font.size = DocxPt(14)
     run.font.bold = True
@@ -383,8 +383,8 @@ async def generate_ppt_content(topic: str, slides: int, purpose: str, lang: str,
     """
     lang_name = {"uz": "O'zbek", "ru": "Русский", "en": "English"}.get(lang, "O'zbek")
 
-    # Asosiy qism slaydlari soni = jami - (titul + reja + kirish + xulosa + adabiyotlar)
-    main_count = max(1, slides - 5)
+    # Asosiy qism slaydlari soni = jami - (titul + reja + kirish + xulosa + adabiyotlar + rahmat)
+    main_count = max(1, slides - 6)
 
     # 1-QADAM: REJA tuzish — mazmunli sarlavhalar
     plan_prompt = f"""Sen "{lang_name}" tilida GOST standartidagi akademik taqdimot (PPT) tayyorlayotgan mutaxassissan.
@@ -444,9 +444,10 @@ Faqat to'g'ri JSON. Markdown yo'q."""
     plan_t = {"uz": "Reja", "ru": "План", "en": "Plan"}.get(lang, "Reja")
     concl_t = {"uz": "Xulosa", "ru": "Заключение", "en": "Conclusion"}.get(lang, "Xulosa")
     refs_t = {"uz": "Foydalanilgan adabiyotlar", "ru": "Использованная литература", "en": "References"}.get(lang, "Foydalanilgan adabiyotlar")
+    thanks_t = {"uz": "E'tiboringiz uchun rahmat!", "ru": "Спасибо за внимание!", "en": "Thank you for your attention!"}.get(lang, "E'tiboringiz uchun rahmat!")
 
-    # To'liq slayd sarlavhalari ro'yxati
-    full_titles = [topic, plan_t, intro_t] + main_titles + [concl_t, refs_t]
+    # To'liq slayd sarlavhalari ro'yxati (oxirida "rahmat" slaydi — shablondagidek)
+    full_titles = [topic, plan_t, intro_t] + main_titles + [concl_t, refs_t, thanks_t]
 
     # 2-QADAM: Kontentni KICHIK GURUHLARGA bo'lib generatsiya qilamiz.
     # MUHIM: bitta katta so'rovda barcha slaydlarni so'rasak, AI JSON ni
@@ -491,8 +492,10 @@ Faqat to'g'ri, to'liq JSON massiv. Markdown yo'q."""
 
     results = []
     BATCH = 5
-    for bi in range(0, len(full_titles), BATCH):
-        batch_titles = full_titles[bi:bi + BATCH]
+    # "Rahmat" slaydiga AI kontent kerak emas — uni alohida qo'shamiz
+    gen_titles = full_titles[:-1]
+    for bi in range(0, len(gen_titles), BATCH):
+        batch_titles = gen_titles[bi:bi + BATCH]
         arr = await _gen_batch(batch_titles)
         # Har slaydni sarlavhasiga majburan bog'laymiz va yetishmaganini to'ldiramiz
         for k, t in enumerate(batch_titles):
@@ -514,6 +517,9 @@ Faqat to'g'ri, to'liq JSON massiv. Markdown yo'q."""
         if item.get("title") == plan_t:
             item["content"] = main_titles[:]
             break
+
+    # Oxirgi slayd — "E'tiboringiz uchun rahmat!" (bullet yo'q, markazda)
+    results.append({"title": thanks_t, "content": [], "notes": "", "kind": "thanks"})
 
     return results[:len(full_titles)]
 
@@ -713,12 +719,27 @@ async def create_ppt_file(topic: str, slides_count: int, design: str, purpose: s
             sub = slide.shapes.add_textbox(Inches(1), Inches(5.0), Inches(11.3), Inches(0.8))
             stf = sub.text_frame
             sp = stf.paragraphs[0]
-            sp.text = "MasterStudent — NOVA AI AI tomonidan tayyorlandi"
+            sp.text = "MasterStudent — NOVA AI tomonidan tayyorlandi"
             sp.font.size = Pt(16)
             sp.font.name = "Times New Roman"
             sp.font.italic = True
             sp.font.color.rgb = RGBColor.from_string(colors["text"])
             sp.alignment = PP_ALIGN.CENTER
+            continue
+        
+        # === RAHMAT SLAYDI (oxirgi, markazda katta yozuv) ===
+        if slide_data.get("kind") == "thanks":
+            _add_decorative_elements(slide, colors, idx, total)
+            txBox = slide.shapes.add_textbox(Inches(1), Inches(3.0), Inches(11.3), Inches(1.6))
+            tf = txBox.text_frame
+            tf.word_wrap = True
+            p = tf.paragraphs[0]
+            p.text = slide_data.get("title", "E'tiboringiz uchun rahmat!")
+            p.font.size = Pt(44)
+            p.font.name = "Times New Roman"
+            p.font.bold = True
+            p.font.color.rgb = RGBColor.from_string(colors["title"])
+            p.alignment = PP_ALIGN.CENTER
             continue
         
         # === KONTENT SLAYDLARI ===
@@ -789,10 +810,23 @@ async def generate_document_content(topic: str, doc_type: str, pages: int, lang:
     words_per_page = 250
     total_words = pages * words_per_page
 
-    # Sahifalar soniga qarab bo'limlar soni — ko'p sahifa = ko'p bo'lim.
-    # Har bo'lim ~1.5-2 sahifa bo'lishi uchun bo'lim sonini sahifaga moslaymiz.
-    # 10 sahifa -> 4 bo'lim, 15 -> 6, 20 -> 9, 25 -> 11, 30 -> 14
-    num_sections = max(4, min(16, (pages - 2) // 2))
+    # Shablon ("Shablon mustaqil ish.docx") tuzilishi: BOB -> kichik bo'limlar
+    # (I -> 1.1, 1.2 / II -> 2.1, 2.2 ...). Sahifaga qarab bob va kichik bo'lim
+    # soni moslanadi. Har kichik bo'lim ~1.5 sahifani to'ldiradi.
+    content_pages = max(4, pages - 4)
+    total_subs = max(4, round(content_pages / 1.5))
+    if total_subs <= 6:
+        num_chapters = 3
+    elif total_subs <= 9:
+        num_chapters = 4
+    else:
+        num_chapters = 5
+    _base, _extra = divmod(total_subs, num_chapters)
+    subs_per_chapter = [_base + (1 if c < _extra else 0) for c in range(num_chapters)]
+    subs_per_chapter = [max(1, n) for n in subs_per_chapter]
+    total_subs = sum(subs_per_chapter)
+    # Mavjud "section_headings" logikasi shu sondagi kichik bo'lim sarlavhasini beradi
+    num_sections = total_subs
 
     # 1-QADAM: Reja tuzish — HAQIQIY, mazmunli bo'lim nomlari
     plan_prompt = f"""Sen "{lang_name}" tilida GOST standartidagi akademik "{doc_type}" yozayotgan professional mutaxassissan.
@@ -983,10 +1017,57 @@ Use realistic recent years (2015-2024). Return each reference on a new line, num
                     line = line.split(".", 1)[1].strip()
                 refs.append(line)
     
+    # 6-QADAM: kichik bo'limlarni BOBLARGA guruhlash (shablon: I -> 1.1, 1.2 ...)
+    groups = []
+    _idx = 0
+    for n in subs_per_chapter:
+        groups.append(sections[_idx:_idx + n])
+        _idx += n
+    if _idx < len(sections):
+        groups[-1].extend(sections[_idx:])
+    groups = [g for g in groups if g]  # bo'sh boblarni olib tashlaymiz
+
+    # Har bob uchun umumiy, qamrovli sarlavha (kichik bo'lim nomlariga asoslanib)
+    chap_title_prompt = (
+        f'Quyida "{title}" mavzusidagi {doc_type} ning boblar bo\'yicha kichik bo\'limlari berilgan.\n'
+        f"Har bir BOB uchun umumiy, mazmunli va qamrovli sarlavha yoz ({lang_name} tilida).\n\n"
+        + "\n".join(
+            f"BOB {ci + 1} kichik bo'limlari: " + "; ".join(s["heading"] for s in g)
+            for ci, g in enumerate(groups)
+        )
+        + f"\n\nFaqat JSON massiv qaytar (aniq {len(groups)} ta sarlavha):\n"
+        + '["1-bob sarlavhasi", "2-bob sarlavhasi", ...]\nMarkdown yo\'q.'
+    )
+    chapter_titles = []
+    try:
+        ct = await ai_generate(chap_title_prompt, max_tokens=900, temperature=0.6)
+        ct = ct.strip()
+        if ct.startswith("```"):
+            ct = ct.split("\n", 1)[1]
+            if ct.endswith("```"):
+                ct = ct[:-3]
+        parsed = json.loads(ct.strip())
+        if isinstance(parsed, list):
+            chapter_titles = [str(x).strip() for x in parsed if str(x).strip()]
+    except Exception:
+        chapter_titles = []
+    # Yetishmasa — kichik bo'lim nomidan foydalanamiz
+    while len(chapter_titles) < len(groups):
+        gi = len(chapter_titles)
+        chapter_titles.append(groups[gi][0]["heading"] if groups[gi] else topic)
+    chapter_titles = chapter_titles[:len(groups)]
+
+    chapters = []
+    for ci, g in enumerate(groups):
+        chapters.append({
+            "title": chapter_titles[ci],
+            "subsections": [{"title": s["heading"], "content": s["content"]} for s in g],
+        })
+
     return {
         "title": title,
         "introduction": introduction.strip(),
-        "sections": sections,
+        "chapters": chapters,
         "conclusion": conclusion.strip(),
         "references": refs[:20]
     }
@@ -1004,18 +1085,21 @@ async def create_document_file(topic: str, doc_type: str, pages: int, lang: str,
     # === TITUL VARAQ (GOST) ===
     _add_gost_title_page(doc, data.get("title", topic), doc_type, lang)
     
-    # === MUNDARIJA ===
-    toc_title = {"uz": "MUNDARIJA", "ru": "СОДЕРЖАНИЕ", "en": "TABLE OF CONTENTS"}
+    # === REJA (shablondagidek) ===
+    toc_title = {"uz": "Reja", "ru": "План", "en": "Plan"}
     _add_gost_heading(doc, toc_title.get(lang, toc_title["uz"]), level=1)
     
     # Mundarija elementlari
     intro_name = {"uz": "Kirish", "ru": "Введение", "en": "Introduction"}
     conclusion_name = {"uz": "Xulosa", "ru": "Заключение", "en": "Conclusion"}
     ref_name = {"uz": "Foydalanilgan adabiyotlar", "ru": "Список литературы", "en": "References"}
+    roman = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"]
     
+    # Reja faqat asosiy BOBLARNI ko'rsatadi (shablon tuzilishi)
     toc_items = [intro_name.get(lang, "Kirish")]
-    for i, section in enumerate(data.get("sections", []), 1):
-        toc_items.append(f"{i}. {section.get('heading', '')}")
+    for ci, chapter in enumerate(data.get("chapters", [])):
+        rn = roman[ci] if ci < len(roman) else str(ci + 1)
+        toc_items.append(f"{rn}. {chapter.get('title', '')}")
     toc_items.append(conclusion_name.get(lang, "Xulosa"))
     if references:
         toc_items.append(ref_name.get(lang, "Adabiyotlar"))
@@ -1040,17 +1124,15 @@ async def create_document_file(topic: str, doc_type: str, pages: int, lang: str,
     
     doc.add_page_break()
     
-    # === ASOSIY QISM (GOST) ===
-    for i, section in enumerate(data.get("sections", []), 1):
-        heading = section.get("heading", f"Bo'lim {i}")
-        _add_gost_heading(doc, f"{i}. {heading}", level=1)
-        
-        content = section.get("content", "")
-        for para in content.split("\n"):
-            if para.strip():
-                _add_gost_paragraph(doc, para.strip())
-        
-        # Har bir bo'limdan keyin bo'sh joy (lekin page break yo'q — GOST shunday)
+    # === ASOSIY QISM (GOST) — BOB -> kichik bo'lim (shablon tuzilishi) ===
+    for ci, chapter in enumerate(data.get("chapters", [])):
+        rn = roman[ci] if ci < len(roman) else str(ci + 1)
+        _add_gost_heading(doc, f"{rn}. {chapter.get('title', '')}", level=1)
+        for si, sub in enumerate(chapter.get("subsections", []), 1):
+            _add_gost_heading(doc, f"{ci + 1}.{si} {sub.get('title', '')}", level=2)
+            for para in sub.get("content", "").split("\n"):
+                if para.strip():
+                    _add_gost_paragraph(doc, para.strip())
     
     doc.add_page_break()
     
